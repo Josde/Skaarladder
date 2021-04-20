@@ -1,1 +1,1 @@
-web: python manage.py runserver 8000
+web: gunicorn application.wsgi
