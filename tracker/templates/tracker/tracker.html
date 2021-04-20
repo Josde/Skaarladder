@@ -1,0 +1,19 @@
+{# tutorial/templates/tutorial/people.html #}
+{% load render_table from django_tables2 %}
+<!doctype html>
+<html>
+    <head>
+        <title>LISTA DE CHAVALES</title>
+    </head>
+    <body>
+        <center>
+            <h1>SOLOQ CHALLENGE DE LOS NOTAS</h1>
+            {% render_table object_list %}
+            <form action="{% url 'index' %}" method="post">
+                <input type="submit" value="Recargar Datos" name="botonDatos">
+                {%csrf_token%}
+            </form>
+            <p>Ultima Actualización: {{ date }}</p>
+        </center>
+    </body>
+</html>
