@@ -17,7 +17,7 @@ class LeagueDataListView(ListView):
         return ctx
 
 def index(request):
-    if MiscData.objects.first() is None:
+    if MiscData.objects.count() == 0:
         MiscData.objects.create(date=datetime.now)
     else:
         MiscData.objects.first().delete();
