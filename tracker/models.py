@@ -8,6 +8,6 @@ class LeagueData(models.Model):
     points = models.IntegerField()
     wins = models.IntegerField()
     losses = models.IntegerField()
+    winrate = models.FloatField()
+    progress = models.IntegerField()
 
-class MiscData(models.Model):
-    date = models.DateTimeField(auto_now_add=True)

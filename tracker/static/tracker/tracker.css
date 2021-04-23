@@ -1,0 +1,36 @@
+html {
+  background: url("res/bg.png") no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+
+}
+.center {
+    background-color:rgba(255, 255, 255, 1);
+    box-shadow: 0px 10px 50px 3px #1b1b1b;
+    display:flex;
+    flex-direction:column;
+    vertical-align:center;
+    text-align:center;
+    justify-content: center;
+    align-items: center;
+    horiz-align:center;
+}
+
+#title {
+    font-family: 'MedievalSharp', cursive;
+    font-weight:lighter;
+}
+
+.ranktable, th, td {
+    border: 1px solid black;
+    margin:10px;
+    padding:5px;
+}
