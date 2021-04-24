@@ -36,10 +36,13 @@ def updateData():
     region = os.environ.get("REGION")
     playernames = os.environ.get("PLAYERS").split(",")
     startingRanks = os.environ.get("STARTING_RANKS").split(",")
+    ignoredPlayers = os.environ.get("IGNORED_PLAYERS").split(",")
     for str, str2 in zip(playernames, startingRanks):
         summonerData = lolWatcher.summoner.by_name(region, str)
         allLeagueData = lolWatcher.league.by_summoner(region, summonerData['id'])
         startingRankSplit = list(filter(None, str2.split(" ")))
+        if (str in ignoredPlayers): #skip players in ignored player list
+            continue
         for element in allLeagueData:
             if (element['queueType'] == "RANKED_SOLO_5x5"):
                 leagueData = element
