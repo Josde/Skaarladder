@@ -1,0 +1,1 @@
+web: gunicorn SimpleSoloQTracker.wsgi:application
