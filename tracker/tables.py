@@ -1,5 +1,7 @@
 import django_tables2 as tables
+
 from .models import LeagueData
+
 
 class LeagueTable(tables.Table):
     class Meta:
@@ -7,7 +9,7 @@ class LeagueTable(tables.Table):
         template_name = "django_tables2/bootstrap.html"
         fields = ("name", "tier", "rank", "points", "wins", "losses", "winrate", "progress")
         attrs = {"class": "ranktable"}
-        orderable = False; # disable header clicking
+        orderable = False  # disable header clicking
 
     def render_winrate(self, value, column):
         if value > 0.5:
