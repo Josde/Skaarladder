@@ -16,7 +16,11 @@ class LeagueDataListView(SingleTableView):
 
     def get_context_data(self, **kwargs):
         ctx = super(LeagueDataListView, self).get_context_data(**kwargs)
-        ctx['date'] = datetime.now;
+        ctx['date'] = datetime.now().strftime("%d %B, %Y, %H:%M:%S")
+        timeDelta = datetime(2021, 7, 1) - datetime.now()
+        hours, rem = divmod(timeDelta.seconds, 3600)
+        mins, secs = divmod(rem, 60)
+        ctx['timeLeft'] = "{0} dias, {1} horas y {2} minutos".format(timeDelta.days, hours, mins)
         return ctx
 
 

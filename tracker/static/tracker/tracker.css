@@ -9,11 +9,13 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction:column;
     min-height: 100vh;
 
 }
 .center {
     background-color:rgba(255, 255, 255, 1);
+    margin-top: auto;
     box-shadow: 0px 10px 50px 3px #1b1b1b;
     display:flex;
     flex-direction:column;
@@ -24,6 +26,15 @@ body {
     horiz-align:center;
 }
 
+.bottom {
+    margin-top: 40vh;
+    display:flex;
+    flex-direction:column;
+    vertical-align:bottom;
+    justify-content: center;
+    align-items: center;
+    horiz-align:center;
+}
 #title {
     font-family: 'MedievalSharp', cursive;
     font-weight:lighter;

@@ -8,7 +8,7 @@
         <link href="http://fonts.cdnfonts.com/css/edo-sz" rel="stylesheet">
         <link rel="preconnect" href="https://fonts.gstatic.com">
         <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
-        <title>LISTA DE CHAVALES</title>
+        <title>SOLOQ CHALLENGE</title>
     </head>
     <body>
         <center>
@@ -20,7 +20,11 @@
                 {%csrf_token%}
             </form>
             <p>Ultima Actualización: <b>{{ date }}</b></p>
+            <p>Quedan <b>{{ timeLeft }}</b></p>
         </div>
         </center>
+    <div class="bottom" align="center">
+        <a href="https://github.com/Josde/SimpleSoloQTracker"><img src="{% static 'tracker/res/github.png' %}" style="border-radius: 50px; box-shadow: 0px 0px 100px 20px rgba(255, 255, 255, 0.8);"></a>
+    </div>
     </body>
 </html>
