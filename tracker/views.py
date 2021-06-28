@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from .tables import LeagueTable
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
@@ -18,9 +18,13 @@ class LeagueDataListView(SingleTableView):
         ctx = super(LeagueDataListView, self).get_context_data(**kwargs)
         ctx['date'] = datetime.now().strftime("%d %B, %Y, %H:%M:%S")
         timeDelta = datetime(int(os.getenv("ENDDATE_YEAR")), int(os.getenv("ENDDATE_MONTH")), int(os.getenv("ENDDATE_DAY"))) - datetime.now()
-        hours, rem = divmod(timeDelta.seconds, 3600)
-        mins, secs = divmod(rem, 60)
-        ctx['timeLeft'] = "{0} dias, {1} horas y {2} minutos".format(timeDelta.days, hours, mins)
+        if (timeDelta > timedelta(seconds=0)):
+            hours, rem = divmod(timeDelta.seconds, 3600)
+            mins, secs = divmod(rem, 60)
+            ctx['timeLeft'] = "Quedan {0} dias, {1} horas y {2} minutos".format(timeDelta.days, hours, mins)
+        else:
+            players = self.model.objects.order_by('-progress');
+            ctx['timeLeft'] = "🎉🎉 El ganador es... ¡¡{0}!! 🎉🎉".format(players[0].name);
         return ctx
 
 
