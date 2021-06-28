@@ -21,10 +21,10 @@ class LeagueDataListView(SingleTableView):
         if (timeDelta > timedelta(seconds=0)):
             hours, rem = divmod(timeDelta.seconds, 3600)
             mins, secs = divmod(rem, 60)
-            ctx['timeLeft'] = "Quedan {0} dias, {1} horas y {2} minutos".format(timeDelta.days, hours, mins)
+            ctx['bottomMessage'] = "Quedan {0} dias, {1} horas y {2} minutos".format(timeDelta.days, hours, mins)
         else:
             players = self.model.objects.order_by('-progress');
-            ctx['timeLeft'] = "🎉🎉 El ganador es... ¡¡{0}!! 🎉🎉".format(players[0].name);
+            ctx['bottomMessage'] = "🎉🎉 El ganador es... ¡¡{0}!! 🎉🎉".format(players[0].name);
         return ctx
 
 
