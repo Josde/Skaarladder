@@ -24,7 +24,10 @@ class LeagueDataListView(SingleTableView):
             ctx['bottomMessage'] = "Quedan {0} dias, {1} horas y {2} minutos".format(timeDelta.days, hours, mins)
         else:
             players = self.model.objects.order_by('-progress');
-            ctx['bottomMessage'] = "🎉🎉 El ganador es... ¡¡{0}!! 🎉🎉".format(players[0].name);
+            if len(players) != 0:
+                ctx['bottomMessage'] = "🎉🎉 El ganador es... ¡¡{0}!! 🎉🎉".format(players[0].name)
+            else:
+                ctx['bottomMessage'] = "El reto ya ha acabado."
         return ctx
 
 

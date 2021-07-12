@@ -12,15 +12,15 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import django_heroku
+import os
+import dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+dotenv.load_dotenv()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure--d=zr++tb%93fqa+$&p(8s(!7d0#by0s&f%(j@%&2=1-z331^g'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -124,6 +124,10 @@ STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
-
+#TODO: Implement this https://stackoverflow.com/a/28323779
+#TODO: Start using Heroku PostgreSQL https://devcenter.heroku.com/articles/heroku-postgresql#connecting-with-django
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = os.getenv("SECRET_KEY")
 django_heroku.settings(locals())
+

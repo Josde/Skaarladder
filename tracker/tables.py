@@ -1,4 +1,5 @@
 import django_tables2 as tables
+from django.utils.html import format_html
 
 from .models import LeagueData
 
@@ -10,6 +11,9 @@ class LeagueTable(tables.Table):
         fields = ("name", "tier", "rank", "points", "wins", "losses", "winrate", "progress")
         attrs = {"class": "ranktable"}
         orderable = False  # disable header clicking
+    def render_name(self, value, column):
+        sanitized_name = value.replace(" ", "+")
+        return format_html('<a href=https://euw.op.gg/summoner/userName={0}>{1}</a>'.format(sanitized_name, value))
 
     def render_winrate(self, value, column):
         if value > 0.5:
@@ -24,3 +28,5 @@ class LeagueTable(tables.Table):
         elif value < 0:
             column.attrs = {'td': {'style': 'color:red'}}
         return "{0}LP".format(value)
+
+
