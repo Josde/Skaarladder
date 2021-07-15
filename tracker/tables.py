@@ -12,6 +12,7 @@ class LeagueTable(tables.Table):
         attrs = {"class": "ranktable"}
         orderable = False  # disable header clicking
     def render_name(self, value, column):
+        #TODO: This is currently hardcoded to be EUW OPGG.
         sanitized_name = value.replace(" ", "+")
         return format_html('<a href=https://euw.op.gg/summoner/userName={0}>{1}</a>'.format(sanitized_name, value))
 
