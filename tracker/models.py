@@ -18,4 +18,4 @@ class TrackedPlayers(models.Model):
     startingPoints = models.IntegerField()
     region = models.CharField(max_length=10)
 
-#TODO: Add "Challenge" database that holds the end date, name and playernames. This way we can hold multiple challenges in the same site, and also so we don't need to set ENDDATE through env variables.
+#TODO: Add "Challenge" database that holds the challenge name, queue type, end date, and playernames. This way we can hold multiple challenges in the same site, and also so we don't need to set ENDDATE through env variables.

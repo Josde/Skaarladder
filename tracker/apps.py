@@ -14,9 +14,10 @@ class TrackerConfig(AppConfig):
         # populate TrackerPlayers model
         # TODO: Improve "REGION" usability by making it a list.
         region = os.environ.get("REGION", default="euw1")
+        queueType = os.environ.get("QUEUE_TYPE", default="RANKED_SOLO_5x5")
+        # TODO: Skip this completely if config vars not set.
         playernames = os.environ.get("PLAYERS").split(",")
         startingRanks = os.environ.get("STARTING_RANKS").split(",")
-        queueType = os.environ.get("QUEUE_TYPE", default="RANKED_SOLO_5x5")
         for playerName, startingRank in zip(playernames, startingRanks):
             try:
                 # if player exists, we dont't have to do anything

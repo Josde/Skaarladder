@@ -6,7 +6,8 @@ Deploy this repo through a Heroku dyno. Configure the following config vars:
   - API_KEY: Your Riot Games API Key.
   - SECRET_KEY: Your Django secret key.
   - ENDDATE_YEAR, ENDDATE_MONTH, ENDDATE_DAY: The end date for your challenge
-  - REGION: The default region of your players. For example: euw1. If you don't set this, you can always modify the database manually, but it's a chore.
+  - REGION: The default region of your players. For example: euw1. If you don't set this, you can always modify the database manually, but it's a chore.  
+
 Optionally, you may configure these config vars. If you don't, you can always add more players through your Django admin panel: 
   - PLAYERS: Comma-separated player list. Example: player1, player2...
   - STARTING_RANKS: Comma-separated starting ranks, in "RANK TIER POINT" format. Example: BRONZE II 20,SILVER IV 100,GOLD I 0
