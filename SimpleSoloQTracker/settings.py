@@ -74,6 +74,7 @@ WSGI_APPLICATION = 'SimpleSoloQTracker.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
+# Actual database is set by django-on-heroku; this one is the local one for development.
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',

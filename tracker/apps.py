@@ -12,7 +12,8 @@ class TrackerConfig(AppConfig):
     def ready(self):
         from tracker.models import TrackedPlayers
         # populate TrackerPlayers model
-        region = os.environ.get("REGION")
+        # TODO: Improve "REGION" usability by making it a list.
+        region = os.environ.get("REGION", default="euw1")
         playernames = os.environ.get("PLAYERS").split(",")
         startingRanks = os.environ.get("STARTING_RANKS").split(",")
         queueType = os.environ.get("QUEUE_TYPE", default="RANKED_SOLO_5x5")
