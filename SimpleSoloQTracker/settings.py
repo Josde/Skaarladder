@@ -76,8 +76,13 @@ WSGI_APPLICATION = 'SimpleSoloQTracker.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'soloqtracker',
+        'USER': os.getenv('DATABASE_USER'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD'),
+        'HOST': 'localhost',
+        'PORT': '',
+        'CONN_MAX_AGE': 500
     }
 }
 
@@ -126,9 +131,9 @@ STATIC_URL = '/static/'
 #TODO: Start using Heroku PostgreSQL https://devcenter.heroku.com/articles/heroku-postgresql#connecting-with-django
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = os.environ.get('SECRET_KEY')
 import django_on_heroku
-django_on_heroku.settings(locals())
+django_on_heroku.settings(locals(), secret_key=False)
 
 
 
