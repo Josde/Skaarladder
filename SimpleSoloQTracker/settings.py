@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
-import django_heroku
 import os
 import dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -75,7 +74,6 @@ WSGI_APPLICATION = 'SimpleSoloQTracker.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -128,10 +126,9 @@ STATIC_URL = '/static/'
 #TODO: Start using Heroku PostgreSQL https://devcenter.heroku.com/articles/heroku-postgresql#connecting-with-django
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # SECURITY WARNING: keep the secret key used in production secret!
-if os.getenv("SECRET_KEY") != "":
-    #only for non-heroku environments, where secret_key variable must be set in .env
-    SECRET_KEY = os.getenv("SECRET_KEY")
-django_heroku.settings(locals())
+SECRET_KEY = os.getenv("SECRET_KEY")
+import django_on_heroku
+django_on_heroku.settings(locals())
 
 
 
