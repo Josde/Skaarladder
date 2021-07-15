@@ -128,6 +128,10 @@ STATIC_URL = '/static/'
 #TODO: Start using Heroku PostgreSQL https://devcenter.heroku.com/articles/heroku-postgresql#connecting-with-django
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY")
+if os.getenv("SECRET_KEY") != "":
+    #only for non-heroku environments, where secret_key variable must be set in .env
+    SECRET_KEY = os.getenv("SECRET_KEY")
 django_heroku.settings(locals())
+
+
 
