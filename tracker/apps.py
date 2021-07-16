@@ -69,7 +69,6 @@ class TrackerConfig(AppConfig):
                     print("[TrackedPlayers] Successfully created non-existing player", playerName)
                     player.save()
         from .models import Challenge
-        Challenge.objects.all().delete() #FIXME: Delete before pushing.
         if len(Challenge.objects.all()) != 0:
             print("[Challenge] A challenge is already configured. Skipping setup.")
             SKIP_CHALLENGE = True
