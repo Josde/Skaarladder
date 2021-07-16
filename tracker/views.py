@@ -1,10 +1,10 @@
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from .tables import LeagueTable
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 import riotwatcher
-from tracker.models import LeagueData, TrackedPlayers
+from tracker.models import LeagueData, TrackedPlayers, Challenge
 from django.views.generic import ListView
 from django_tables2 import SingleTableView
 from .misc import *
@@ -16,9 +16,13 @@ class LeagueDataListView(SingleTableView):
     ordering = "-progress"
 
     def get_context_data(self, **kwargs):
+        # This will never give an error because if no challenges are registered, we make one on ready()
+        challenge = Challenge.objects.first()
         ctx = super(LeagueDataListView, self).get_context_data(**kwargs)
-        ctx['date'] = datetime.now().strftime("%d %B, %Y, %H:%M:%S")
-        timeDelta = datetime(int(os.getenv("ENDDATE_YEAR")), int(os.getenv("ENDDATE_MONTH")), int(os.getenv("ENDDATE_DAY"))) - datetime.now()
+        #TODO: CurrentDate currently doesn't represent the last update time like it should.
+        ctx['currentDate'] = datetime.now().strftime("%d %B, %Y, %H:%M:%S")
+        ctx['endDate'] = challenge.endDate
+        timeDelta = challenge.endDate - date.today()
         if (timeDelta > timedelta(seconds=0)):
             hours, rem = divmod(timeDelta.seconds, 3600)
             mins, secs = divmod(rem, 60)

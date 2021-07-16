@@ -19,7 +19,10 @@
                 <input type="submit" value="Recargar Datos" name="botonDatos">
                 {%csrf_token%}
             </form>
-            <p>Ultima Actualización: <b>{{ date }}</b></p>
+            <br>
+            <a>Ultima Actualización: <b>{{ currentDate }}</b></a>
+            <br>
+            <a>El reto acaba el: <b>{{ endDate }}</b></a>
             <p><b>{{ bottomMessage }}</b></p>
         </div>
         </center>

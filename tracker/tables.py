@@ -3,7 +3,7 @@ from django.utils.html import format_html
 
 from .models import LeagueData
 
-
+#TODO: Once multiple Challenge support is added, add filtering to this table.
 class LeagueTable(tables.Table):
     class Meta:
         model = LeagueData

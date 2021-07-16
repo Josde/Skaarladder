@@ -13,7 +13,8 @@ class LeagueData(models.Model):
     winrate = models.FloatField()
     progress = models.IntegerField()
 
-
+# TODO: Add ChallengeList to either this or LeagueData so we can have multiple leaderboards. For now, Challenge is a glorified way to store a date.
+# Using Junction tables to store lists: https://stackoverflow.com/a/444268
 class TrackedPlayers(models.Model):
     name = models.CharField(max_length=100, primary_key=True)
     startingTier = models.CharField(max_length=30)
@@ -21,7 +22,7 @@ class TrackedPlayers(models.Model):
     startingPoints = models.IntegerField()
     region = models.CharField(max_length=10)
 
-#TODO: Add "Challenge" database that holds the challenge name, queue type, end date, and playernames. This way we can hold multiple challenges in the same site, and also so we don't need to set ENDDATE through env variables.
+
 
 
 class Challenge(models.Model):
