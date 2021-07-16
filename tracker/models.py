@@ -1,8 +1,10 @@
 from django.db import models
 
 # Create your models here.
+
+
 class LeagueData(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, primary_key=True)
     tier = models.CharField(max_length=100)
     rank = models.CharField(max_length=100)
     points = models.IntegerField()
@@ -11,11 +13,18 @@ class LeagueData(models.Model):
     winrate = models.FloatField()
     progress = models.IntegerField()
 
+
 class TrackedPlayers(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, primary_key=True)
     startingTier = models.CharField(max_length=30)
     startingRank = models.CharField(max_length=10)
     startingPoints = models.IntegerField()
     region = models.CharField(max_length=10)
 
 #TODO: Add "Challenge" database that holds the challenge name, queue type, end date, and playernames. This way we can hold multiple challenges in the same site, and also so we don't need to set ENDDATE through env variables.
+
+
+class Challenge(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=100)
+    endDate = models.DateField()

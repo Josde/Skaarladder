@@ -128,8 +128,6 @@ STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
-#TODO: Implement this https://stackoverflow.com/a/28323779
-#TODO: Start using Heroku PostgreSQL https://devcenter.heroku.com/articles/heroku-postgresql#connecting-with-django
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY')

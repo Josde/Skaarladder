@@ -10,19 +10,45 @@ class TrackerConfig(AppConfig):
     name = 'tracker'
 
     def ready(self):
+        regions = os.environ.get("REGION", default="")
+        playernames = os.environ.get("PLAYERS", default="")
+        startingRanks = os.environ.get("STARTING_RANKS", default="")
+
+        if (len(playernames) == 0 or len(startingRanks) == 0):
+            print("[Startup] No players / starting ranks detected in environment variables. Skipping initial setup.")
+            print("If you haven't added your players yet, you can still do so by setting environment variables and restarting.")
+            print("Or alternatively through Django control panel.")
+            return
+        else:
+            # If they are not blank, interpret as list.
+            playernames = os.environ.get("PLAYERS").split(",")
+            startingRanks = os.environ.get("STARTING_RANKS").split(",")
+        if len(playernames) != len(startingRanks):
+            print("[Startup] Player names ({0}) and starting ranks ({1}) don't match up, skipping initial setup.".format(len(playernames), len(startingRanks)))
+            print("If you haven't added your players yet, you can still do so by setting environment variables and restarting.")
+            print("Or alternatively through Django control panel.")
+            return
+        if len(regions) == 0:
+            # If blank, set default.
+            print("[Startup] No region detected, set default to EUW1")
+            regions = ["euw1"] * len(playernames)
+        else:
+            # If not blank, interpret as list.
+            regions = os.environ.get("REGION").split(",")
+        if len(regions) == 1:
+            # If its a one-element list, interpret as default for all users.
+            print("[Startup] Region is only one entry, interpreting as default for all users.")
+            regions = regions * len(playernames)
+
         from tracker.models import TrackedPlayers
         # populate TrackerPlayers model
-        # TODO: Improve "REGION" usability by making it a list.
-        region = os.environ.get("REGION", default="euw1")
-        queueType = os.environ.get("QUEUE_TYPE", default="RANKED_SOLO_5x5")
-        # TODO: Skip this completely if config vars not set.
-        playernames = os.environ.get("PLAYERS").split(",")
-        startingRanks = os.environ.get("STARTING_RANKS").split(",")
-        for playerName, startingRank in zip(playernames, startingRanks):
+        # This will be skipped if PLAYERS / STARTING_RANKS are not set or incorrect.
+        for playerName, startingRank, region in zip(playernames, startingRanks, regions):
             try:
                 # if player exists, we dont't have to do anything
                 player = TrackedPlayers.objects.get(name=playerName)
                 print("Player {0} already in tracked players, skipping.".format(playerName))
+                continue
             except ObjectDoesNotExist:
                 # if player does not exist, parse it from .env
                 try:
