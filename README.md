@@ -24,8 +24,13 @@ Clone the repo.
 Create a PostGreSQL database called "soloqtracker" and give all permissions to a user.  
 Configure your config vars in KEY=VALUE format and save as ".env" in the repo root folder.  
 When deploying locally, you will also need to configure the following config vars:  
-    - DATABASE_USER: Your PostGreSQL user for the app database.
-    - DATABASE_PASSWORD: Your user's password.
-Then, run "gunicorn SimpleSoloQTracker.wsgi:application"
+  - DATABASE_USER: Your PostGreSQL user for the app database.  
+  - DATABASE_PASSWORD: Your user's password. 
+
+Then, go into the project's folder and run:  
+  - python manage.py migrate --run-syncdb
+  - python manage.py createsuperuser  
+
+Finally, run "gunicorn SimpleSoloQTracker.wsgi:application". Your SoloQ tracker is now running!
 ## Demo
 You can check out a demo of this running at http://soloq.josde.me/
