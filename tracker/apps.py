@@ -17,7 +17,7 @@ class TrackerConfig(AppConfig):
         playernames = os.environ.get("PLAYERS", default="")
         startingRanks = os.environ.get("STARTING_RANKS", default="")
 
-        if (len(playernames) == 0 or len(startingRanks) == 0):
+        if len(playernames) == 0 or len(startingRanks) == 0:
             print("[Startup] No players / starting ranks detected in environment variables. Skipping initial setup.")
             print("If you haven't added your players yet, you can still do so by setting environment variables and restarting.")
             print("Or alternatively through Django control panel.")
@@ -57,7 +57,7 @@ class TrackerConfig(AppConfig):
                     # if player does not exist, parse it from .env
                     try:
                         startingRankSplit = startingRank.split(" ")
-                        if (len(startingRankSplit) != 3):
+                        if len(startingRankSplit) != 3:
                             raise StartingRankException
                     except StartingRankException:
                         print("Malformed starting rank for player {0}, skipping...".format(playerName))
@@ -77,7 +77,7 @@ class TrackerConfig(AppConfig):
             endDay = os.getenv("ENDDATE_DAY", default="")
             endMonth = os.getenv("ENDDATE_MONTH", default="")
             endYear = os.getenv("ENDDATE_YEAR", default="")
-            if (endDay == "" or endMonth == "" or endYear == ""):
+            if endDay == "" or endMonth == "" or endYear == "":
                 print("[Challenge] No ENDDATE_ environment variables set. Will setup challenge end in a month.")
                 USE_ENVDATES = False
             else:
@@ -93,7 +93,7 @@ class TrackerConfig(AppConfig):
                     print("[Challenge] Invalid date '{0}-{1}-{2}' found in environment variables. Will setup challenge end in a month.".format(endDay, endMonth, endYear))
                     USE_ENVDATES = False
         if not SKIP_CHALLENGE:
-            if (USE_ENVDATES):
+            if USE_ENVDATES:
                 endDay = os.getenv("ENDDATE_DAY")
                 endMonth = os.getenv("ENDDATE_MONTH")
                 endYear = os.getenv("ENDDATE_YEAR")

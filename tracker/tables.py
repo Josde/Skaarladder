@@ -6,8 +6,8 @@ from . import constants
 from .models import LeagueData, TrackedPlayers
 
 
-#TODO: Once multiple Challenge support is added, add filtering to this table.
-#About filtering: https://django-tables2.readthedocs.io/en/latest/pages/filtering.html
+# TODO: Once multiple Challenge support is added, add filtering to this table.
+# About filtering: https://django-tables2.readthedocs.io/en/latest/pages/filtering.html
 class LeagueTable(tables.Table):
     class Meta:
         model = LeagueData
@@ -16,15 +16,16 @@ class LeagueTable(tables.Table):
         attrs = {"class": "ranktable"}
         orderable = False  # disable header clicking
 
-    def render_name(self, value, column):
-        region = "EUW1" #default
+    def render_name(self, value):
+        region = "EUW1"  # default
         try:
             player = TrackedPlayers.objects.get(name=value)
             region = player.region
         except ObjectDoesNotExist:
             print("[LeagueTable] Rendering a player that can't be found in TrackedPlayers. This shouldn't happen.")
         sanitized_name = value.replace(" ", "+")
-        return format_html('<a href=https://{0}.op.gg/summoner/userName={1}>{2}</a>'.format(constants.riotToOPGGRegions[region.upper()], sanitized_name, value))
+        return format_html('<a href=https://{0}.op.gg/summoner/userName={1}>{2}</a>'.format(
+            constants.riotToOPGGRegions[region.upper()], sanitized_name, value))
 
     def render_winrate(self, value, column):
         if value > 0.5:
@@ -40,5 +41,3 @@ class LeagueTable(tables.Table):
             column.attrs = {'td': {'style': 'color:red'}}
         sign = "+" if (record.progressDelta >= 0) else "-"
         return "{0}LP ({1}{2})".format(value, sign, record.progressDelta)
-
-

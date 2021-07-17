@@ -1,24 +1,27 @@
-import riotwatcher
 import os
-from .exceptions import *
-from .models import LeagueData
-from django.core.exceptions import *
 import traceback
+
+import riotwatcher
+from django.core.exceptions import *
+
 from . import constants
+from .models import LeagueData
+
 
 def rankToLP(rank, tier, points):
     return (constants.rankWeights[rank]) * 400 + (constants.tierWeights[tier]) * 100 + int(points)
+
 
 def updatePlayerData(playerName, region, queueType, startingTier, startingRank, startingPoints):
     lolWatcher = riotwatcher.LolWatcher(os.environ.get("API_KEY"))
     ignoredPlayers = os.environ.get("IGNORED_PLAYERS").split(",")
     try:
-        if (playerName in ignoredPlayers):  # skip players in ignored player list
+        if playerName in ignoredPlayers:  # skip players in ignored player list
             return
         summonerData = lolWatcher.summoner.by_name(region, playerName)
         allLeagueData = lolWatcher.league.by_summoner(region, summonerData['id'])
         for element in allLeagueData:
-            if (element['queueType'] == queueType):
+            if element['queueType'] == queueType:
                 leagueData = element
                 winrate = float(leagueData['wins']) / (leagueData['wins'] + float(leagueData['losses']))
                 startingLP = rankToLP(startingTier, startingRank, startingPoints)
