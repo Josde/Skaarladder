@@ -32,6 +32,7 @@ def updatePlayerData(playerName, region, queueType, startingTier, startingRank, 
                     player.losses = leagueData['losses']
                     player.winrate = winrate
                     player.progress = currentLP - startingLP
+                    player.progressDelta = player.progress - player.progressDelta
                     print("[LeagueData] Successfully updated existing player", playerName)
                 except ObjectDoesNotExist:
                     player = LeagueData.objects.create(name=summonerData['name'], tier=leagueData['tier'],

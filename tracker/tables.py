@@ -33,11 +33,12 @@ class LeagueTable(tables.Table):
             column.attrs = {'td': {'style': 'color:red'}}
         return "{:0.2f}%".format(value * 100)
 
-    def render_progress(self, value, column):
+    def render_progress(self, value, column, record):
         if value > 0:
             column.attrs = {'td': {'style': 'color:green'}}
         elif value < 0:
             column.attrs = {'td': {'style': 'color:red'}}
-        return "{0}LP".format(value)
+        sign = "+" if (record.progressDelta >= 0) else "-"
+        return "{0}LP ({1}{2})".format(value, sign, record.progressDelta)
 
 

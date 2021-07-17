@@ -12,6 +12,7 @@ class LeagueData(models.Model):
     losses = models.IntegerField()
     winrate = models.FloatField()
     progress = models.IntegerField()
+    progressDelta = models.IntegerField()
 
 # TODO: Add ChallengeList to either this or LeagueData so we can have multiple leaderboards. For now, Challenge is a glorified way to store a date.
 # Using Junction tables to store lists: https://stackoverflow.com/a/444268
@@ -24,8 +25,9 @@ class TrackedPlayers(models.Model):
 
 
 
-# TODO: Add QUEUE_TYPE to this model.
 class Challenge(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=100)
     endDate = models.DateField()
+    #queueType = models.CharField(max_length=25) for some reason this is triggering django problems, commented temporarily
+
