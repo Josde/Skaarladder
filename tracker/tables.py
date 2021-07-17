@@ -1,9 +1,13 @@
 import django_tables2 as tables
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils.html import format_html
 
-from .models import LeagueData
+from . import constants
+from .models import LeagueData, TrackedPlayers
+
 
 #TODO: Once multiple Challenge support is added, add filtering to this table.
+#About filtering: https://django-tables2.readthedocs.io/en/latest/pages/filtering.html
 class LeagueTable(tables.Table):
     class Meta:
         model = LeagueData
@@ -11,10 +15,16 @@ class LeagueTable(tables.Table):
         fields = ("name", "tier", "rank", "points", "wins", "losses", "winrate", "progress")
         attrs = {"class": "ranktable"}
         orderable = False  # disable header clicking
+
     def render_name(self, value, column):
-        #TODO: This is currently hardcoded to be EUW OPGG.
+        region = "EUW1" #default
+        try:
+            player = TrackedPlayers.objects.get(name=value)
+            region = player.region
+        except ObjectDoesNotExist:
+            print("[LeagueTable] Rendering a player that can't be found in TrackedPlayers. This shouldn't happen.")
         sanitized_name = value.replace(" ", "+")
-        return format_html('<a href=https://euw.op.gg/summoner/userName={0}>{1}</a>'.format(sanitized_name, value))
+        return format_html('<a href=https://{0}.op.gg/summoner/userName={1}>{2}</a>'.format(constants.riotToOPGGRegions[region.upper()], sanitized_name, value))
 
     def render_winrate(self, value, column):
         if value > 0.5:

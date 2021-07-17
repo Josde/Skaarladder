@@ -24,7 +24,7 @@ class TrackedPlayers(models.Model):
 
 
 
-
+# TODO: Add QUEUE_TYPE to this model.
 class Challenge(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=100)

@@ -4,23 +4,10 @@ from .exceptions import *
 from .models import LeagueData
 from django.core.exceptions import *
 import traceback
-def rankToLP(rank, tier, points):
-    rankWeights = {
-        "IRON" : 0,
-        "BRONZE" : 1,
-        "SILVER" : 2,
-        "GOLD" : 3,
-        "PLATINUM" : 4,
-        "DIAMOND" : 5
-    }
-    tierWeights = {
-        "IV" : 0,
-        "III" : 1,
-        "II" : 2,
-        "I" : 3
-    }
-    return (rankWeights[rank]) * 400 + (tierWeights[tier]) * 100 + int(points)
+from . import constants
 
+def rankToLP(rank, tier, points):
+    return (constants.rankWeights[rank]) * 400 + (constants.tierWeights[tier]) * 100 + int(points)
 
 def updatePlayerData(playerName, region, queueType, startingTier, startingRank, startingPoints):
     lolWatcher = riotwatcher.LolWatcher(os.environ.get("API_KEY"))
