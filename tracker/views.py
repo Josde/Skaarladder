@@ -40,8 +40,9 @@ def index(request):
     if request.method == 'POST':
         queueType = os.getenv("QUEUE_TYPE", default="RANKED_SOLO_5x5")
         for player in TrackedPlayers.objects.all():
-            updatePlayerData(player.name, player.region, queueType, player.startingTier, player.startingRank,
-                             player.startingPoints)
+            if not player.ignored:
+                updatePlayerData(player.name, player.region, queueType, player.startingTier, player.startingRank,
+                                 player.startingPoints)
         return redirect('tracker', permanent=False)
     else:
         return redirect('tracker', permanent=False)

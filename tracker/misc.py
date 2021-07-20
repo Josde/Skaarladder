@@ -14,10 +14,7 @@ def rankToLP(rank, tier, points):
 
 def updatePlayerData(playerName, region, queueType, startingTier, startingRank, startingPoints):
     lolWatcher = riotwatcher.LolWatcher(os.environ.get("API_KEY"))
-    ignoredPlayers = os.environ.get("IGNORED_PLAYERS").split(",")
     try:
-        if playerName in ignoredPlayers:  # skip players in ignored player list
-            return
         summonerData = lolWatcher.summoner.by_name(region, playerName)
         allLeagueData = lolWatcher.league.by_summoner(region, summonerData['id'])
         for element in allLeagueData:
@@ -37,14 +34,14 @@ def updatePlayerData(playerName, region, queueType, startingTier, startingRank, 
                     player.progress = currentLP - startingLP
                     player.progressDelta = player.progress - player.progressDelta
                     print("[LeagueData] Successfully updated existing player", playerName)
+                    player.save()
                 except ObjectDoesNotExist:
                     player = LeagueData.objects.create(name=summonerData['name'], tier=leagueData['tier'],
                                                        rank=leagueData['rank'],
                                                        points=leagueData['leaguePoints'], wins=leagueData['wins'],
                                                        losses=leagueData['losses'], winrate=winrate,
-                                                       progress=currentLP - startingLP)
+                                                       progress=currentLP-startingLP, progressDelta=0)
                     print("[LeagueData] Successfully created non-existing player", playerName)
-                finally:
                     player.save()
 
     except Exception as ex:
