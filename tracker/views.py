@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, date
-from datetime import datetime, timedelta, date
 
 from django.shortcuts import redirect
+from django.utils import timezone
 from django_tables2 import SingleTableView
 
 from tracker.models import TrackedPlayers, Challenge
@@ -19,8 +19,7 @@ class LeagueDataListView(SingleTableView):
         # This will never give an error because if no challenges are registered, we make one on ready()
         challenge = Challenge.objects.first()
         ctx = super(LeagueDataListView, self).get_context_data(**kwargs)
-        # TODO: CurrentDate currently doesn't represent the last update time like it should.
-        ctx['currentDate'] = datetime.now().strftime("%d %B, %Y, %H:%M:%S")
+        ctx['currentDate'] = challenge.lastUpdate
         ctx['endDate'] = challenge.endDate
         timeDelta = challenge.endDate - date.today()
         if timeDelta > timedelta(seconds=0):
@@ -43,6 +42,9 @@ def index(request):
             if not player.ignored:
                 updatePlayerData(player.name, player.region, queueType, player.startingTier, player.startingRank,
                                  player.startingPoints)
+        challenge = Challenge.objects.first()
+        challenge.lastUpdate = datetime.now()
+        challenge.save()
         return redirect('tracker', permanent=False)
     else:
         return redirect('tracker', permanent=False)

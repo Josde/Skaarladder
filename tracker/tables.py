@@ -6,8 +6,9 @@ from . import constants
 from .models import LeagueData, TrackedPlayers
 
 
-# TODO: Once multiple Challenge support is added, add filtering to this table.
+# TODO: Once multiple Challenge support is added, add filtering to this table. Else, add one view per challenge.
 # About filtering: https://django-tables2.readthedocs.io/en/latest/pages/filtering.html
+# Dynamic views: https://stackoverflow.com/a/49341050
 class LeagueTable(tables.Table):
     class Meta:
         model = LeagueData

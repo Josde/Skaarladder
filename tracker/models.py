@@ -1,9 +1,8 @@
 from django.db import models
-
-
+from django.utils import timezone
 # Create your models here.
 
-
+#TODO: Implement django-model-history so I can get stadistics out of this model.
 class LeagueData(models.Model):
     name = models.CharField(max_length=100, primary_key=True)
     tier = models.CharField(max_length=100)
@@ -14,6 +13,7 @@ class LeagueData(models.Model):
     winrate = models.FloatField()
     progress = models.IntegerField()
     progressDelta = models.IntegerField()
+    streak = models.CharField(max_length=5, default='EEEEE') #TODO: Implement this
 
 
 
@@ -42,7 +42,7 @@ class TrackedPlayers(models.Model):
                    ('IV', 'IV')]
 
     name = models.CharField(max_length=100, primary_key=True)
-    #Defaults set just to prevent ------ to show up in choices.
+    #Defaults set just to prevent ------ from showing up in choices.
     startingTier = models.CharField(max_length=30, choices=tierChoices, default='SILVER')
     startingRank = models.CharField(max_length=10, choices=rankChoices, default='I')
     startingPoints = models.IntegerField()
@@ -56,4 +56,4 @@ class Challenge(models.Model):
     name = models.CharField(max_length=100)
     endDate = models.DateField()
     queueType = models.CharField(max_length=25, choices=queueTypeChoices, default='RANKED_SOLO_5x5')
-
+    lastUpdate = models.DateTimeField(default=timezone.now)
