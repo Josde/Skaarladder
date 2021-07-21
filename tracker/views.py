@@ -1,9 +1,10 @@
 from datetime import datetime, timedelta, date
 
 from django.shortcuts import redirect
-from django.utils import timezone
+from django.utils.timezone import make_aware
 from django_tables2 import SingleTableView
-
+from django.template import loader
+from django.http import HttpResponse
 from tracker.models import TrackedPlayers, Challenge
 from .misc import *
 from .tables import LeagueTable
@@ -22,6 +23,7 @@ class LeagueDataListView(SingleTableView):
         ctx['currentDate'] = challenge.lastUpdate
         ctx['endDate'] = challenge.endDate
         timeDelta = challenge.endDate - date.today()
+        #TODO: Refactor bottomMessage into multiple strings to make it fully configurable from HTML.
         if timeDelta > timedelta(seconds=0):
             hours, rem = divmod(timeDelta.seconds, 3600)
             mins, secs = divmod(rem, 60)
@@ -36,15 +38,20 @@ class LeagueDataListView(SingleTableView):
 
 
 def index(request):
-    if request.method == 'POST':
-        queueType = os.getenv("QUEUE_TYPE", default="RANKED_SOLO_5x5")
+    try:
+        challenge = Challenge.objects.first()
+        queueType = challenge.queueType
         for player in TrackedPlayers.objects.all():
             if not player.ignored:
                 updatePlayerData(player.name, player.region, queueType, player.startingTier, player.startingRank,
                                  player.startingPoints)
         challenge = Challenge.objects.first()
-        challenge.lastUpdate = datetime.now()
+        challenge.lastUpdate = make_aware(datetime.now())
         challenge.save()
         return redirect('tracker', permanent=False)
-    else:
-        return redirect('tracker', permanent=False)
+    except Exception:
+        return redirect('error', permanent=False)
+
+def error(request):
+    template = loader.get_template('tracker/error.html')
+    return HttpResponse(template.render())
