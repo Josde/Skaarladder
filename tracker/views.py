@@ -1,3 +1,4 @@
+import threading
 from datetime import datetime, timedelta, date
 
 from django.shortcuts import redirect
@@ -36,60 +37,32 @@ class LeagueDataListView(SingleTableView):
                 ctx['bottomMessage'] = "El reto ya ha acabado."
         return ctx
 
+
 def index(request):
     try:
         challenge = Challenge.objects.first()
         queueType = challenge.queueType
         lastUpdateTimeDelta = make_aware(datetime.now()) - challenge.lastUpdate
+        threads = []
         if (lastUpdateTimeDelta < timedelta(seconds=30)):
-            print('[Index] Last updated less than 30 seconds ago, ignoring.')
+            print('[Index] Last updated less than a minute ago, ignoring.')
             return redirect('tracker', permanent=False)
-        else: #unneeded but for clarity
-            for trackedPlayer in TrackedPlayers.objects.all():
-                if not trackedPlayer.ignored:
-                    try:
-                        player = LeagueData.objects.get(name=trackedPlayer.name)
-                        tier, rank, points, wins, losses, winrate, progress, progressDelta, streak = updatePlayerData(
-                            trackedPlayer.name, trackedPlayer.region, queueType, trackedPlayer.startingTier, trackedPlayer.startingRank,
-                            trackedPlayer.startingPoints, player.progressDelta)
-                        player.tier = tier
-                        player.rank = rank
-                        player.points = points
-                        player.wins = wins
-                        player.losses = losses
-                        player.winrate = winrate
-                        player.progress = progress
-                        player.progressDelta = progressDelta
-                        player.streak = streak
-                        player.save()
-                        print("[LeagueData] Successfully updated existing player", player.name)
-                    except ObjectDoesNotExist:
-                        player = LeagueData.objects.create(name=trackedPlayer.name)
-                        tier, rank, points, wins, losses, winrate, progress, progressDelta, streak = updatePlayerData(
-                            trackedPlayer.name, trackedPlayer.region, queueType, trackedPlayer.startingTier,
-                            trackedPlayer.startingRank,
-                            trackedPlayer.startingPoints, player.progressDelta)
-                        player.tier = tier
-                        player.rank = rank
-                        player.points = points
-                        player.wins = wins
-                        player.losses = losses
-                        player.winrate = winrate
-                        player.progress = progress
-                        player.progressDelta = progressDelta
-                        player.streak = streak
-                        player.save()
-                        print("[LeagueData] Successfully created non-existing player", trackedPlayer.name)
-            challenge = Challenge.objects.first()
-            challenge.lastUpdate = make_aware(datetime.now())
-            challenge.save()
-            return redirect('tracker', permanent=False)
+        for player in TrackedPlayers.objects.all():
+            if not player.ignored:
+                threads += [threading.Thread(target=updatePlayerData, args=(player.name, player.region, queueType, player.startingTier, player.startingRank,
+                                 player.startingPoints))]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()  # waits for thread to complete its task
+        challenge.lastUpdate = make_aware(datetime.now())
+        challenge.save()
+        return redirect('tracker', permanent=False)
     except Exception as ex:
-        print("Exception {0} ocurred while updating data".format(type(ex).__name__))
+        print("Exception {0} ocurred while updating data.".format(type(ex).__name__))
         traceback.print_exc()
         return redirect('error', permanent=False)
 
-#TODO: Make error page not a placeholder.
 def error(request):
     template = loader.get_template('tracker/error.html')
     return HttpResponse(template.render())
