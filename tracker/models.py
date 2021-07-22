@@ -20,16 +20,16 @@ class LeagueData(models.Model):
 # TODO: Add ChallengeList to either this or LeagueData so we can have multiple leaderboards. For now, Challenge is a glorified way to store a date.
 # Using Junction tables to store lists: https://stackoverflow.com/a/444268
 class TrackedPlayers(models.Model):
-    regionChoices = [('EUW', 'EUW1'),
-                     ("BR","BR1"),
-                     ("EUNE", "EUN1"),
-                     ('JP', 'JP1'),
-                     ('KR', 'KR1'),
-                     ('LAN', 'LA1'),
-                     ('LAS', 'LA2'),
-                     ('OCE', 'OC1'),
+    regionChoices = [('EUW1', 'EUW1'),
+                     ("BR1","BR1"),
+                     ("EUN1", "EUN1"),
+                     ('JP1', 'JP1'),
+                     ('KR1', 'KR1'),
+                     ('LA1', 'LA1'),
+                     ('LA2', 'LA2'),
+                     ('OC1', 'OC1'),
                      ('RU', 'RU'),
-                     ('TR', 'TR1')]
+                     ('TR1', 'TR1')]
     tierChoices = [('IRON', 'IRON'),
                    ('BRONZE', 'BRONZE'),
                    ('SILVER', 'SILVER'),
@@ -50,8 +50,8 @@ class TrackedPlayers(models.Model):
     ignored = models.BooleanField(default=False)
 
 class Challenge(models.Model):
-    queueTypeChoices = [('SoloQ', 'RANKED_SOLO_5x5'),
-                 ('Flex', 'RANKED_FLEX_5x5')]
+    queueTypeChoices = [('RANKED_SOLO_5x5', 'RANKED_SOLO_5x5'),
+                 ('RANKED_FLEX_SR', 'RANKED_SR_5x5')]
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=100)
     endDate = models.DateField()

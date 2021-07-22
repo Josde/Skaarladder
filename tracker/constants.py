@@ -26,3 +26,8 @@ riotToOPGGRegions = {
     "RU": "RU",
     "TR1": "TR"
 }
+
+queueNameToQueueID = {
+    "RANKED_SOLO_5x5": 420,
+    "RANKED_FLEX_5x5": 440
+ }
