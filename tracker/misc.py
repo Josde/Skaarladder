@@ -56,6 +56,7 @@ def getPlayerStreakData(playerName, puuid, region, queueType):
     streakString = ""
     try:
         #FIXME: bump to v5 before august, when riotwatcher updates
+        #FIXME: I really, really hope there is a better way to do this. If not, we are going to run into ratelimits very easily.
         #matchData = lolWatcher.match_v5.matchlist_by_puuid(region=region, puuid=puuid, count=5, queue=queueNumber) # this requires a region name update / dict because riot is fucking annoying
         matchData = lolWatcher.match_v4.matchlist_by_account(region=region, encrypted_account_id=puuid, queue=queueNumber, end_index=5)
         # This API is fucking horrid, just what is this level of nesting structs

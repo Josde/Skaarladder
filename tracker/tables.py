@@ -19,11 +19,13 @@ class LeagueTable(tables.Table):
 
     def render_name(self, value):
         region = "EUW1"  # default
+        playerName = "" + value
+        playerName = playerName.strip()
         try:
-            player = TrackedPlayers.objects.get(name=value)
+            player = TrackedPlayers.objects.get(name=playerName)
             region = player.region
         except ObjectDoesNotExist:
-            print("[LeagueTable] Rendering a player that can't be found in TrackedPlayers. This shouldn't happen.")
+            print("[LeagueTable] Rendering player {0}, who can't be found in TrackedPlayers. This shouldn't happen.".format(value))
         sanitized_name = value.replace(" ", "+")
         return format_html('<a href=https://{0}.op.gg/summoner/userName={1}>{2}</a>'.format(
             constants.riotToOPGGRegions[region.upper()], sanitized_name, value))

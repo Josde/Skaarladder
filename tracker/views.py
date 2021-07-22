@@ -43,18 +43,13 @@ def index(request):
         challenge = Challenge.objects.first()
         queueType = challenge.queueType
         lastUpdateTimeDelta = make_aware(datetime.now()) - challenge.lastUpdate
-        threads = []
         if (lastUpdateTimeDelta < timedelta(seconds=30)):
             print('[Index] Last updated less than a minute ago, ignoring.')
             return redirect('tracker', permanent=False)
         for player in TrackedPlayers.objects.all():
             if not player.ignored:
-                threads += [threading.Thread(target=updatePlayerData, args=(player.name, player.region, queueType, player.startingTier, player.startingRank,
-                                 player.startingPoints))]
-        for thread in threads:
-            thread.start()
-        for thread in threads:
-            thread.join()  # waits for thread to complete its task
+                updatePlayerData(player.name, player.region, queueType, player.startingTier, player.startingRank,
+                                 player.startingPoints)
         challenge.lastUpdate = make_aware(datetime.now())
         challenge.save()
         return redirect('tracker', permanent=False)
