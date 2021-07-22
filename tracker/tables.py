@@ -40,7 +40,7 @@ class LeagueTable(tables.Table):
             column.attrs = {'td': {'style': 'color:green'}}
         elif value < 0:
             column.attrs = {'td': {'style': 'color:red'}}
-        sign = "+" if (record.progressDelta >= 0) else "-"
+        sign = "+" if (record.progressDelta >= 0) else ""
         return "{0}LP ({1}{2})".format(value, sign, record.progressDelta)
 
     def render_streak(self, value):

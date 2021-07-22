@@ -5,14 +5,14 @@ from django.utils import timezone
 #TODO: Implement django-model-history so I can get stadistics out of this model.
 class LeagueData(models.Model):
     name = models.CharField(max_length=100, primary_key=True)
-    tier = models.CharField(max_length=100)
-    rank = models.CharField(max_length=100)
-    points = models.IntegerField()
-    wins = models.IntegerField()
-    losses = models.IntegerField()
-    winrate = models.FloatField()
-    progress = models.IntegerField()
-    progressDelta = models.IntegerField()
+    tier = models.CharField(max_length=100, default='IRON')
+    rank = models.CharField(max_length=100, default='IV')
+    points = models.IntegerField(default=0)
+    wins = models.IntegerField(default=0)
+    losses = models.IntegerField(default=0)
+    winrate = models.FloatField(default=0)
+    progress = models.IntegerField(default=0)
+    progressDelta = models.IntegerField(default=0)
     streak = models.CharField(max_length=5, default='EEEEE') #TODO: Implement this
 
 
