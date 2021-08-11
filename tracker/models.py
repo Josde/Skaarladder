@@ -5,6 +5,7 @@ from django.utils import timezone
 #TODO: Implement django-model-history so I can get stadistics out of this model.
 class LeagueData(models.Model):
     name = models.CharField(max_length=100, primary_key=True)
+    puuid = models.CharField(max_length=100, default="")
     tier = models.CharField(max_length=100, default='IRON')
     rank = models.CharField(max_length=100, default='IV')
     points = models.IntegerField(default=0)
@@ -42,6 +43,7 @@ class TrackedPlayers(models.Model):
                    ('IV', 'IV')]
 
     name = models.CharField(max_length=100, primary_key=True)
+    puuid = models.CharField(max_length=100, default="")
     #Defaults set just to prevent ------ from showing up in choices.
     startingTier = models.CharField(max_length=30, choices=tierChoices, default='SILVER')
     startingRank = models.CharField(max_length=10, choices=rankChoices, default='I')

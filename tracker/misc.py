@@ -73,4 +73,5 @@ def getPlayerStreakData(playerName, puuid, region, queueType):
         print("Exception {0} ocurred while looking up player {1}".format(type(ex).__name__, playerName))
         traceback.print_exc()
     finally:
+        print("[LeagueData] Finished processing player {0}, streak is {1}".format(playerName, streakString))
         return streakString
