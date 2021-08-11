@@ -43,13 +43,51 @@ def index(request):
         challenge = Challenge.objects.first()
         queueType = challenge.queueType
         lastUpdateTimeDelta = make_aware(datetime.now()) - challenge.lastUpdate
+        # Ignore if last update was less than 30 seconds ago.
         if (lastUpdateTimeDelta < timedelta(seconds=30)):
             print('[Index] Last updated less than a minute ago, ignoring.')
             return redirect('tracker', permanent=False)
-        for player in TrackedPlayers.objects.all():
-            if not player.ignored:
-                updatePlayerData(player.name, player.region, queueType, player.startingTier, player.startingRank,
-                                 player.startingPoints)
+        # Delete players that are not present in the model anymore
+        for leaguePlayer in LeagueData.objects.all():
+            try:
+                trackedPlayer = TrackedPlayers.objects.get(pk=leaguePlayer.name)
+            except ObjectDoesNotExist:
+                print("[TrackedPlayer] Player {0} exists in ranking table but isn't tracked anymore, deleting...".format(leaguePlayer.name))
+                leaguePlayer.delete()
+        # Update all the player ranks and stats
+        for trackedPlayer in TrackedPlayers.objects.all():
+            try:
+                leaguePlayer = LeagueData.objects.get(pk=trackedPlayer.name)
+                if not trackedPlayer.ignored:
+                    tier, rank, points, wins, losses, winrate, progress, progressDelta, streak = updatePlayerData(trackedPlayer.name, trackedPlayer.puuid, trackedPlayer.region, queueType, trackedPlayer.startingTier, trackedPlayer.startingRank,
+                                     trackedPlayer.startingPoints, leaguePlayer.progressDelta)
+                    leaguePlayer.tier = tier
+                    leaguePlayer.rank = rank
+                    leaguePlayer.points = points
+                    leaguePlayer.wins = wins
+                    leaguePlayer.losses = losses
+                    leaguePlayer.winrate = winrate
+                    leaguePlayer.progress = progress
+                    leaguePlayer.progressDelta = progressDelta
+                    leaguePlayer.streak = streak
+                    print("[LeagueData] Successfully updated existing player", trackedPlayer.name)
+                    leaguePlayer.save()
+            except ObjectDoesNotExist:
+                tier, rank, points, wins, losses, winrate, progress, progressDelta, streak = updatePlayerData(
+                    trackedPlayer.name, trackedPlayer.puuid, trackedPlayer.region, queueType,
+                    trackedPlayer.startingTier, trackedPlayer.startingRank,
+                    trackedPlayer.startingPoints, 0)
+                leaguePlayer = LeagueData.objects.create(name=trackedPlayer.name, tier=tier,
+                                                         rank=rank,
+                                                         points=points, wins=wins,
+                                                         losses=losses, winrate=winrate,
+                                                         progress=0, progressDelta=0)
+                print("[LeagueData] Successfully created non-existing player", trackedPlayer.name)
+            except TypeError:
+                print("[LeagueData] Error getting data for player ", trackedPlayer.name)
+                continue
+            finally:
+                leaguePlayer.save()
         challenge.lastUpdate = make_aware(datetime.now())
         challenge.save()
         return redirect('tracker', permanent=False)

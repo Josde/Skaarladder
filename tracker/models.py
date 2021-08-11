@@ -14,7 +14,7 @@ class LeagueData(models.Model):
     winrate = models.FloatField(default=0)
     progress = models.IntegerField(default=0)
     progressDelta = models.IntegerField(default=0)
-    streak = models.CharField(max_length=5, default='EEEEE') #TODO: Implement this
+    streak = models.CharField(max_length=5, default='EEEEE')
 
 
 
