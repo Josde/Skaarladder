@@ -22,7 +22,6 @@ def getIds(playerName, region):
 def updatePlayerData(playerName, accountId, id, region, queueType, startingTier, startingRank, startingPoints, oldProgressDelta):
     lolWatcher = riotwatcher.LolWatcher(os.environ.get("API_KEY"))
     try:
-        summonerData = lolWatcher.summoner.by_name(region, playerName)
         if len(accountId) < 20 or len(id) < 20: #validity check, idk if theres a documented minimum
             summonerData = lolWatcher.summoner.by_name(region, playerName)
             validId = summonerData['id']
