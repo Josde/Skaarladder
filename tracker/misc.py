@@ -23,13 +23,14 @@ def updatePlayerData(playerName, accountId, id, region, queueType, startingTier,
     lolWatcher = riotwatcher.LolWatcher(os.environ.get("API_KEY"))
     try:
         summonerData = lolWatcher.summoner.by_name(region, playerName)
-        print(summonerData)
-        if len(puuid) < 20: #validity check, idk if theres a documented minimum
+        if len(accountId) < 20 or len(id) < 20: #validity check, idk if theres a documented minimum
             summonerData = lolWatcher.summoner.by_name(region, playerName)
-            validPuuid = summonerData['id']
+            validId = summonerData['id']
+            validAccountId = summonerData['accountId']
         else:
-            validPuuid = puuid
-        allLeagueData = lolWatcher.league.by_summoner(region, puuid)
+            validId = id
+            validAccountId = accountId
+        allLeagueData = lolWatcher.league.by_summoner(region, validId)
         for element in allLeagueData:
             if element['queueType'] == queueType:
                 leagueData = element
@@ -44,7 +45,7 @@ def updatePlayerData(playerName, accountId, id, region, queueType, startingTier,
                 winrate = winrate
                 progress = currentLP - startingLP
                 progressDelta = progress - oldProgressDelta
-                streak = getPlayerStreakData(playerName, validPuuid, region, queueType)
+                streak = getPlayerStreakData(playerName, validAccountId, region, queueType)
                 return tier, rank, points, wins, losses, winrate, progress, progressDelta, streak
     except Exception as ex:
         print("Exception {0} ocurred while looking up player {1}".format(type(ex).__name__, playerName))

@@ -59,13 +59,13 @@ class TrackerConfig(AppConfig):
                     try:
                         # if player exists, we dont't have to do anything
                         player = TrackedPlayers.objects.get(name=playerName)
-                        if len(player.id) < 20 or len(player.accountId) < 20 or len(player.puuid) < 20:
-                            id, accountId, puuid = getIds(player.name, player.region)
-                            player.id = id
-                            player.accountId = accountId
-                            player.puuid = puuid
-                            print("[Startup] Added missing PUUID {0} for existing player {1}".format(player.puuid, player.name))
-                            player.save()
+                        #if len(player.id) < 20 or len(player.accountId) < 20 or len(player.puuid) < 20:
+                        id, accountId, puuid = getIds(player.name, player.region)
+                        player.id = id
+                        player.accountId = accountId
+                        player.puuid = puuid
+                        print("[Startup] Added missing PUUID {0} for existing player {1}".format(player.puuid, player.name))
+                        player.save()
                         print("Player {0} already in tracked players, skipping.".format(playerName))
                         continue
                     except ObjectDoesNotExist:
