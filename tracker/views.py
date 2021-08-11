@@ -73,16 +73,20 @@ def index(request):
                     print("[LeagueData] Successfully updated existing player", trackedPlayer.name)
                     leaguePlayer.save()
             except ObjectDoesNotExist:
-                tier, rank, points, wins, losses, winrate, progress, progressDelta, streak = updatePlayerData(
-                    trackedPlayer.name, trackedPlayer.puuid, trackedPlayer.region, queueType,
-                    trackedPlayer.startingTier, trackedPlayer.startingRank,
-                    trackedPlayer.startingPoints, 0)
-                leaguePlayer = LeagueData.objects.create(name=trackedPlayer.name, tier=tier,
-                                                         rank=rank,
-                                                         points=points, wins=wins,
-                                                         losses=losses, winrate=winrate,
-                                                         progress=0, progressDelta=0)
-                print("[LeagueData] Successfully created non-existing player", trackedPlayer.name)
+                try:
+                    tier, rank, points, wins, losses, winrate, progress, progressDelta, streak = updatePlayerData(
+                        trackedPlayer.name, trackedPlayer.puuid, trackedPlayer.region, queueType,
+                        trackedPlayer.startingTier, trackedPlayer.startingRank,
+                        trackedPlayer.startingPoints, 0)
+                    leaguePlayer = LeagueData.objects.create(name=trackedPlayer.name, tier=tier,
+                                                             rank=rank,
+                                                             points=points, wins=wins,
+                                                             losses=losses, winrate=winrate,
+                                                             progress=0, progressDelta=0)
+                    print("[LeagueData] Successfully created non-existing player", trackedPlayer.name)
+                except TypeError:
+                    print("[LeagueData] Error getting data for non-existing player ", trackedPlayer.name)
+                    continue
             except TypeError:
                 print("[LeagueData] Error getting data for player ", trackedPlayer.name)
                 continue
