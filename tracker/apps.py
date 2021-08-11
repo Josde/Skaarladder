@@ -15,7 +15,7 @@ class TrackerConfig(AppConfig):
         print("%n%n%n%n----------------------------")
         print("ARGUMENTS: {0}", sys.argv)
         print("----------------------------%n%n%n%n")
-        if 'runserver' in sys.argv or 'gunicorn' in sys.argv: #dont run this on migrations
+        if 'runserver' in sys.argv or 'gunicorn' in sys.argv[0]: #dont run this on migrations
             SKIP_TRACKEDPLAYERS = False
             SKIP_CHALLENGE = False
             USE_ENVDATES = True
