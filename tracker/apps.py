@@ -52,15 +52,18 @@ class TrackerConfig(AppConfig):
                 regions = regions * len(playernames)
             if not SKIP_TRACKEDPLAYERS:
                 from tracker.models import TrackedPlayers
-                from .misc import getPuuid
+                from .misc import getIds
                 # populate TrackerPlayers model
                 # This will be skipped if PLAYERS / STARTING_RANKS are not set or incorrect.
                 for playerName, startingRank, region in zip(playernames, startingRanks, regions):
                     try:
                         # if player exists, we dont't have to do anything
                         player = TrackedPlayers.objects.get(name=playerName)
-                        if player.puuid == "":
-                            player.puuid = getPuuid(player.name, player.region)
+                        if len(player.id) < 20 or len(player.accountId) < 20 or len(player.puuid) < 20:
+                            id, accountId, puuid = getIds(player.name, player.region)
+                            player.id = id
+                            player.accountId = accountId
+                            player.puuid = puuid
                             print("[Startup] Added missing PUUID {0} for existing player {1}".format(player.puuid, player.name))
                             player.save()
                         print("Player {0} already in tracked players, skipping.".format(playerName))
@@ -75,8 +78,11 @@ class TrackerConfig(AppConfig):
                             print("Malformed starting rank for player {0}, skipping...".format(playerName))
                             continue
                         isIgnored = True if playerName in ignoredPlayers else False
-                        puuid = getPuuid(playerName, region)
-                        player = TrackedPlayers.objects.create(name=playerName, puuid=puuid, startingTier=startingRankSplit[0],
+                        id, accountId, puuid = getIds(player.name, player.region)
+                        player.id = id
+                        player.accountId = accountId
+                        player.puuid = puuid
+                        player = TrackedPlayers.objects.create(name=playerName, id=id, accountId=accountId, puuid=puuid, startingTier=startingRankSplit[0],
                                                                startingRank=startingRankSplit[1],
                                                                startingPoints=startingRankSplit[2],
                                                                region=region, ignored=isIgnored)

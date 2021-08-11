@@ -11,22 +11,25 @@ from .models import LeagueData
 def rankToLP(rank, tier, points):
     return (constants.rankWeights[rank]) * 400 + (constants.tierWeights[tier]) * 100 + int(points)
 
-def getPuuid(playerName, region):
+def getIds(playerName, region):
     lolWatcher = riotwatcher.LolWatcher(os.environ.get("API_KEY"))
     try:
         summonerData = lolWatcher.summoner.by_name(region, playerName)
-        return summonerData['id']
+        return summonerData['id'], summonerData['accountId'], summonerData['puuid']
     except Exception:
         return ""
 
-def updatePlayerData(playerName, puuid, region, queueType, startingTier, startingRank, startingPoints, oldProgressDelta):
+def updatePlayerData(playerName, accountId, id, region, queueType, startingTier, startingRank, startingPoints, oldProgressDelta):
     lolWatcher = riotwatcher.LolWatcher(os.environ.get("API_KEY"))
     try:
+        summonerData = lolWatcher.summoner.by_name(region, playerName)
+        print(summonerData)
         if len(puuid) < 20: #validity check, idk if theres a documented minimum
             summonerData = lolWatcher.summoner.by_name(region, playerName)
-            allLeagueData = lolWatcher.league.by_summoner(region, summonerData['id'])
+            validPuuid = summonerData['id']
         else:
-            allLeagueData = lolWatcher.league.by_summoner(region, puuid)
+            validPuuid = puuid
+        allLeagueData = lolWatcher.league.by_summoner(region, puuid)
         for element in allLeagueData:
             if element['queueType'] == queueType:
                 leagueData = element
@@ -41,7 +44,7 @@ def updatePlayerData(playerName, puuid, region, queueType, startingTier, startin
                 winrate = winrate
                 progress = currentLP - startingLP
                 progressDelta = progress - oldProgressDelta
-                streak = getPlayerStreakData(playerName, summonerData['accountId'], region, queueType)
+                streak = getPlayerStreakData(playerName, validPuuid, region, queueType)
                 return tier, rank, points, wins, losses, winrate, progress, progressDelta, streak
     except Exception as ex:
         print("Exception {0} ocurred while looking up player {1}".format(type(ex).__name__, playerName))
