@@ -12,6 +12,9 @@ class TrackerConfig(AppConfig):
     name = 'tracker'
 
     def ready(self):
+        print("%n%n%n%n----------------------------")
+        print("ARGUMENTS: {0}", sys.argv)
+        print("----------------------------%n%n%n%n")
         if 'runserver' in sys.argv or 'gunicorn' in sys.argv: #dont run this on migrations
             SKIP_TRACKEDPLAYERS = False
             SKIP_CHALLENGE = False

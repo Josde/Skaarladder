@@ -22,7 +22,7 @@ def getPuuid(playerName, region):
 def updatePlayerData(playerName, puuid, region, queueType, startingTier, startingRank, startingPoints, oldProgressDelta):
     lolWatcher = riotwatcher.LolWatcher(os.environ.get("API_KEY"))
     try:
-        if (puuid != ""):
+        if len(puuid) < 20: #validity check, idk if theres a documented minimum
             summonerData = lolWatcher.summoner.by_name(region, playerName)
             allLeagueData = lolWatcher.league.by_summoner(region, summonerData['id'])
         else:
