@@ -70,6 +70,7 @@ def index(request):
                     leaguePlayer.progress = progress
                     leaguePlayer.progressDelta = progressDelta
                     leaguePlayer.streak = streak
+                    leaguePlayer.puuid = trackedPlayer.puuid
                     print("[LeagueData] Successfully updated existing player", trackedPlayer.name)
                     leaguePlayer.save()
             except ObjectDoesNotExist:
@@ -78,7 +79,7 @@ def index(request):
                         trackedPlayer.name, trackedPlayer.puuid, trackedPlayer.region, queueType,
                         trackedPlayer.startingTier, trackedPlayer.startingRank,
                         trackedPlayer.startingPoints, 0)
-                    leaguePlayer = LeagueData.objects.create(name=trackedPlayer.name, tier=tier,
+                    leaguePlayer = LeagueData.objects.create(name=trackedPlayer.name, puuid=trackedPlayer.puuid, tier=tier,
                                                              rank=rank,
                                                              points=points, wins=wins,
                                                              losses=losses, winrate=winrate,
