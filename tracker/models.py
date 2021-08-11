@@ -41,7 +41,6 @@ class TrackedPlayers(models.Model):
                    ('II', 'II'),
                    ('III', 'III'),
                    ('IV', 'IV')]
-    # TODO: Temporarily, puuid has been refering to id. We have to update the tables manually and fix the code.
     name = models.CharField(max_length=100, primary_key=True)
     id = models.CharField(max_length=100, default="")
     accountId = models.CharField(max_length=100, default="")

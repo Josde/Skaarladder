@@ -56,6 +56,10 @@ def index(request):
                 leaguePlayer.delete()
         # Update all the player ranks and stats
         for trackedPlayer in TrackedPlayers.objects.all():
+            if trackedPlayer.ignored:
+                # Ignore the player, using if not might be more logic but this saves an indentation level which looks better.
+                print("[LeagueData] Player {0} is in ignored list, continuing...".format(trackedPlayer.name))
+                continue
             try:
                 leaguePlayer = LeagueData.objects.get(pk=trackedPlayer.name)
                 if not trackedPlayer.ignored:
