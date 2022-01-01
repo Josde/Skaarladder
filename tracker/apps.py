@@ -20,6 +20,7 @@ class TrackerConfig(AppConfig):
             playernames = os.environ.get("PLAYERS", default="")
             startingRanks = os.environ.get("STARTING_RANKS", default="")
             ignoredPlayers = os.environ.get("IGNORED_PLAYERS", default="")
+            UPDATE_IDS_ON_STARTUP = os.environ.get("UPDATE_IDS", default="f").lower() in ("t", "true", "1")
 
             if len(ignoredPlayers) != 0:
                 ignoredPlayers = os.environ.get("IGNORED_PLAYERS").split(",")
@@ -52,24 +53,29 @@ class TrackerConfig(AppConfig):
                 regions = regions * len(playernames)
             if not SKIP_TRACKEDPLAYERS:
                 from tracker.models import TrackedPlayers
-                from .misc import getIds
+                from .misc import getIds, updateIds
                 # populate TrackerPlayers model
                 # This will be skipped if PLAYERS / STARTING_RANKS are not set or incorrect.
+                if UPDATE_IDS_ON_STARTUP:
+                    print("[Startup] UPDATE_IDS_ON_STARTUP set to true, updating all player IDs...")
+                    updateIds()
                 for playerName, startingRank, region in zip(playernames, startingRanks, regions):
                     try:
                         # if player exists, we dont't have to do anything
                         player = TrackedPlayers.objects.get(name=playerName)
-                        #if len(player.id) < 20 or len(player.accountId) < 20 or len(player.puuid) < 20:
-                        id, accountId, puuid = getIds(player.name, player.region)
-                        player.id = id
-                        player.accountId = accountId
-                        player.puuid = puuid
-                        print("[Startup] Added missing PUUID {0} for existing player {1}".format(player.puuid, player.name))
+                        if len(player.id) < 20 or len(player.accountId) < 20 or len(player.puuid) < 20:
+                            id, accountId, puuid = getIds(player.name, player.region)
+                            player.id = id
+                            player.accountId = accountId
+                            player.puuid = puuid
+                            print("[Startup] Added missing PUUID {0} for existing player {1}".format(player.puuid, player.name))
+                        else:
+                            print("Player {0} already in tracked players, skipping.".format(playerName))
                         player.save()
-                        print("Player {0} already in tracked players, skipping.".format(playerName))
                         continue
                     except ObjectDoesNotExist:
-                        # if player does not exist, get data from API.
+                        # FIXME: if player does not exist, get data from API.
+                        # TODO: Use the least amount of environment variables possible. It makes running this a lot easier, as it prevents problems such as deleted players popping back up.
                         try:
                             startingRankSplit = startingRank.split(" ")
                             if len(startingRankSplit) != 3:

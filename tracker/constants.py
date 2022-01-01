@@ -27,6 +27,19 @@ riotToOPGGRegions = {
     "TR1": "TR"
 }
 
+platformToRegion = {
+    "BR1": "AMERICAS",
+    "EUN1": "EUROPE",
+    "EUW1": "EUROPE",
+    "JP1": "ASIA",
+    "KR": "ASIA",
+    "LA1": "AMERICAS",
+    "LA2": "AMERICAS",
+    "OC1": "AMERICAS", # ??? recheck this
+    "RU": "EUROPE", # ??? recheck this
+    "TR1": "EUROPE" #??? recheck this
+}
+
 queueNameToQueueID = {
     "RANKED_SOLO_5x5": 420,
     "RANKED_FLEX_5x5": 440

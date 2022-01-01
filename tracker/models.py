@@ -41,6 +41,7 @@ class TrackedPlayers(models.Model):
                    ('II', 'II'),
                    ('III', 'III'),
                    ('IV', 'IV')]
+    #TODO: Make PUUID the primary key for both this and LeagueData, so dealing with namechanges is automated
     name = models.CharField(max_length=100, primary_key=True)
     id = models.CharField(max_length=100, default="")
     accountId = models.CharField(max_length=100, default="")

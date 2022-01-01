@@ -5,11 +5,20 @@ import riotwatcher
 from django.core.exceptions import *
 
 from . import constants
-from .models import LeagueData
+from .models import LeagueData, TrackedPlayers
 
 
 def rankToLP(rank, tier, points):
     return (constants.rankWeights[rank]) * 400 + (constants.tierWeights[tier]) * 100 + int(points)
+
+def updateIds():
+    for player in TrackedPlayers.objects.all():
+        id, accountId, puuid = getIds(player.name, player.region)
+        player.id = id
+        player.accountId = accountId
+        player.puuid = puuid
+        print("[UpdateIds] New IDs for player {0}: {1} // {2} // {3}".format(player.name, id, accountId, puuid))
+        player.save()
 
 def getIds(playerName, region):
     lolWatcher = riotwatcher.LolWatcher(os.environ.get("API_KEY"))
@@ -17,7 +26,8 @@ def getIds(playerName, region):
         summonerData = lolWatcher.summoner.by_name(region, playerName)
         return summonerData['id'], summonerData['accountId'], summonerData['puuid']
     except Exception:
-        return ""
+        return ["", "", ""]
+
 
 def updatePlayerData(playerName, accountId, id, region, queueType, startingTier, startingRank, startingPoints, oldProgressDelta):
     lolWatcher = riotwatcher.LolWatcher(os.environ.get("API_KEY"))
@@ -55,16 +65,17 @@ def getPlayerStreakData(playerName, puuid, region, queueType):
     lolWatcher = riotwatcher.LolWatcher(os.environ.get("API_KEY"))
     count = 1
     streakString = ""
+    correctedRegion = constants.platformToRegion[region]
     try:
-        #FIXME: bump to v5 before august, when riotwatcher updates
+        #FIXME: BUMP TO V5!!! V4 is deprecated
         #FIXME: I really, really hope there is a better way to do this. If not, we are going to run into ratelimits very easily.
-        #matchData = lolWatcher.match_v5.matchlist_by_puuid(region=region, puuid=puuid, count=5, queue=queueNumber) # this requires a region name update / dict because riot is fucking annoying
-        matchData = lolWatcher.match_v4.matchlist_by_account(region=region, encrypted_account_id=puuid, queue=queueNumber, end_index=5)
+        matchData = lolWatcher.match.matchlist_by_puuid(region=correctedRegion, puuid=puuid, count=5, queue=queueNumber)
+        #matchData = lolWatcher.match_v4.matchlist_by_account(region=region, encrypted_account_id=puuid, queue=queueNumber, end_index=5)
         # This API is fucking horrid, just what is this level of nesting structs
         for match in matchData['matches']:
             print("[LeagueData] Processing match {0} for player {1}".format(count, playerName))
             count += 1
-            gameData = lolWatcher.match_v4.by_id(region=region, match_id=match['gameId'])
+            gameData = lolWatcher.match.by_id(region=region, match_id=match['gameId'])
             for participant, participantID in zip(gameData['participants'], gameData['participantIdentities']):
                 participantStats = participant['stats']
                 participantPlayerData = participantID['player']
