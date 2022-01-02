@@ -32,16 +32,16 @@ class LeagueTable(tables.Table):
 
     def render_winrate(self, value, column):
         if value > 0.5:
-            column.attrs = {'td': {'style': 'color:green'}}
+            column.attrs = {'td': {'style': 'color:rgb(180, 210, 115);'}}
         elif value < 0.5:
-            column.attrs = {'td': {'style': 'color:red'}}
+            column.attrs = {'td': {'style': 'color:rgb(249,36,114);'}}
         return "{:0.2f}%".format(value * 100)
 
     def render_progress(self, value, column, record):
         if value > 0:
-            column.attrs = {'td': {'style': 'color:green'}}
+            column.attrs = {'td': {'style': 'color:rgb(180, 210, 115);'}}
         elif value < 0:
-            column.attrs = {'td': {'style': 'color:red'}}
+            column.attrs = {'td': {'style': 'color:rgb(249,36,114);'}}
         sign = "+" if (record.progressDelta >= 0) else ""
         return "{0}LP ({1}{2})".format(value, sign, record.progressDelta)
 
@@ -50,9 +50,9 @@ class LeagueTable(tables.Table):
         new_string = ""
         for letter in streak_string:
             if letter == "W":
-                new_string += '<span style="color:green">W</span>'
+                new_string += '<span style="color:rgb(180, 210, 115);">W</span>'
             elif letter == "L":
-                new_string += '<span style="color:red">L</span>'
+                new_string += '<span style="color:rgb(249,36,114);">L</span>'
             else:
                 new_string += letter
         return format_html(new_string)

@@ -6,28 +6,43 @@
         <link rel="stylesheet" type="text/css" href="{% static 'tracker/tracker.css' %}">
         <link href="http://fonts.cdnfonts.com/css/edo-sz" rel="stylesheet">
         <link rel="preconnect" href="https://fonts.gstatic.com">
-        <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href='{% static 'tracker/loading.min.css' %}'/>
 		<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
         <title>SOLOQ CHALLENGE</title>
     </head>
     <body>
         <center>
         <div class="center">
-            <h1 id="title">LIGUILLA DEL LOL</h1>
-            {% render_table table %}
-            <form action="{% url 'index' %}" method="post">
-                <input type="submit" value="Recargar Datos" name="botonDatos">
-                {%csrf_token%}
-            </form>
-            <br>
-            <a>Ultima Actualización: <b>{{ currentDate }}</b></a>
-            <br>
-            <a>El reto acaba el: <b>{{ endDate }}</b></a>
-            <p><b>{{ bottomMessage }}</b></p>
+            <div id="loader" style="display:none;width:100vw;height:100vh;z-index:1">
+                 <div class="ld" style="background-color:rgb(46, 46, 46)" >
+                                <div class="ld ld-ring ld-spin" style="font-size:128px;color:rgb(214, 214, 214)"></div>
+                                <div class="text" style="color:rgb(214, 214, 214)">recargando...</div>
+                </div>
+            </div>
+            <div id="contenido">
+                <div id="contenidoHolder" style="display:inherit">
+                    <h1 id="title">LIGUILLA DEL LOL</h1>
+                    {% render_table table %}
+                    <form action="{% url 'index' %}" method="post" onsubmit="document.getElementById('loader').style.display = 'block'; document.getElementById('contenido').style.display = 'none';document.getElementById('bottomDiv').style.display = 'none'">
+
+                            <input type="submit" value="Recargar" name="botonDatos" class="reloadButton">
+
+
+                        {%csrf_token%}
+                    </form>
+                    <br>
+                    <a>Ultima Actualización: <b>{{ currentDate }}</b></a>
+                    <br>
+                    <a>El reto acaba el: <b>{{ endDate }}</b></a>
+                    <p><b>{{ bottomMessage }}</b></p>
+                </div>
+            </div>
+            </center>
+        <div class="bottom" id="bottomDiv" align="center">
+            <a href="https://github.com/Josde/SimpleSoloQTracker"><img src="{% static 'tracker/res/github.png' %}" style="display:inherit"></a>
         </div>
-        </center>
-    <div class="bottom" align="center">
-        <a href="https://github.com/Josde/SimpleSoloQTracker"><img src="{% static 'tracker/res/github.png' %}" style="border-radius: 50px; box-shadow: 0px 0px 100px 20px rgba(255, 255, 255, 0.8);"></a>
     </div>
     </body>
 </html>
