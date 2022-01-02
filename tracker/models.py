@@ -2,22 +2,6 @@ from django.db import models
 from django.utils import timezone
 # Create your models here.
 
-#TODO: Implement django-model-history so I can get stadistics out of this model.
-class LeagueData(models.Model):
-    name = models.CharField(max_length=100, primary_key=True)
-    puuid = models.CharField(max_length=100, default="")
-    tier = models.CharField(max_length=100, default='IRON')
-    rank = models.CharField(max_length=100, default='IV')
-    points = models.IntegerField(default=0)
-    wins = models.IntegerField(default=0)
-    losses = models.IntegerField(default=0)
-    winrate = models.FloatField(default=0)
-    progress = models.IntegerField(default=0)
-    progressDelta = models.IntegerField(default=0)
-    streak = models.CharField(max_length=5, default='EEEEE')
-
-
-
 # TODO: Add ChallengeList to either this or LeagueData so we can have multiple leaderboards. For now, Challenge is a glorified way to store a date.
 # Using Junction tables to store lists: https://stackoverflow.com/a/444268
 class TrackedPlayers(models.Model):
@@ -52,6 +36,29 @@ class TrackedPlayers(models.Model):
     startingPoints = models.IntegerField()
     region = models.CharField(max_length=10, choices=regionChoices, default='EUW')
     ignored = models.BooleanField(default=False)
+
+    def save(self, **kwargs):
+        super(TrackedPlayers, self).save(**kwargs)
+        leaguePlayer = LeagueData(name=self.name)
+        if (leaguePlayer.tracked != self):
+            leaguePlayer.tracked = self
+            leaguePlayer.save()
+
+#TODO: Implement django-model-history so I can get stadistics out of this model.
+class LeagueData(models.Model):
+    name = models.CharField(max_length=100, primary_key=True)
+    puuid = models.CharField(max_length=100, default="")
+    tier = models.CharField(max_length=100, default='IRON')
+    rank = models.CharField(max_length=100, default='IV')
+    points = models.IntegerField(default=0)
+    wins = models.IntegerField(default=0)
+    losses = models.IntegerField(default=0)
+    winrate = models.FloatField(default=0)
+    progress = models.IntegerField(default=0)
+    progressDelta = models.IntegerField(default=0)
+    streak = models.CharField(max_length=5, default='EEEEE')
+    tracked = models.ForeignKey('tracker.TrackedPlayers', on_delete=models.CASCADE, blank=True, null=True)
+
 
 class Challenge(models.Model):
     queueTypeChoices = [('RANKED_SOLO_5x5', 'RANKED_SOLO_5x5'),

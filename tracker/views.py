@@ -12,8 +12,9 @@ from .tables import LeagueTable
 
 
 class LeagueDataListView(SingleTableView):
-    model = LeagueData
+    #model = LeagueData
     table_class = LeagueTable
+    queryset = LeagueData.objects.filter(tracked__ignored=False)
     template_name = 'tracker/tracker.html'
     ordering = "-progress"
 
@@ -63,7 +64,7 @@ def index(request):
             try:
                 leaguePlayer = LeagueData.objects.get(pk=trackedPlayer.name)
                 if not trackedPlayer.ignored:
-                    tier, rank, points, wins, losses, winrate, progress, progressDelta, streak = updatePlayerData(trackedPlayer.name, trackedPlayer.accountId, trackedPlayer.id, trackedPlayer.region, queueType, trackedPlayer.startingTier, trackedPlayer.startingRank,
+                    tier, rank, points, wins, losses, winrate, progress, progressDelta, streak = updatePlayerData(trackedPlayer.name, trackedPlayer.puuid, trackedPlayer.accountId, trackedPlayer.id, trackedPlayer.region, queueType, trackedPlayer.startingTier, trackedPlayer.startingRank,
                                      trackedPlayer.startingPoints, leaguePlayer.progressDelta)
                     leaguePlayer.tier = tier
                     leaguePlayer.rank = rank
@@ -80,7 +81,7 @@ def index(request):
             except ObjectDoesNotExist:
                 try:
                     tier, rank, points, wins, losses, winrate, progress, progressDelta, streak = updatePlayerData(
-                        trackedPlayer.name, trackedPlayer.accountId, trackedPlayer.id, trackedPlayer.region, queueType,
+                        trackedPlayer.name, trackedPlayer.puuid, trackedPlayer.accountId, trackedPlayer.id, trackedPlayer.region, queueType,
                         trackedPlayer.startingTier, trackedPlayer.startingRank,
                         trackedPlayer.startingPoints, 0)
                     leaguePlayer = LeagueData.objects.create(name=trackedPlayer.name, puuid=trackedPlayer.puuid, tier=tier,
