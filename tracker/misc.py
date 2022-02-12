@@ -31,7 +31,7 @@ def getIds(playerName: str, region: str):
         return ["", "", ""]
 
 #TODO: Refactor these to only take a primary key and do all the database logic too.
-def updatePlayerData(playerName: str, puuid: str, accountId: str, id: str, region: str, queueType: int, startingTier: str, startingRank: str, startingPoints: int, oldProgressDelta: int):
+def updatePlayerData(playerName: str, puuid: str, accountId: str, id: str, region: str, queueType: int, startingTier: str, startingRank: str, startingPoints: int, oldProgress: int):
     lolWatcher = riotwatcher.LolWatcher(os.environ.get("API_KEY"))
     try:
         if len(accountId) < 20 or len(id) < 20 or len(puuid) < 20: #validity check, idk if theres a documented minimum
@@ -57,7 +57,7 @@ def updatePlayerData(playerName: str, puuid: str, accountId: str, id: str, regio
                 losses = leagueData['losses']
                 winrate = winrate
                 progress = currentLP - startingLP
-                progressDelta = progress - points
+                progressDelta = progress - oldProgress
                 streak = getPlayerStreakData(playerName, validPuuid, region, queueType)
                 return tier, rank, points, wins, losses, winrate, progress, progressDelta, streak
     except Exception as ex:
@@ -82,11 +82,11 @@ def getPlayerStreakData(playerName: str, puuid: str, region: str, queueType: int
             for participant in gameData['info']['participants']:
                 if (playerName == participant['summonerName']):
                     streakString += "W" if participant['win'] else "L"
-            # since we read LTR, we reverse the string to put newest matches at the right.
-            streakString = streakString[::-1]
     except Exception as ex:
         print("Exception {0} ocurred while looking up player {1}".format(type(ex).__name__, playerName))
         traceback.print_exc()
     finally:
         print("[LeagueData] Finished processing player {0}, streak is {1}".format(playerName, streakString))
+        # since we read LTR, we reverse the string to put newest matches at the right.
+        streakString = streakString[::-1]
         return streakString

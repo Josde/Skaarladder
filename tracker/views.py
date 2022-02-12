@@ -65,7 +65,7 @@ def index(request):
                 leaguePlayer = LeagueData.objects.get(pk=trackedPlayer.name)
                 if not trackedPlayer.ignored:
                     tier, rank, points, wins, losses, winrate, progress, progressDelta, streak = updatePlayerData(trackedPlayer.name, trackedPlayer.puuid, trackedPlayer.accountId, trackedPlayer.id, trackedPlayer.region, queueType, trackedPlayer.startingTier, trackedPlayer.startingRank,
-                                     trackedPlayer.startingPoints, leaguePlayer.progressDelta)
+                                     trackedPlayer.startingPoints, leaguePlayer.progress)
                     leaguePlayer.tier = tier
                     leaguePlayer.rank = rank
                     leaguePlayer.points = points
