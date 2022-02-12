@@ -57,7 +57,7 @@ def updatePlayerData(playerName: str, puuid: str, accountId: str, id: str, regio
                 losses = leagueData['losses']
                 winrate = winrate
                 progress = currentLP - startingLP
-                progressDelta = progress - oldProgressDelta
+                progressDelta = progress - points
                 streak = getPlayerStreakData(playerName, validPuuid, region, queueType)
                 return tier, rank, points, wins, losses, winrate, progress, progressDelta, streak
     except Exception as ex:
@@ -82,6 +82,8 @@ def getPlayerStreakData(playerName: str, puuid: str, region: str, queueType: int
             for participant in gameData['info']['participants']:
                 if (playerName == participant['summonerName']):
                     streakString += "W" if participant['win'] else "L"
+            # since we read LTR, we reverse the string to put newest matches at the right.
+            streakString = streakString[::-1]
     except Exception as ex:
         print("Exception {0} ocurred while looking up player {1}".format(type(ex).__name__, playerName))
         traceback.print_exc()
