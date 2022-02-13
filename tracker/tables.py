@@ -31,7 +31,7 @@ class LeagueTable(tables.Table):
             constants.riotToOPGGRegions[region.upper()], sanitized_name, value))
 
     def render_winrate(self, value, column):
-        if value > 0.5:
+        if value >= 0.5:
             column.attrs = {'td': {'style': 'color:rgb(180, 210, 115);'}}
         elif value < 0.5:
             column.attrs = {'td': {'style': 'color:rgb(249,36,114);'}}
