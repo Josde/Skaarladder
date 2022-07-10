@@ -1,1 +1,1 @@
-web: gunicorn SimpleSoloQTracker.wsgi:application
+web: gunicorn SoloQTracker.wsgi:application

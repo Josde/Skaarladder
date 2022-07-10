@@ -1,0 +1,40 @@
+{% load render_table from django_tables2 %}
+{% load static %}
+<!doctype html>
+<html>
+    <head>
+        <meta name=”viewport” content=”width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="{% static 'tracker/tracker.css' %}">
+        <link href="http://fonts.cdnfonts.com/css/edo-sz" rel="stylesheet">
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href='{% static 'tracker/loading.min.css' %}'/>
+		<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
+        <title>SOLOQ CHALLENGE</title>
+    </head>
+    <body>
+        <center>
+            <div id="center"> 
+                <div id="contenido">
+                    <div id="contenidoHolder" style="display:inherit">
+                        <h1 id="title">LIGUILLA DEL LOL</h1>
+                        {% comment %} TODO: uncomment this when tables get implemented  {% endcomment %}
+                        {# {% render_table table %} #}
+                        {% comment %} {%csrf_token%} {% endcomment %}
+                        <br>
+                        {% comment %} TODO: Update this when parsing gets reimplemented, also support customizable strings  {% endcomment %}
+                        <a>Ultima Actualización: <b>{{ currentDate }}</b></a>
+                        <br>
+                        <a>El reto acaba el: <b>{{ endDate }}</b></a>
+                        <p><b>{{ bottomMessage }}</b></p>
+                    </div>
+                </div>
+            </div>
+            </center>
+        <div class="bottom" id="bottomDiv" align="center">
+            <a href="https://github.com/Josde/SimpleSoloQTracker">source code</a>
+        </div>
+    </div>
+    </body>
+</html>
