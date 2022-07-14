@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_tables2',
-    'tracker'
+    'tracker',
+    'pyot',
 ]
 
 MIDDLEWARE = [
@@ -75,7 +76,7 @@ WSGI_APPLICATION = 'SoloQTracker.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-
+# TODO: Move this over to Heroku PGSQL
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -129,11 +130,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # See: https://docs.djangoproject.com/en/4.0/topics/auth/customizing/#using-a-custom-user-model-when-starting-a-project
 AUTH_USER_MODEL = 'tracker.User'
 
+PYOT_CONFS = ['tracker.pyotconf']
+
 import django_on_heroku
 django_on_heroku.settings(locals(), secret_key=False)
 
 
-import sentry_sdk
+""" import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
 sentry_sdk.init(
@@ -153,4 +156,4 @@ sentry_sdk.init(
     # If you wish to associate users to errors (assuming you are using
     # django.contrib.auth) you may enable sending PII data.
     send_default_pii=True
-)
+) """
