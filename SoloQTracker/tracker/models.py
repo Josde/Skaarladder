@@ -1,37 +1,10 @@
-from logging.handlers import SYSLOG_UDP_PORT
 from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from pyot.utils.lol.routing import platform_to_region
 from asgiref.sync import sync_to_async
+from tracker.utils.constants import regionChoices, platformChoices, tierChoices, rankChoices
 # Choices for ease of use on choice fields. Could be stored in constants.py, but isn't done since usage is constrained to this file for now.
-regionChoices = [('euw1', 'euw1'),
-                     ("br1","br1"),
-                     ("eun1", "eun1"),
-                     ('jp1', 'jp1'),
-                     ('kr1', 'kr1'),
-                     ('la1', 'la1'),
-                     ('la2', 'la2'),
-                     ('oc1', 'oc1'),
-                     ('ru', 'ru'),
-                     ('tr1', 'tr1')]
-
-platformChoices = [('europe', 'europe'),
-                     ("americas","americas"),
-                     ("asia", "asia"),
-                     ]
-
-tierChoices = [('IRON', 'IRON'),
-                ('BRONZE', 'BRONZE'),
-                ('SILVER', 'SILVER'),
-                ('GOLD', 'GOLD'),
-                ('PLATINUM', 'PLATINUM'),
-                ('DIAMOND', 'DIAMOND'),
-                ('MASTER_PLUS', 'MASTER_PLUS')]
-rankChoices = [('I', 'I'),
-                ('II', 'II'),
-                ('III', 'III'),
-                ('IV', 'IV')]
 
 class User(AbstractUser): # Override user model for future use, just in case. See: https://docs.djangoproject.com/en/4.0/topics/auth/customizing/#using-a-custom-user-model-when-starting-a-project
     pass 

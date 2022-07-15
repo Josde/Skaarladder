@@ -1,0 +1,5 @@
+<form action="/create/" method="post">
+    {% comment %} {% csrf_token %} {% endcomment %}
+    {{ form|linebreaks }}
+    <input type="submit" value="Submit">
+</form>

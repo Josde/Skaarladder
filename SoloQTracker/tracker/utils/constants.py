@@ -26,3 +26,33 @@ riotToOPGGRegions = {
     "RU": "RU",
     "TR1": "TR"
 }
+
+# Form choices 
+
+regionChoices = [('euw1', 'euw1'),
+                     ("br1","br1"),
+                     ("eun1", "eun1"),
+                     ('jp1', 'jp1'),
+                     ('kr1', 'kr1'),
+                     ('la1', 'la1'),
+                     ('la2', 'la2'),
+                     ('oc1', 'oc1'),
+                     ('ru', 'ru'),
+                     ('tr1', 'tr1')]
+
+platformChoices = [('europe', 'europe'),
+                     ("americas","americas"),
+                     ("asia", "asia"),
+                     ]
+
+tierChoices = [('IRON', 'IRON'),
+                ('BRONZE', 'BRONZE'),
+                ('SILVER', 'SILVER'),
+                ('GOLD', 'GOLD'),
+                ('PLATINUM', 'PLATINUM'),
+                ('DIAMOND', 'DIAMOND'),
+                ('MASTER_PLUS', 'MASTER_PLUS')]
+rankChoices = [('I', 'I'),
+                ('II', 'II'),
+                ('III', 'III'),
+                ('IV', 'IV')]
