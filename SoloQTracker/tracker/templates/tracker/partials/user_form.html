@@ -1,0 +1,10 @@
+
+<div hx-target="this" hx-swap="outerHTML">
+    <form id='user_form' style='display: inline'>
+        {% csrf_token %}
+        {{ form }}
+    </form>
+    <div id='results' style='display: inline'>
+
+    </div>
+</div>

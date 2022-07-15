@@ -17,6 +17,16 @@ class ChallengeForm(forms.Form):
     name = forms.CharField(label=_('ChallengeName'), max_length=50)
     start_date = forms.DateTimeField(label=_('StartDate'), widget=DateTimePickerInput)
     end_date = forms.DateTimeField(label=_('EndDate'), widget=DateTimePickerInput)
-    player = forms.MultiValueField(fields=[forms.CharField(label=_('PlayerName'), max_length=30)])
-    region = forms.CharField(label=_('Region'), widget=forms.Select(choices=regionChoices))
+
+class UserForm(forms.Form):
+    player = forms.CharField(label=_('PlayerName'), max_length=30, widget=forms.TextInput(attrs={'hx-post': '/create/htmx/provisional_parse/',
+                                                                            'hx-trigger': 'keydown delay:1000ms changed',
+                                                                            'hx-swap':"innerhtml",
+                                                                            'hx-target': "#results"}))
+    region = forms.CharField(label=_('Region'), widget=forms.Select(choices=regionChoices, attrs={'hx-post': '/create/htmx/provisional_parse/',
+                                                                            'hx-trigger': 'mouseleave delay:1000ms changed',
+                                                                            'hx-swap':"innerhtml",
+                                                                            'hx-target': "#results"}))
+
+    
     

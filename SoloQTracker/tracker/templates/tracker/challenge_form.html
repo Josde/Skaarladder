@@ -1,5 +1,34 @@
-<form action="/create/" method="post">
-    {% comment %} {% csrf_token %} {% endcomment %}
-    {{ form|linebreaks }}
-    <input type="submit" value="Submit">
-</form>
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+{% load static %}
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Challenge Creation</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+        <script src="{% static 'tracker/htmx.min.js' %}" type='text/javascript'><!-- required for some browsers ??? --></script> 
+    </head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+        <div id='challenge_form'>
+            <form action="/create/" method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type='button' hx-get="{% url 'player_form' %}" hx-swap="beforeend" hx-target='#player_forms'>Add another user</button>
+                <div id='player_forms'>
+
+                </div>
+                <input type="submit" value="Submit">
+            </form>
+        </div>
+        <script src="" async defer></script>
+    </body>
+</html>
