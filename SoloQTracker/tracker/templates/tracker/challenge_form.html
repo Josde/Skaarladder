@@ -13,13 +13,14 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="">
         <script src="{% static 'tracker/htmx.min.js' %}" type='text/javascript'><!-- required for some browsers ??? --></script> 
+        <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <body>
         <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
-        <div id='challenge_form'>
-            <form action="/create/" method="post">
+        <div>
+            <form action="/create/" method="post" id='challenge_form'>
                 {% csrf_token %}
                 {{ form.as_p }}
                 <button type='button' hx-get="{% url 'player_form' %}" hx-swap="beforeend" hx-target='#player_forms'>Add another user</button>
