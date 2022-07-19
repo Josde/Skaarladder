@@ -4,7 +4,7 @@
 import asyncio
 from django.utils import timezone
 from tracker.utils.league import rankToLP
-from tracker.models import Player, Challenge_Player
+from tracker.models import Player, Challenge_Player, Challenge
 import datetime
 import traceback
 from pyot.models import lol
@@ -54,15 +54,20 @@ class UpdateHelper():
             current_absolute_lp = rankToLP(self.queried_player.tier, self.queried_player.rank, self.queried_player.lp)
             if (previous_absolute_lp != current_absolute_lp):
                 # Rank changed, must update all challenges
-                challenges = await sync_to_async(list)(Challenge_Player.objects.filter(player_id=self.queried_player.id))
+                challenges = await sync_to_async(list)(Challenge_Player.objects.filter(player_id=self.queried_player.id).select_related('challenge_id').all())
                 for item in challenges:
+                    challenge_details = item.challenge_id
                     previous_progress = item.progress
-                    absolute_starting_lp = rankToLP(item.starting_rank, item.starting_tier, item.starting_lp)
+                    if (challenge_details.is_absolute):
+                        absolute_starting_lp = 0
+                    else:
+                        absolute_starting_lp = rankToLP(item.starting_tier, item.starting_rank, item.starting_lp)
+                    
                     item.progress = current_absolute_lp - absolute_starting_lp
                     item.progress_delta = item.progress - previous_progress
                 #TODO: Change this to abulk_update once it gets to Django release
                 #await sync_to_async(Challenge_Player.objects.bulk_update(challenges, ['progress', 'progress_delta']))
-                
+                await sync_to_async(Challenge_Player.objects.bulk_update)(challenges, ['progress', 'progress_delta']) 
             await sync_to_async(self.queried_player.save)()
         except Exception: # For debugging, implement errors later.
             traceback.print_exc()
