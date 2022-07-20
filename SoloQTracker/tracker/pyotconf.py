@@ -20,5 +20,9 @@ class LolPipeline(PipelineConf):
         {
             "backend": "pyot.stores.riotapi.RiotAPI",
             "api_key": API_KEY,
+            "rate_limiter": {
+                "backend": "pyot.limiters.memory.MemoryLimiter",
+                "limiting_share": 0.9,
+             }
         }
     ]

@@ -56,3 +56,7 @@ rankChoices = [('I', 'I'),
                 ('II', 'II'),
                 ('III', 'III'),
                 ('IV', 'IV')]
+
+# Settings
+
+UPDATE_DELAY = 600
