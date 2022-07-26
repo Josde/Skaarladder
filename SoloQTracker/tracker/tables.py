@@ -21,7 +21,7 @@ class ChallengeTable(tables.Table):
 
     class Meta:
         template_name = "django_tables2/bootstrap.html"
-        attrs = {"class": "ranktable"}
+        attrs = {"class": "border-collapse text-white text-center"}
         order_by = "-progress"
         orderable = False  # disable header clicking
 
@@ -30,7 +30,7 @@ class ChallengeTable(tables.Table):
         region = "EUW1"  # default
         playerName = "" + value
         playerName = playerName.strip()
-        column.attrs = {'td': {'style': 'white-space:nowrap;'}}
+        column.attrs = {'td': {'class': 'whitespace-nowrap'}}
         try:
             player = Player.objects.get(name=playerName)
             region = player.platform
@@ -38,9 +38,9 @@ class ChallengeTable(tables.Table):
             if streak < 1 and streak > -1:
                 streak_string = ""
             elif streak > 1:
-                streak_string = '<span style="color:rgb(180, 210, 115);">{0}L</span>'.format(streak)
+                streak_string = '<span style="color:rgb(180, 210, 115);">{0}L</span>'.format(streak) # TODO: For some reason styling this with a tailwind class doesn't work, check later.
             elif streak < -1:
-                streak_string = '<span style="color:rgb(249, 36, 114);">{0}W</span>'.format(streak)
+                streak_string = '<span style="color:rgb(249,36,114);">{0}W</span>'.format(streak)
         
         except ObjectDoesNotExist:
             print("[LeagueTable] Rendering player {0}, who can't be found in TrackedPlayers. This shouldn't happen.".format(value))
@@ -56,10 +56,11 @@ class ChallengeTable(tables.Table):
         return "{:0.2f}%".format(value)
 
     def render_progress (self, value, column, record):
+        column.attr = {'class': 'whitespace-nowrap'}
         if value > 0:
-            column.attrs = {'td': {'style': 'color:rgb(180, 210, 115);'}}
+            column.attrs = column.attrs | {'td': {'style': 'color:rgb(180, 210, 115);'}}
         elif value < 0:
-            column.attrs = {'td': {'style': 'color:rgb(249,36,114);'}}
+            column.attrs = column.attrs | {'td': {'style': 'color:rgb(249,36,114);'}}
         progressSign = "+" if (record.progress >= 0) else ""
         progressDeltaSign = "+" if (record.progress_delta >= 0) else ""
         return "{0}{1}LP ({2}{3})".format(progressSign, value, progressDeltaSign, record.progress_delta)

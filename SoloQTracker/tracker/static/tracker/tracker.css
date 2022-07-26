@@ -5,15 +5,7 @@ html {
   -o-background-size: cover;
   background-size: cover;
 }
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction:column;
-    min-height: 100vh;
-    height: 100%;
-    overflow: hidden;
-}
+
 .center {
     margin-top: auto;
     display:flex;

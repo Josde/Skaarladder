@@ -12,7 +12,7 @@ from asgiref.sync import sync_to_async
 from .tables import ChallengeTable
 # Create your views here.
 def index(request): 
-    return render(request, 'tracker/tracker.html')
+    return render(request, 'tracker/index.html')
 
 async def player(request, player=""):
     if (player != ""):
@@ -84,8 +84,9 @@ async def provisional_parse(request):
     
 def challenge(request, id):
     challenge_data = Challenge.objects.filter(id=id).first()
-    player_query = Challenge_Player.objects.filter(challenge_id=id).select_related('player_id')
-    table = ChallengeTable(player_query, order_by="-progress")
+    player_query = Challenge_Player.objects.filter(challenge_id=id).select_related('player_id').order_by('-progress')
+    table = ChallengeTable(player_query)
+    start_date = challenge_data.start_date
     end_date = challenge_data.end_date
     challenge_name = challenge_data.name 
     return render(request, 'tracker/challenge.html', context=locals())

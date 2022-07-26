@@ -1,39 +1,40 @@
 {% load render_table from django_tables2 %}
 {% load static %}
-<!doctype html>
-<html>
+<html data-color-scheme="dark" color-scheme="dark">
     <head>
-        <meta name=”viewport” content=”width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" type="text/css" href="{% static 'tracker/tracker.css' %}">
-        <link href="http://fonts.cdnfonts.com/css/edo-sz" rel="stylesheet">
+        <title>Skaarladder :: {{ challenge_name }}</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="http://fonts.cdnfonts.com/css/edo-sz" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href='{% static 'tracker/loading.min.css' %}'/>
-        <script src="https://cdn.tailwindcss.com"></script>
-		<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
-        <title>Skaarladder :: {{ challenge_name }}</title>
+        <link href="{% static 'tracker/deploy/tailwind.css' %}" rel="stylesheet">
+        <link href="{% static 'tracker/tracker.css' %}" rel="stylesheet">
+        <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
+        <script src="{% static 'tracker/htmx.min.js' %}" type='text/javascript' defer><!-- required for some browsers ??? --></script> 
     </head>
     <body>
-        <center>
-            <div id="center"> 
-                <div id="contenido">
-                    <div id="contenidoHolder" style="display:inherit">
-                        <h1 id="title">{{ challenge_name }}</h1>
-                        {% render_table table %} 
-                        {%csrf_token%} 
-                        <br>
-                        <a>Ultima Actualización: <b>{{ currentDate }}</b></a>
-                        <br>
-                        <a>El reto acaba el: <b>{{ end_date }}</b></a>
-                        <p><b>{{ bottomMessage }}</b></p>
-                    </div>
-                </div>
+        {% include "tracker/partials/navbar.html" %}    
+        <div class="flex items-center justify-center w-full h-full overflow-hidden text-white bg-neutral-900"> 
+            <div class="flex w-[64rem] h-screen bg-neutral-800 text-white flex-col drop-shadow-xl z-10">
+                <h1 id="title" class="pt-16 m-8 font-bold text-center text-white shadow-sm">{{ challenge_name }}</h1>
+                <div class='flex flex-col justify-end'>
+                    <!-- <a class="text-center">Last update: <b>{{ currentDate }}</b></a> -->
+                    <a class="text-center">Starts on <b>{{ start_date }}</b> and ends on <b>{{ end_date }}</b></a>
+                    <p><b class="text-center">{{ bottomMessage }}</b></p>
+                    <a class="pb-4" name="fill"></a>
             </div>
-            </center>
-        <div class="bottom" id="bottomDiv" align="center">
-            <a href="https://github.com/Josde/SimpleSoloQTracker">source code</a>
+                <hr class="bg-neutral-600"></hr>
+                <div class="flex justify-center w-full m-8">
+                    {% render_table table %} 
+                    {%csrf_token%} 
+                </div>
+                
+            </div>
         </div>
+        {% include "tracker/partials/footer.html" %} 
     </div>
     </body>
 </html>

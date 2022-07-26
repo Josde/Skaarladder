@@ -1,0 +1,48 @@
+{% load render_table from django_tables2 %}
+{% load static %}
+<html data-color-scheme="dark" color-scheme="dark">
+    <head>
+        <title>Skaarladder :: {{ challenge_name }}</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="http://fonts.cdnfonts.com/css/edo-sz" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+        <link href="{% static 'tracker/deploy/tailwind.css' %}" rel="stylesheet">
+        <link href="{% static 'tracker/tracker.css' %}" rel="stylesheet">
+        <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
+        <script src="{% static 'tracker/htmx.min.js' %}" type='text/javascript' defer><!-- required for some browsers ??? --></script> 
+    </head>
+    <body>
+        {% include "tracker/partials/navbar.html" %}    
+        <div class="flex items-center justify-center w-full h-full overflow-hidden text-white bg-neutral-900"> 
+            <div class="flex flex-col items-center justify-start w-full h-full"> 
+                <div name="logo" class="flex flex-col w-64 h-64 mt-16 text-center">
+                    <img src="{% static 'tracker/logo.png' %}" class="duration-300 hover:animate-spin"></img>
+                    <b class="font-mono text-4xl drop-shadow-md">Skaarladder </b>
+                </div>
+                <div name="callouts" class="flex flex-row w-full h-full mt-16">
+                    <div name="what" class="flex flex-col mt-16 ml-32">
+                        <b class="text-xl font-bold drop-shadow-lg">What is Skaarladder?</b>
+                        <p class="mt-4 font-medium">Skaarladder is a online service that lets you create League of Legends ladders and competitions for SoloQ.</p>
+                    </div>
+                    <div name="how" class="flex flex-col mt-16 ml-32">
+                        <b class="text-xl font-bold drop-shadow-lg">How do I use it?</b>
+                        <p class="mt-4 font-medium">Click on the '+' button at the top or <a class='font-bold' href="{% url 'create_challenge' %}">here</a> to begin.</p>
+                    </div>
+                    <div name="contribute" class="flex flex-col mt-16 ml-32 mr-32">
+                        <b class="text-xl font-bold drop-shadow-lg">Can I contribute?</b>
+                        <p class="mt-4 font-medium">Yes! Skaarladder is open-source and contributions can be made <a class='font-bold' href='https://github.com/Josde/SimpleSoloQTracker'>here.</a>
+                            <br>
+                            If you have used the project, consider donating <a class='font-bold' href='https://paypal.me/itsJosde'>here</a> to pay for server costs!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% include "tracker/partials/footer.html" %} 
+    </div>
+    </body>
+</html>
