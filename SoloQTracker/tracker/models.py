@@ -20,11 +20,12 @@ class Player(models.Model):
     # Ranked data
     tier = models.CharField(max_length=100, default='SILVER', choices=tierChoices)
     rank = models.CharField(max_length=5, default='I', choices=rankChoices)
-    lp = models.IntegerField(default=0)
+    lp = models.IntegerField(default=0, verbose_name='LP')
     wins = models.IntegerField(default=0)
     losses = models.IntegerField(default=0)
     winrate = models.FloatField(default=0)
     streak = models.IntegerField(default=0)
+    last_ranked_update = models.DateTimeField(default=timezone.now) # mostly for debugging
 
     @classmethod
     def create(cls, name, platform):
@@ -39,7 +40,7 @@ class Challenge(models.Model):
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
     is_absolute = models.BooleanField()
-    last_access_date = models.DateTimeField(default=timezone.now)
+    last_access_date = models.DateTimeField(default=timezone.now) # Debugging
 
 
 class Challenge_Player(models.Model):

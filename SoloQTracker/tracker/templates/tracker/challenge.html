@@ -12,22 +12,20 @@
         <link rel="stylesheet" type="text/css" href='{% static 'tracker/loading.min.css' %}'/>
         <script src="https://cdn.tailwindcss.com"></script>
 		<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
-        <title>SOLOQ CHALLENGE</title>
+        <title>Skaarladder :: {{ challenge_name }}</title>
     </head>
     <body>
         <center>
             <div id="center"> 
                 <div id="contenido">
                     <div id="contenidoHolder" style="display:inherit">
-                        <h1 id="title">LIGUILLA DEL LOL</h1>
-                        {% comment %} TODO: uncomment this when tables get implemented  {% endcomment %}
-                        {# {% render_table table %} #}
-                        {% comment %} {%csrf_token%} {% endcomment %}
+                        <h1 id="title">{{ challenge_name }}</h1>
+                        {% render_table table %} 
+                        {%csrf_token%} 
                         <br>
-                        {% comment %} TODO: Update this when parsing gets reimplemented, also support customizable strings  {% endcomment %}
                         <a>Ultima Actualización: <b>{{ currentDate }}</b></a>
                         <br>
-                        <a>El reto acaba el: <b>{{ endDate }}</b></a>
+                        <a>El reto acaba el: <b>{{ end_date }}</b></a>
                         <p><b>{{ bottomMessage }}</b></p>
                     </div>
                 </div>

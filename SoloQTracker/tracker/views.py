@@ -9,6 +9,7 @@ from .models import Player, Challenge, Challenge_Player
 from .forms import ChallengeForm
 from .utils.validators import GenericNameValidator
 from asgiref.sync import sync_to_async
+from .tables import ChallengeTable
 # Create your views here.
 def index(request): 
     return render(request, 'tracker/tracker.html')
@@ -82,6 +83,10 @@ async def provisional_parse(request):
         
     
 def challenge(request, id):
-    #TODO: Implement this
-    raise NotImplementedError
+    challenge_data = Challenge.objects.filter(id=id).first()
+    player_query = Challenge_Player.objects.filter(challenge_id=id).select_related('player_id')
+    table = ChallengeTable(player_query, order_by="-progress")
+    end_date = challenge_data.end_date
+    challenge_name = challenge_data.name 
+    return render(request, 'tracker/challenge.html', context=locals())
 

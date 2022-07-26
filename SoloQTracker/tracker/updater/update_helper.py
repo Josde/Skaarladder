@@ -50,6 +50,7 @@ class UpdateHelper():
             self.queried_player.tier = self.ranked_data['tier']
             self.queried_player.rank = self.ranked_data['rank']
             self.queried_player.lp = self.ranked_data['leaguePoints']
+            self.queried_player.last_ranked_update = timezone.now()
             
             current_absolute_lp = rankToLP(self.queried_player.tier, self.queried_player.rank, self.queried_player.lp)
             if (previous_absolute_lp != current_absolute_lp):
@@ -117,7 +118,6 @@ class UpdateHelper():
                 participant_ids = [p.puuid for p in t.participants]
                 if self.queried_player.puuid in participant_ids:
                     if t.win == result or result is None:
-                        print(t.win)
                         if t.win:
                             streak += 1
                         else: 
