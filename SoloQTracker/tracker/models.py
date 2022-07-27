@@ -10,12 +10,13 @@ class User(AbstractUser): # Override user model for future use, just in case. Se
     pass 
 
 class Player(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=24)
+    avatar_id = models.CharField(max_length=24, default="")
     puuid = models.CharField(max_length=100, default="")
     summoner_id = models.CharField(max_length=100, default="")
     account_id = models.CharField(max_length=100, default="")
-    region = models.CharField(max_length=10, default='euw1', choices=regionChoices)
-    platform = models.CharField(max_length=10, default='europe', choices=platformChoices)
+    region = models.CharField(max_length=10, default='europes', choices=regionChoices)
+    platform = models.CharField(max_length=10, default='euw1', choices=platformChoices)
     last_data_update = models.DateTimeField(default=timezone.now)
     # Ranked data
     tier = models.CharField(max_length=100, default='SILVER', choices=tierChoices)
@@ -28,8 +29,8 @@ class Player(models.Model):
     last_ranked_update = models.DateTimeField(default=timezone.now) # mostly for debugging
 
     @classmethod
-    def create(cls, name, platform):
-        res = cls(name=name, platform=platform, region=platform_to_region(platform))
+    def create(cls, name, platform, avatar_id=""):
+        res = cls(name=name, platform=platform, region=platform_to_region(platform), avatar_id=avatar_id)
         return res
     def __str__(self): # For admin panel aesthetics
         return self.name

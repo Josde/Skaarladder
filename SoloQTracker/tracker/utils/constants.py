@@ -29,7 +29,7 @@ riotToOPGGRegions = {
 
 # Form choices 
 
-regionChoices = [('euw1', 'euw1'),
+platformChoices = [('euw1', 'euw1'),
                      ("br1","br1"),
                      ("eun1", "eun1"),
                      ('jp1', 'jp1'),
@@ -40,7 +40,7 @@ regionChoices = [('euw1', 'euw1'),
                      ('ru', 'ru'),
                      ('tr1', 'tr1')]
 
-platformChoices = [('europe', 'europe'),
+regionChoices = [('europe', 'europe'),
                      ("americas","americas"),
                      ("asia", "asia"),
                      ]

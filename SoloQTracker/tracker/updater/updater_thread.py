@@ -6,7 +6,7 @@ import tracker.utils.constants as constants
 from asgiref.sync import sync_to_async
 class UpdaterThread(threading.Thread):
     """ Class that manages a background task for updating user data periodically """    
-
+    # FIXME: Use schedule and a polled sleep to make this way easier, and make it support tasks. https://github.com/dbader/schedule
     
     def run(self):
         asyncio.run(self.main_loop())
@@ -27,3 +27,4 @@ class UpdaterThread(threading.Thread):
             uh = UpdateHelper(player)
             task_list.append(uh.update())
         return task_list
+    
