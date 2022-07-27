@@ -1,4 +1,6 @@
 {% load static %}
+{% load tailwind_filters %}
+{% load crispy_forms_tags %}
 <html data-color-scheme="dark" color-scheme="dark">
     <head>
         <title>Challenge Creation</title>
@@ -10,6 +12,7 @@
         <link href="http://fonts.cdnfonts.com/css/edo-sz" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+        <link href="{% static 'tracker/bugfix.css' %}" rel=stylesheet>
         <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
         <script src="{% static 'tracker/htmx.min.js' %}" type='text/javascript' defer><!-- required for some browsers ??? --></script> 
     </head>
@@ -18,16 +21,28 @@
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
         <div>
-            <form action="/create/" method="post" id='challenge_form'>
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type='button' hx-get="{% url 'player_form' %}" hx-swap="beforeend" hx-target='#player_forms'>Add another user</button>
-                <div id='player_forms'>
-
+            {% include 'tracker/partials/navbar.html' %}
+            <div class="flex flex-row w-full h-full overflow-auto bg-neutral-900"> 
+            <form class="flex flex-row mt-16 ml-[10%]"action="/create/" method="post" id='challenge_form'>
+                <div class="flex-col">
+                    {% csrf_token %}
+                    {% crispy form form.helper %}
                 </div>
-                <input type="submit" value="Submit">
+                    <div class="flex flex-col items-start mt-16 text-center">
+                        <form id="challenge_form" method="post">
+                            <b class="justify-start px-4 text-white">Players</b>
+                            <!-- TODO: Figure out how to make this work better with many players added I guess.-->
+                            <button class="px-4 py-2 m-4 text-4xl font-bold text-center text-white bg-blue-500 rounded place-self-start" hx-get="{% url 'player_form' %}" hx-swap="beforeend" hx-target='#player_forms'>+</button>
+                            <div id='player_forms' class="max-h-[80%] flex flex-col flex-wrap">
+                                <!-- forms get added here programmatically through htmx on the + button -->
+                            </div>
+                        </form>
+                </div>
+                </div>
+                
             </form>
         </div>
-        <script src="" async defer></script>
+        </div>
+        {% include 'tracker/partials/footer.html' %}    
     </body>
 </html>

@@ -1,0 +1,9 @@
+{% if exists %}
+<i class="inline font-mono text-sm text-white">
+    Player 
+    <img class="inline w-12 h-12" onerror="this.style.display='none'" src="https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/{{ player.avatar_id }}.jpg"> </img>
+    {{ player.name }} <span class="text-green-400"> exists in</span> {{ player.platform }}</span>
+{% else %}
+<span class="inline font-mono text-sm text-white">
+    Player {{ player.name }} <span class="text-red-400"> does not exist in </span> {{ player.platform }}</span>
+{% endif %}

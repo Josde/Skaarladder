@@ -10,30 +10,32 @@ from .models import Challenge_Player, Challenge, Player
 # Dynamic views: https://stackoverflow.com/a/49341050
 
 class ChallengeTable(tables.Table):
-    name = tables.Column(accessor="player_id.name")
-    tier = tables.Column(accessor="player_id.tier")
-    rank = tables.Column(accessor="player_id.rank")
-    lp = tables.Column(accessor="player_id.lp")
-    wins = tables.Column(accessor="player_id.wins")
-    losses = tables.Column(accessor="player_id.losses")
-    winrate = tables.Column(accessor="player_id.winrate")
-    progress = tables.Column(accessor="progress")
+    # There is no way to set a default column style in django-tables2, apparently. Fuck DRY
+    column_style = {"cell": {"class": "m-2 p-2 border border-white border-collapse whitespace-nowrap"}}
+    name = tables.Column(accessor="player_id.name", attrs=column_style)
+    tier = tables.Column(accessor="player_id.tier", attrs=column_style)
+    rank = tables.Column(accessor="player_id.rank", attrs=column_style)
+    lp = tables.Column(accessor="player_id.lp", attrs=column_style)
+    wins = tables.Column(accessor="player_id.wins", attrs=column_style)
+    losses = tables.Column(accessor="player_id.losses", attrs=column_style)
+    winrate = tables.Column(accessor="player_id.winrate", attrs=column_style)
+    progress = tables.Column(accessor="progress", attrs=column_style)
 
     class Meta:
         template_name = "django_tables2/bootstrap.html"
-        attrs = {"class": "border-collapse text-white text-center"}
+        attrs = {"class": "table-auto border-collapse border border-white text-white text-center"}
+        row_attrs = {"class": "border border-white border-collapse"}
         order_by = "-progress"
         orderable = False  # disable header clicking
 
-    def render_name(self, value, column):
+    def render_name(self, value):
         streak_string = ""
-        region = "EUW1"  # default
+        platform = "EUW1"  # default
         playerName = "" + value
         playerName = playerName.strip()
-        column.attrs = {'td': {'class': 'whitespace-nowrap'}}
         try:
             player = Player.objects.get(name=playerName)
-            region = player.platform
+            platform = player.platform
             streak = player.streak
             if streak < 1 and streak > -1:
                 streak_string = ""
@@ -46,21 +48,23 @@ class ChallengeTable(tables.Table):
             print("[LeagueTable] Rendering player {0}, who can't be found in TrackedPlayers. This shouldn't happen.".format(value))
         sanitized_name = value.replace(" ", "+")
         return format_html('<a href=https://{0}.op.gg/summoner/userName={1}>{2}</a> {3}'.format(
-            constants.riotToOPGGRegions[region.upper()], sanitized_name, value, streak_string))
+            constants.riotToOPGGRegions[platform.upper()], sanitized_name, value, streak_string))
 
-    def render_winrate(self, value, column):
+    def render_winrate(self, value):
         if value >= 0.5:
-            column.attrs = {'td': {'style': 'color:rgb(180, 210, 115);'}}
+            style = "color:rgb(180, 210, 115);"
         elif value < 0.5:
-            column.attrs = {'td': {'style': 'color:rgb(249,36,114);'}}
-        return "{:0.2f}%".format(value)
+            style =  "color:rgb(249,36,114);"
+        return format_html('<span style="{0}">{1:.2f}%</span>'.format(style, value))
 
-    def render_progress (self, value, column, record):
-        column.attr = {'class': 'whitespace-nowrap'}
-        if value > 0:
-            column.attrs = column.attrs | {'td': {'style': 'color:rgb(180, 210, 115);'}}
-        elif value < 0:
-            column.attrs = column.attrs | {'td': {'style': 'color:rgb(249,36,114);'}}
-        progressSign = "+" if (record.progress >= 0) else ""
-        progressDeltaSign = "+" if (record.progress_delta >= 0) else ""
-        return "{0}{1}LP ({2}{3})".format(progressSign, value, progressDeltaSign, record.progress_delta)
+    def render_progress (self, value, record):
+        progress_style =  "color:rgb(180, 210, 115);" if (record.progress >= 0) else "color:rgb(249,36,114);"
+        progress_delta_style = "color:rgb(180, 210, 115);" if (record.progress_delta >= 0) else "color:rgb(249,36,114);"
+        progress_sign = "+" if (record.progress >= 0) else ""
+        progress_delta_sign = "+" if (record.progress_delta >= 0) else ""
+        return format_html('<span style="{0}">{1}{2}LP</span> <span style="{3}">({4}{5})</span>'.format(progress_style, 
+                                                                                                    progress_sign, 
+                                                                                                    value,
+                                                                                                    progress_delta_style, 
+                                                                                                    progress_delta_sign,
+                                                                                                    record.progress_delta))

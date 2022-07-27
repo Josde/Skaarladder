@@ -1,0 +1,11 @@
+/* Fixes some ugly stuff caused by crispy-tailwind */
+
+select {
+  background-color: #171717 !important; /* Fixes not being able to change the select BG color, 171717 is neutral-900 */ 
+  background-image: none !important; /* Small notch in the background of the select that clips into the text */
+}
+
+.fill-current.h-4.w-4 { /* Fixes the ugly uncentered arrow left in select by crispy-tailwind that can't be styled */
+  display: none !important; 
+}
+

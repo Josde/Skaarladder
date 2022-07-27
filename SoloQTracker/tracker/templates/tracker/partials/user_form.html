@@ -1,9 +1,13 @@
-<div hx-target="this" hx-swap="outerHTML">
-    <div id='user_form' style='display: inline'>
-        {% csrf_token %}
-        {{ form }}
-    </div>
-    <div id='results' style='display: inline'>
+{% load tailwind_filters %}
+{% load crispy_forms_tags %}
+<div class="flex flex-col">
+        <div class="flex flex-row m-4 duration-300 ease-in-out">
+            {% csrf_token %}
+            {% crispy form form.helper %}
+        </div>
+        <div id='results-{{ form_id }}' class="inline text-white duration-300 ease-in-out">
+            <!-- player data gets added here programmatically through htmx on finishing an input on the form-->
+        </div>
 
-    </div>
+   
 </div>
