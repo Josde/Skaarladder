@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'django_tables2',
     "django_htmx",
     'django_browser_reload',
+    "crispy_forms",
+    "crispy_tailwind",
     'tracker',
     'pyot',
 ]
@@ -135,12 +137,19 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # See: https://docs.djangoproject.com/en/4.0/topics/auth/customizing/#using-a-custom-user-model-when-starting-a-project
 AUTH_USER_MODEL = 'tracker.User'
 
+# pyot
 PYOT_CONFS = ['tracker.pyotconf']
 
+# crispy-forms
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
+
+CRISPY_TEMPLATE_PACK = "tailwind"
+# heroku config, TODO: config this with env variables? or make the full code platform agnostic
 import django_on_heroku
 django_on_heroku.settings(locals(), secret_key=False)
 
-
+# sentry 
 """ import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
