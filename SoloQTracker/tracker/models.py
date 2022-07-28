@@ -61,5 +61,3 @@ class Challenge_Player(models.Model):
         indexes = [
             models.Index(fields=['player_id', 'challenge_id'])
         ]
-    # TODO: Check out index_together for efficiency. See: https://docs.djangoproject.com/en/4.0/ref/models/options/#index-together
-    

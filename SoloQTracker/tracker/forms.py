@@ -35,7 +35,7 @@ class ChallengeForm(forms.Form):
         )
 
     name = forms.CharField(label=_('ChallengeName'), max_length=50, empty_value="Challenge name")
-    start_date = forms.DateTimeField(label=_('StartDate'), widget=DateTimePickerInput)
+    start_date = forms.DateTimeField(label=_('StartDate'), widget=DateTimePickerInput, initial=timezone.now())
     end_date = forms.DateTimeField(label=_('EndDate'), widget=DateTimePickerInput)
    
 

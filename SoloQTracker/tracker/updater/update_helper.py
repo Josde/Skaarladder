@@ -1,6 +1,4 @@
-""" Class that will take a user PUUID as argument and will make the appropiate calls to return updated values for that user. """
-# FIXME: Zen of Python, simple is better than complex and flat is better than nested.
-# Turn this into some helper functions, there is no point in making this a class, I guess.
+""" Class that will take a user PUUID as argument and will make the appropiate calls to return updated values for that user. """.
 import asyncio
 from django.utils import timezone
 from tracker.utils.league import rankToLP
@@ -22,7 +20,6 @@ class UpdateHelper():
     
     async def update(self):
         """ Function that gets the updated data for a user and returns it.""" 
-        # TODO: Decide whether to return it, modify a variable in the class or straight up commit it to the database.
         time_since_last_update = timezone.now() - self.queried_player.last_data_update 
         try:
             previous_absolute_lp = rankToLP(self.queried_player.tier, self.queried_player.rank, self.queried_player.lp)

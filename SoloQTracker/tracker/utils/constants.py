@@ -4,7 +4,10 @@ tierWeights = {
     "SILVER": 2,
     "GOLD": 3,
     "PLATINUM": 4,
-    "DIAMOND": 5
+    "DIAMOND": 5,
+    "MASTER": 6,
+    "GRANDMASTER": 6,
+    "CHALLENGER": 6,
 }
 
 rankWeights = {

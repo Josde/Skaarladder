@@ -32,7 +32,8 @@ async def create_challenge(request):
         submitted_form = ChallengeForm(request.POST)
         #print(submitted_form.cleaned_data)
         #FIXME: Check is_valid and such, we are currently only using this for testing
-        #TODO: Change to redirect to the newly created challenge.
+        if not form.is_valid:
+            return render(request, 'tracker/error.html') 
         _name = request.POST['name']
         _start_date = datetime.strptime(request.POST['start_date'], '%Y-%m-%dT%H:%M')
         _end_date = datetime.strptime(request.POST['end_date'], '%Y-%m-%dT%H:%M')
@@ -44,7 +45,7 @@ async def create_challenge(request):
         player_challenges = []
         for item in _player_platform:
             if (len(item) < 2):
-                return render(request, 'tracker/error.html') #FIXME: Temporal
+                return render(request, 'tracker/error.html')
             print("Searching player {0} {1}".format(item[0], item[1]))
             try:
                 
@@ -60,9 +61,10 @@ async def create_challenge(request):
                 player_challenge = Challenge_Player(player_id=player, challenge_id=challenge, starting_lp=0, starting_tier='IRON', starting_rank='IV')
                 player_challenges.append(player_challenge)
         
-        await sync_to_async(Player.objects.bulk_create)(players)
+        await sync_to_async(Player.objects.bulk_create)(players)  
         await sync_to_async(Challenge_Player.objects.bulk_create)(player_challenges)
-        await asyncio.gather(*tasks)        
+        await asyncio.gather(*tasks)
+              
         return redirect('challenge', id=challenge.id)
     else:
         template = loader.get_template('tracker/challenge_form.html')
@@ -91,17 +93,18 @@ async def provisional_parse(request):
                 player_data = await uh.get_player_data()
                 player.avatar_id = player_data['profileIconId']
                 exists = True
-                #TODO: Use proper template user_validation.html
-                return render(request, 'tracker/partials/user_validation.html', context=locals())
             except Exception:
                 exists = False
+            finally:
                 return render(request, 'tracker/partials/user_validation.html', context=locals())
         
         
     
 def challenge(request, id=0):
     if request.htmx and id == 0:
-        id = request.POST['search_input']
+        id = request.POST.get['search_input', None]
+        if (id == None):
+            return HttpResponse("")
         return HttpResponseClientRedirect('challenge/{0}/'.format(id)) #FIXME: Janky as fuck
         # FIXME: Error handling here.
     if (id == 0 or id is None): 
