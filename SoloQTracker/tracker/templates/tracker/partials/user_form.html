@@ -1,11 +1,20 @@
+{% load static %}
 {% load tailwind_filters %}
 {% load crispy_forms_tags %}
+{% load django_htmx %}
+<>
+    <script src="{% static 'tracker/htmx.min.js' %}" type='text/javascript' defer><!-- required for some browsers ??? --></script> 
+    <link href="{% static 'tracker/loader.css' %}" rel=stylesheet>
+    <script src="{% static 'tracker/hyperscript.min.js' %}" type='text/javascript' defer><!-- required for some browsers ??? --></script> 
+    {% django_htmx_script %}
+</head>
 <div class="flex flex-col">
-        <div class="flex flex-row m-4 transition-all duration-300 ease-in-out">
+        <div class="flex flex-row m-4 transition-all duration-300 ease-in-out" hx-indicator="#player_loading-{{ form_id }}" >
             {% csrf_token %}
             {% crispy form form.helper %}
         </div>
-        <div id='results-{{ form_id }}' class="inline text-white duration-300 ease-in-out">
+        <span id="player_loading-{{ form_id }}" class="m-4 loader htmx-indicator place-self-center"></span>
+        <div id='results-{{ form_id }}' class="visible inline text-white transition-all duration-300 ease-in-out">
             <!-- player data gets added here programmatically through htmx on finishing an input on the form-->
         </div>
 

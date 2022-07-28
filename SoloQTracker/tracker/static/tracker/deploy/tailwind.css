@@ -733,6 +733,10 @@ select {
   --tw-backdrop-sepia:  ;
 }
 
+.visible {
+  visibility: visible;
+}
+
 .static {
   position: static;
 }
@@ -746,16 +750,16 @@ select {
   position: sticky;
 }
 
-.bottom-0 {
-  bottom: 0px;
+.top-0 {
+  top: 0px;
 }
 
 .left-0 {
   left: 0px;
 }
 
-.top-0 {
-  top: 0px;
+.bottom-0 {
+  bottom: 0px;
 }
 
 .right-4 {
@@ -818,12 +822,12 @@ select {
   display: none;
 }
 
-.h-full {
-  height: 100%;
-}
-
 .h-screen {
   height: 100vh;
+}
+
+.h-full {
+  height: 100%;
 }
 
 .h-64 {
@@ -854,8 +858,16 @@ select {
   height: 3rem;
 }
 
+.h-10 {
+  height: 2.5rem;
+}
+
 .max-h-\[80\%\] {
   max-height: 80%;
+}
+
+.w-screen {
+  width: 100vw;
 }
 
 .w-full {
@@ -886,40 +898,28 @@ select {
   width: 4rem;
 }
 
-.w-screen {
-  width: 100vw;
-}
-
 .w-\[75\%\] {
   width: 75%;
-}
-
-.w-\[90\%\] {
-  width: 90%;
-}
-
-.w-12 {
-  width: 3rem;
-}
-
-.w-\[100\%\] {
-  width: 100%;
 }
 
 .w-\[50\%\] {
   width: 50%;
 }
 
-.flex-auto {
-  flex: 1 1 auto;
+.w-12 {
+  width: 3rem;
+}
+
+.w-8 {
+  width: 2rem;
+}
+
+.w-10 {
+  width: 2.5rem;
 }
 
 .flex-grow {
   flex-grow: 1;
-}
-
-.flex-grow-0 {
-  flex-grow: 0;
 }
 
 .table-auto {
@@ -1054,11 +1054,6 @@ select {
   background-color: rgb(115 115 115 / var(--tw-bg-opacity));
 }
 
-.bg-white {
-  --tw-bg-opacity: 1;
-  background-color: rgb(255 255 255 / var(--tw-bg-opacity));
-}
-
 .bg-opacity-50 {
   --tw-bg-opacity: 0.5;
 }
@@ -1101,6 +1096,10 @@ select {
   text-align: center;
 }
 
+.text-start {
+  text-align: start;
+}
+
 .font-mono {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
@@ -1141,11 +1140,6 @@ select {
 .text-neutral-100 {
   --tw-text-opacity: 1;
   color: rgb(245 245 245 / var(--tw-text-opacity));
-}
-
-.text-neutral-900 {
-  --tw-text-opacity: 1;
-  color: rgb(23 23 23 / var(--tw-text-opacity));
 }
 
 .text-green-400 {
@@ -1201,16 +1195,6 @@ select {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.before\:-z-10::before {
-  content: var(--tw-content);
-  z-index: -10;
-}
-
-.after\:z-10::after {
-  content: var(--tw-content);
-  z-index: 10;
-}
-
 @-webkit-keyframes spin {
   to {
     transform: rotate(360deg);
@@ -1231,10 +1215,6 @@ select {
 .hover\:bg-neutral-700:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(64 64 64 / var(--tw-bg-opacity));
-}
-
-.focus\:border-none:focus {
-  border-style: none;
 }
 
 .focus\:outline-none:focus {

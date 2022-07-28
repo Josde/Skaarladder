@@ -13,6 +13,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
         <link href="{% static 'tracker/bugfix.css' %}" rel=stylesheet>
+        <link href="{% static 'tracker/loader.css' %}" rel=stylesheet>
         <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
         <script src="{% static 'tracker/htmx.min.js' %}" type='text/javascript' defer><!-- required for some browsers ??? --></script> 
         <script src="{% static 'tracker/hyperscript.min.js' %}" type='text/javascript' defer><!-- required for some browsers ??? --></script> 
@@ -35,7 +36,7 @@
                             <b class="justify-start px-4 text-white">Players</b>
                             <button class="px-4 py-2 m-4 text-4xl font-bold text-center text-white bg-blue-500 rounded place-self-start" 
                             hx-get="{% url 'player_form' %}" hx-swap="beforeend" hx-target='#player_forms'>+</button>
-                            <div id='player_forms' class="max-h-[80%] flex flex-col flex-wrap" htmx-indicator="...">
+                            <div id='player_forms' class="max-h-[80%] flex flex-col flex-wrap">
                                 <!-- forms get added here programmatically through htmx on the + button -->
                             </div>
                         </form>
