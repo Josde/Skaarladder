@@ -23,12 +23,12 @@ class ChallengeTable(tables.Table):
 
     class Meta:
         template_name = "django_tables2/bootstrap.html"
-        attrs = {"class": "table-auto border-collapse border border-white text-white text-center"}
+        attrs = {"class": "table-auto border-collapse border border-white text-white text-start"}
         row_attrs = {"class": "border border-white border-collapse"}
         order_by = "-progress"
         orderable = False  # disable header clicking
 
-    def render_name(self, value):
+    def render_name(self, value, record):
         streak_string = ""
         platform = "EUW1"  # default
         playerName = "" + value
@@ -37,18 +37,21 @@ class ChallengeTable(tables.Table):
             player = Player.objects.get(name=playerName)
             platform = player.platform
             streak = player.streak
+            avatar_id = player.avatar_id
             if streak < 1 and streak > -1:
                 streak_string = ""
             elif streak > 1:
-                streak_string = '<span style="color:rgb(180, 210, 115);">{0}L</span>'.format(streak) # TODO: For some reason styling this with a tailwind class doesn't work, check later.
+                streak_string = '<span style="color:rgb(180, 210, 115);">{0}W</span>'.format(streak) # TODO: For some reason styling this with a tailwind class doesn't work, check later.
             elif streak < -1:
-                streak_string = '<span style="color:rgb(249,36,114);">{0}W</span>'.format(streak)
+                streak_string = '<span style="color:rgb(249,36,114);">{0}L</span>'.format(abs(streak))
         
         except ObjectDoesNotExist:
             print("[LeagueTable] Rendering player {0}, who can't be found in TrackedPlayers. This shouldn't happen.".format(value))
         sanitized_name = value.replace(" ", "+")
-        return format_html('<a href=https://{0}.op.gg/summoner/userName={1}>{2}</a> {3}'.format(
-            constants.riotToOPGGRegions[platform.upper()], sanitized_name, value, streak_string))
+        return format_html('''<img class="inline w-10 h-10" onerror="this.style.display='none'" 
+                           src="https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/{0}.jpg"> </img>
+                           <a href=https://{1}.op.gg/summoner/userName={2}>{3}</a> {4}'''.format(
+                               avatar_id , constants.riotToOPGGRegions[platform.upper()], sanitized_name, value, streak_string))
 
     def render_winrate(self, value):
         if value >= 0.5:

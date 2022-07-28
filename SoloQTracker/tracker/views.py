@@ -79,6 +79,7 @@ def create_user_form(request):
 
 async def provisional_parse(request):
     if (request.method == 'POST'):
+        print(request.POST)
         if ('player_name' not in request.POST.keys() or 'platform' not in request.POST.keys()):
             return HttpResponse('')
         try: 

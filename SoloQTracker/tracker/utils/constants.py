@@ -7,7 +7,7 @@ tierWeights = {
     "DIAMOND": 5,
     "MASTER": 6,
     "GRANDMASTER": 6,
-    "CHALLENGER": 6,
+    "CHALLENGER": 6, #todo: check this
 }
 
 rankWeights = {
@@ -45,8 +45,7 @@ platformChoices = [('euw1', 'euw1'),
 
 regionChoices = [('europe', 'europe'),
                      ("americas","americas"),
-                     ("asia", "asia"),
-                     ]
+                     ("asia", "asia"),]
 
 tierChoices = [('IRON', 'IRON'),
                 ('BRONZE', 'BRONZE'),

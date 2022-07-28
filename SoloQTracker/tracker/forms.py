@@ -62,13 +62,13 @@ class PlayerForm(forms.Form):
                                                                             'hx-target': '#results-{0}'.format(form_id)})
         
         self.fields['platform'].widget = forms.Select(attrs={'hx-post': '/create/htmx/provisional_parse/',
-                                                                            'hx-trigger': 'onchange',
+                                                                            'hx-trigger': 'changed',
                                                                             'hx-swap':"innerhtml",
                                                                             'form': "challenge_form",
                                                                             'hx-target': '#results-{0}'.format(form_id)})
         
     platform = forms.ChoiceField(label=_('platform'), choices=platformChoices)
-    player_name = forms.CharField(label=_('PlayerName'), max_length=30)
+    player_name = forms.CharField(label=_('PlayerName'), max_length=16)
     
 
     

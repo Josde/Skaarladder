@@ -1,4 +1,3 @@
-""" Class that will take a user PUUID as argument and will make the appropiate calls to return updated values for that user. """.
 import asyncio
 from django.utils import timezone
 from tracker.utils.league import rankToLP
@@ -9,6 +8,7 @@ from pyot.models import lol
 from pyot.utils.lol.routing import platform_to_region
 from asgiref.sync import sync_to_async
 class UpdateHelper():
+    """ Class that will take a Player as argument and will make the appropiate calls to return updated values for that user (helper functions) or update and commit it (update). """
     queried_player = None
     player_data = None 
     ranked_data = None
@@ -20,18 +20,20 @@ class UpdateHelper():
     
     async def update(self):
         """ Function that gets the updated data for a user and returns it.""" 
+        DEBUG = True
         time_since_last_update = timezone.now() - self.queried_player.last_data_update 
         try:
             previous_absolute_lp = rankToLP(self.queried_player.tier, self.queried_player.rank, self.queried_player.lp)
         except Exception:
             previous_absolute_lp = 0
-        if self.queried_player.puuid == "" or time_since_last_update.days >= 7:
+        if self.queried_player.puuid == "" or time_since_last_update.days >= 7 or DEBUG:
             try:
                 self.player_data = await self.get_player_data()
                 self.queried_player.name = self.player_data['name']
                 self.queried_player.puuid = self.player_data['puuid']
                 self.queried_player.summoner_id = self.player_data['id']
                 self.queried_player.account_id = self.player_data['accountId']
+                self.queried_player.avatar_id = self.player_data['profileIconId']
                 await sync_to_async(self.queried_player.save)()
                 
             except Exception:
@@ -86,10 +88,13 @@ class UpdateHelper():
                         .format(self.queried_player.name))
         queue_data = await lol.SummonerLeague(self.queried_player.summoner_id, platform=self.queried_player.platform).get()
         soloq_keys = ['queueType', 'tier', 'rank', 'leaguePoints', 'wins', 'losses'] #Partes de los datos que nos interesan, por simplificar
+        soloq_dict = None
         for item in queue_data.entries:
             soloq_dict = item.dict()
-            if (soloq_dict['queueType'] == "RANKED_SOLO_5x5"): # Fiter SoloQ
+            if (soloq_dict is not None and soloq_dict['queueType'] == "RANKED_SOLO_5x5"): # Fiter SoloQ
                 break
+            if soloq_dict is None:
+                raise Exception
         return soloq_dict
         
     
