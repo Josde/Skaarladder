@@ -2,6 +2,7 @@ import asyncio
 from datetime import datetime
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.template import loader
 from .forms import PlayerForm
 from .updater.update_helper import UpdateHelper
@@ -11,6 +12,7 @@ from .utils.validators import GenericNameValidator
 from asgiref.sync import sync_to_async
 from .tables import ChallengeTable
 import uuid
+from django_htmx.http import HttpResponseClientRedirect
 # Create your views here.
 def index(request): 
     return render(request, 'tracker/index.html')
@@ -97,7 +99,13 @@ async def provisional_parse(request):
         
         
     
-def challenge(request, id):
+def challenge(request, id=0):
+    if request.htmx and id == 0:
+        id = request.POST['search_input']
+        return HttpResponseClientRedirect('challenge/{0}/'.format(id)) #FIXME: Janky as fuck
+        # FIXME: Error handling here.
+    if (id == 0 or id is None): 
+        return render(request, 'tracker/error.html', context=locals())
     challenge_data = Challenge.objects.filter(id=id).first()
     player_query = Challenge_Player.objects.filter(challenge_id=id).select_related('player_id').order_by('-progress')
     table = ChallengeTable(player_query)
@@ -106,3 +114,5 @@ def challenge(request, id):
     challenge_name = challenge_data.name 
     return render(request, 'tracker/challenge.html', context=locals())
 
+def search(request):
+    return render(request, 'tracker/partials/search_modal.html')

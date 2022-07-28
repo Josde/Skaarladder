@@ -7,5 +7,7 @@ urlpatterns = [
     path('create/', views.create_challenge, name='create_challenge'),
     path('create/htmx/user-form/', views.create_user_form, name='player_form'),
     path('create/htmx/provisional_parse/', views.provisional_parse, name='provisional_parse'),
-    path('challenge/<int:id>', views.challenge, name='challenge'),
+    path('challenge/', views.challenge, name='challenge'),
+    path('challenge/<int:id>/', views.challenge, name='challenge'),
+    path('htmx/search/', views.search, name='search')
 ]
