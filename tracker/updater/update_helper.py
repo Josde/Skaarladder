@@ -1,6 +1,6 @@
 import asyncio
 from django.utils import timezone
-from tracker.utils.league import rankToLP
+from tracker.utils.league import rank_to_lp
 from tracker.models import Player, Challenge_Player, Challenge
 import datetime
 import traceback
@@ -25,7 +25,7 @@ class UpdateHelper:
         DEBUG = True
         time_since_last_update = timezone.now() - self.queried_player.last_data_update
         try:
-            previous_absolute_lp = rankToLP(
+            previous_absolute_lp = rank_to_lp(
                 self.queried_player.tier,
                 self.queried_player.rank,
                 self.queried_player.lp,
@@ -34,50 +34,65 @@ class UpdateHelper:
             previous_absolute_lp = 0
         if self.queried_player.puuid == "" or time_since_last_update.days >= 7 or DEBUG:
             try:
-                self.player_data = await self.get_player_data()
-                self.queried_player.name = self.player_data["name"]
-                self.queried_player.puuid = self.player_data["puuid"]
-                self.queried_player.summoner_id = self.player_data["id"]
-                self.queried_player.account_id = self.player_data["accountId"]
-                self.queried_player.avatar_id = self.player_data["profileIconId"]
+                self.player_data = await self.get_player_data(self.queried_player)
+                await sync_to_async(self.update_fields)(
+                    self.queried_player,
+                    self.player_data,
+                    {
+                        "name": "name",
+                        "puuid": "puuid",
+                        "id": "summoner_id",
+                        "accountId": "account_id",
+                        "profileIconId": "avatar_id",
+                    },
+                )
                 await sync_to_async(self.queried_player.save)()
 
             except Exception:
                 traceback.print_exc()
         # Create tasks, since we can do everything else asynchronously
-        tasks = [self.get_player_ranked_data(), self.get_streak_data()]
+        tasks = [self.get_player_ranked_data(self.queried_player), self.get_streak_data(self.queried_player)]
         try:
             self.ranked_data, self.streak = await asyncio.gather(*tasks)
             current_absolute_lp = 0
             if self.ranked_data is not None:
-                self.queried_player.streak = self.streak
-                self.queried_player.wins = self.ranked_data["wins"]
-                self.queried_player.losses = self.ranked_data["losses"]
-                self.queried_player.winrate = (
-                    100 * self.queried_player.wins / (self.queried_player.wins + self.queried_player.losses)
-                )
-                self.queried_player.tier = self.ranked_data["tier"]
-                self.queried_player.rank = self.ranked_data["rank"]
-                self.queried_player.lp = self.ranked_data["leaguePoints"]
-                self.queried_player.last_ranked_update = timezone.now()
+                complete_ranked_data = {
+                    "streak": self.streak,
+                    "wins": self.ranked_data["wins"],
+                    "losses": self.ranked_data["losses"],
+                    "winrate": 100
+                    * self.ranked_data["wins"]
+                    / (self.ranked_data["wins"] + self.ranked_data["losses"]),
+                    "tier": self.ranked_data["tier"],
+                    "rank": self.ranked_data["rank"],
+                    "lp": self.ranked_data["leaguePoints"],
+                    "last_ranked_update": timezone.now(),
+                }
 
-                current_absolute_lp = rankToLP(
+                current_absolute_lp = rank_to_lp(
                     self.queried_player.tier,
                     self.queried_player.rank,
                     self.queried_player.lp,
                 )
             else:
-                self.queried_player.streak = (
-                    self.queried_player.wins
-                ) = self.queried_player.losses = self.queried_player.winrate = 0
-                self.queried_player.tier = "UNRANKED"
-                self.queried_player.rank = "NONE"
-                self.queried_player.lp = 0
-                self.queried_player.last_ranked_update = timezone.now()
+                complete_ranked_data = {
+                    "streak": 0,
+                    "wins": 0,
+                    "losses": 0,
+                    "winrate": 0,
+                    "tier": "UNRANKED",
+                    "rank": "NONE",
+                    "lp": 0,
+                    "last_ranked_update": timezone.now(),
+                }
+                current_absolute_lp = 0
 
-            if (
-                previous_absolute_lp != current_absolute_lp or self.queried_player.tier == "UNRANKED"
-            ):  # FIXME: Change the unranked part to be better
+            await sync_to_async(self.update_fields)(
+                self.queried_player, complete_ranked_data, dict([tuple([x, x]) for x in complete_ranked_data.keys()])
+            )
+
+            if previous_absolute_lp != current_absolute_lp or self.queried_player.tier == "UNRANKED":
+                # FIXME: Change the unranked part to be better
                 # Rank changed, must update all challenges
                 challenges = await sync_to_async(list)(
                     Challenge_Player.objects.filter(player_id=self.queried_player.id)
@@ -94,13 +109,11 @@ class UpdateHelper:
                         if challenge_details.is_absolute:
                             absolute_starting_lp = 0
                         elif item.starting_tier == "UNRANKED" or item.starting_rank == "NONE":
+                            absolute_starting_lp = 0
                             item.starting_tier = self.queried_player.tier
                             item.starting_rank = self.queried_player.rank
-                            absolute_starting_lp = rankToLP(
-                                self.queried_player.tier,
-                                self.queried_player.rank,
-                                self.queried_player.lp,
-                            )
+                        else:
+                            absolute_starting_lp = rank_to_lp(item.starting_tier, item.starting_rank, item.starting_lp)
                         item.progress = current_absolute_lp - absolute_starting_lp
                         item.progress_delta = item.progress - previous_progress
                 # TODO: Change this to abulk_update once it gets to Django release
@@ -110,31 +123,21 @@ class UpdateHelper:
         except Exception:  # For debugging, implement errors later.
             traceback.print_exc()
 
-    async def get_player_data(self):
+    async def get_player_data(self, player):
         print(
             "[{0} UpdateHelper] Running player data update, either this is the first update or last update was over 7 days ago (lu: {1})".format(
-                self.queried_player.name, self.queried_player.last_data_update
+                player.name, player.last_data_update
             )
         )
         """ Updates the ID, name and such of our Player class.
         Only ran if it's the first time the player has been queried or if last update was a while ago. """
-        res = await lol.Summoner(name=self.queried_player.name, platform=self.queried_player.platform).get()
+        res = await lol.Summoner(name=player.name, platform=player.platform).get()
         return res.dict()
 
-    async def get_player_ranked_data(self):
+    async def get_player_ranked_data(self, player):
         """Queries the player's SoloQ data, getting stats such as LP, winrate and etc."""
-        print("[{0} UpdateHelper] Running SoloQ data update.".format(self.queried_player.name))
-        queue_data = await lol.SummonerLeague(
-            self.queried_player.summoner_id, platform=self.queried_player.platform
-        ).get()
-        soloq_keys = [
-            "queueType",
-            "tier",
-            "rank",
-            "leaguePoints",
-            "wins",
-            "losses",
-        ]  # Partes de los datos que nos interesan, por simplificar
+        print("[{0} UpdateHelper] Running SoloQ data update.".format(player.name))
+        queue_data = await lol.SummonerLeague(player.summoner_id, platform=player.platform).get()
         soloq_dict = None
         for item in queue_data.entries:
             soloq_dict = item.dict()
@@ -142,35 +145,49 @@ class UpdateHelper:
                 break
         return soloq_dict
 
-    async def get_streak_data(self):
+    async def get_streak_data(self, player):
         """Queries the player's match history and processes his win or loss streak."""
-        print("[{0} UpdateHelper] Running streak data update".format(self.queried_player.name))
-        tasks = []
+        print("[{0} UpdateHelper] Running streak data update".format(player.name))
         matches = []
         result = last_result = None
         streak = 0
-        history = (
-            await lol.MatchHistory(self.queried_player.puuid, region=self.queried_player.region)
-            .query(count=10, queue=420)
-            .get()
-        )
-        for match in history.matches:
-            tasks.append(match.get())
 
-        matches = await asyncio.gather(*tasks)
+        matches = await self.get_match_history_details(player, count=10, queue=420)
 
         for match_data in matches:
             if (result != last_result) and last_result is not None:
                 break
-            teams = match_data.info.teams
-            for t in teams:
-                participant_ids = [p.puuid for p in t.participants]
-                if self.queried_player.puuid in participant_ids:
-                    if t.win == result or result is None:
-                        if t.win:
-                            streak += 1
-                        else:
-                            streak -= 1
-                    last_result = result
-                    result = t.win
+            won = await self.get_match_result(player, match_data)
+            last_result = result
+            result = won
+            if result == last_result:
+                streak += 1 if won else -1
+
         return streak
+
+    async def get_match_history_details(self, player, count, queue):
+        tasks = []
+        history = await lol.MatchHistory(player.puuid, region=player.region).query(count=count, queue=queue).get()
+
+        for match in history.matches:
+            tasks.append(match.get())
+
+        return await asyncio.gather(*tasks)
+
+    async def get_match_result(self, player, match_data):
+        teams = match_data.info.teams
+        for t in teams:
+            participant_ids = [p.puuid for p in t.participants]
+            if player.puuid in participant_ids:
+                if t.win:
+                    return True
+                else:
+                    return False
+
+    def update_fields(self, obj, data_dict: dict, data_to_obj_fields: dict):
+        for field in data_to_obj_fields.keys():
+            if field in data_dict.keys() and hasattr(obj, data_to_obj_fields[field]):
+                setattr(obj, data_to_obj_fields[field], data_dict[field])
+            else:
+                print("Couldn't find dict field {0} or object field {1}", field, data_to_obj_fields[field])
+                raise KeyError

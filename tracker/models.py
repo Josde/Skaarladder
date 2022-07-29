@@ -36,9 +36,7 @@ class Player(models.Model):
     losses = models.IntegerField(default=0)
     winrate = models.FloatField(default=0)
     streak = models.IntegerField(default=0)
-    last_ranked_update = models.DateTimeField(
-        default=timezone.now
-    )  # mostly for debugging
+    last_ranked_update = models.DateTimeField(default=timezone.now)  # mostly for debugging
 
     @classmethod
     def create(cls, name, platform, avatar_id=""):

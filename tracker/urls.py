@@ -11,7 +11,7 @@ urlpatterns = [
         name="provisional_parse",
     ),
     path("challenge/", views.challenge, name="challenge"),
-    path("challenge/<int:id>/", views.challenge, name="challenge"),
+    path("challenge/<int:challenge_id>/", views.challenge, name="challenge"),
     path("htmx/search/", views.search, name="search"),
     path("error/", views.error, name="error"),
 ]

@@ -1,7 +1,7 @@
 import tracker.utils.constants as constants
 
 
-def rankToLP(tier: str, rank: str, points: int) -> int:
+def rank_to_lp(tier: str, rank: str, points: int) -> int:
     """Turns the rank and tier of a player into a LP number.
     Args:
         tier (str): Rank is IRON, BRONZE... and so on.

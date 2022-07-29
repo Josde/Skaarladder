@@ -6,6 +6,7 @@ from django.utils import timezone
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, Submit, Field, Row, Column, Div
 from .models import Challenge, Player
+from tracker.utils import constants
 
 
 class DatePickerInput(forms.DateInput):
@@ -33,11 +34,11 @@ class ChallengeForm(forms.Form):
                 Column(
                     Field(
                         "name",
-                        css_class="bg-neutral-900 text-white p-4",
+                        css_class=constants.default_form_style,
                         autocomplete="off",
                     ),
-                    Field("start_date", css_class="bg-neutral-900 text-white p-4"),
-                    Field("end_date", css_class="bg-neutral-900 text-white p-4"),
+                    Field("start_date", css_class=constants.default_form_style),
+                    Field("end_date", css_class=constants.default_form_style),
                     Field("is_absolute"),
                     Field("ignore_unranked"),
                     Submit(
@@ -51,12 +52,8 @@ class ChallengeForm(forms.Form):
             ),
         )
 
-    name = forms.CharField(
-        label=_("ChallengeName"), max_length=50, empty_value="Challenge name"
-    )
-    start_date = forms.DateTimeField(
-        label=_("StartDate"), widget=DateTimePickerInput, initial=timezone.now()
-    )
+    name = forms.CharField(label=_("ChallengeName"), max_length=50, empty_value="Challenge name")
+    start_date = forms.DateTimeField(label=_("StartDate"), widget=DateTimePickerInput, initial=timezone.now())
     end_date = forms.DateTimeField(label=_("EndDate"), widget=DateTimePickerInput)
     is_absolute = forms.BooleanField(label=_("AbsoluteRanking"))
     ignore_unranked = forms.BooleanField(label=_("HideUnranked"))

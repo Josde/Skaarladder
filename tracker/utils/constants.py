@@ -70,3 +70,10 @@ rankChoices = [("I", "I"), ("II", "II"), ("III", "III"), ("IV", "IV"), ("NONE", 
 # Settings
 
 UPDATE_DELAY = 600
+
+
+# HTML Attrs
+
+red_text_style = "color:rgb(249,36,114);"
+green_text_style = "color:rgb(180, 210, 115);"
+default_form_style = "bg-neutral-900 text-white p-4"

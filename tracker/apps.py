@@ -8,9 +8,8 @@ class TrackerConfig(AppConfig):
     def ready(self):
         import os
 
-        if (
-            os.environ.get("RUN_MAIN", None) != "true"
-        ):  # Prevents this from running twice when using development server. See: https://stackoverflow.com/a/52430581
+        if os.environ.get("RUN_MAIN", None) != "true":
+            # Prevents this from running twice when using development server. See: https://stackoverflow.com/a/52430581
             from tracker.updater.updater_thread import UpdaterThread
             from concurrent.futures import ThreadPoolExecutor, as_completed
 

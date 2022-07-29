@@ -9,18 +9,21 @@ from .forms import PlayerForm
 from .updater.update_helper import UpdateHelper
 from .models import Player, Challenge, Challenge_Player
 from .forms import ChallengeForm
-from .utils.validators import GenericNameValidator
+from .utils.validators import generic_name_validator
 from asgiref.sync import sync_to_async
 from .tables import ChallengeTable
 import uuid
 from django_htmx.http import HttpResponseClientRedirect
 from django.utils import timezone
+from django.views.decorators.http import require_http_methods, require_GET, require_POST
 
-# Create your views here.
+
+@require_GET
 def index(request):
     return render(request, "tracker/index.html")
 
 
+@require_GET
 def error(request):
     # FIXME: Use django.messages instead of a error code
     msg = messages.get_messages(request)
@@ -32,6 +35,7 @@ def error(request):
     return render(request, "tracker/error.html", context=locals())
 
 
+# Async views can't have required method decorators, so this will show up as an issue on SonarQube for a while.
 async def create_challenge(request):
     form = ChallengeForm()
     if request.method == "POST":
@@ -93,6 +97,7 @@ async def create_challenge(request):
         return render(request, "tracker/challenge_form.html", {"form": form})
 
 
+@require_GET
 def create_user_form(request):
     form_id = uuid.uuid4()
     form = PlayerForm(form_id=form_id)
@@ -116,32 +121,33 @@ async def provisional_parse(request):
         finally:
             uh = UpdateHelper(player)
             try:
-                player_data = await uh.get_player_data()
+                player_data = await uh.get_player_data(player)
                 player.avatar_id = player_data["profileIconId"]
                 exists = True
             except Exception:
                 exists = False
-            finally:
-                return render(request, "tracker/partials/user_validation.html", context=locals())
+
+        return render(request, "tracker/partials/user_validation.html", context=locals())
 
 
-def challenge(request, id=0):
-    if request.htmx and id == 0:
-        id = request.POST.get("search_input", None)
-        return HttpResponseClientRedirect("challenge/{0}/".format(id))  # FIXME: Janky as fuck
+@require_http_methods(["GET", "POST"])
+def challenge(request, challenge_id=0):
+    if request.htmx and challenge_id == 0:
+        challenge_id = request.POST.get("search_input", None)
+        return HttpResponseClientRedirect(reverse("challenge") + "{0}/".format(challenge_id))  # FIXME: Janky as fuck
         # FIXME: Error handling here.
     try:
-        challenge_data = Challenge.objects.get(id=id)
+        challenge_data = Challenge.objects.get(id=challenge_id)
         if challenge_data.ignore_unranked:
             player_query = (
-                Challenge_Player.objects.filter(challenge_id=id)
+                Challenge_Player.objects.filter(challenge_id=challenge_id)
                 .exclude(player_id__tier="UNRANKED")
                 .select_related("player_id")
                 .order_by("-progress")
             )
         else:
             player_query = (
-                Challenge_Player.objects.filter(challenge_id=id)
+                Challenge_Player.objects.filter(challenge_id=challenge_id)
                 .exclude(ignored=True)
                 .select_related("player_id")
                 .order_by("-progress")

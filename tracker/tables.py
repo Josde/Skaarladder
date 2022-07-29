@@ -32,10 +32,10 @@ class ChallengeTable(tables.Table):
     def render_name(self, value, record):
         streak_string = ""
         platform = "EUW1"  # default
-        playerName = "" + value
-        playerName = playerName.strip()
+        player_name = "" + value
+        player_name = player_name.strip()
         try:
-            player = Player.objects.get(name=playerName)
+            player = Player.objects.get(name=player_name)
             platform = player.platform
             streak = player.streak
             avatar_id = player.avatar_id
@@ -69,16 +69,14 @@ class ChallengeTable(tables.Table):
 
     def render_winrate(self, value):
         if value >= 0.5:
-            style = "color:rgb(180, 210, 115);"
+            style = constants.green_text_style
         elif value < 0.5:
-            style = "color:rgb(249,36,114);"
+            style = constants.red_text_style
         return format_html('<span style="{0}">{1:.2f}%</span>'.format(style, value))
 
     def render_progress(self, value, record):
-        progress_style = "color:rgb(180, 210, 115);" if (record.progress >= 0) else "color:rgb(249,36,114);"
-        progress_delta_style = (
-            "color:rgb(180, 210, 115);" if (record.progress_delta >= 0) else "color:rgb(249,36,114);"
-        )
+        progress_style = constants.green_text_style if (record.progress >= 0) else constants.red_text_style
+        progress_delta_style = constants.green_text_style if (record.progress_delta >= 0) else constants.red_text_style
         progress_sign = "+" if (record.progress >= 0) else ""
         progress_delta_sign = "+" if (record.progress_delta >= 0) else ""
         return format_html(
