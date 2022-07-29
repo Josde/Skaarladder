@@ -24,7 +24,7 @@
         <![endif]-->
         <div>
             {% include 'tracker/partials/navbar.html' %}
-            <div id="popup_body" class="fixed top-0 left-0 items-center justify-center hidden w-screen h-screen" _="on htmx:afterSwap toggle .hidden"></div>
+            {% include "tracker/partials/modal_div.html" %}   
             <div class="flex flex-row w-full h-full overflow-auto bg-neutral-900"> 
             <form class="flex flex-row mt-16 ml-[10%]"action="/create/" method="post" id='challenge_form'>
                 <div class="flex-col">
