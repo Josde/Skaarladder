@@ -8,7 +8,7 @@ tierWeights = {
     "DIAMOND": 5,
     "MASTER": 6,
     "GRANDMASTER": 6,
-    "CHALLENGER": 6, #todo: check this
+    "CHALLENGER": 6,  # todo: check this
 }
 
 rankWeights = {
@@ -24,46 +24,48 @@ riotToOPGGRegions = {
     "EUN1": "EUNE",
     "EUW1": "EUW",
     "JP1": "JP",
-    "KR": "www",  #instead of kr.op.gg its www.op.gg
+    "KR": "www",  # instead of kr.op.gg its www.op.gg
     "LA1": "LAN",
     "LA2": "LAS",
     "OC1": "OCE",
     "RU": "RU",
-    "TR1": "TR"
+    "TR1": "TR",
 }
 
-# Form choices 
+# Form choices
 
-platformChoices = [('euw1', 'euw1'),
-                     ("br1","br1"),
-                     ("eun1", "eun1"),
-                     ('jp1', 'jp1'),
-                     ('kr1', 'kr1'),
-                     ('la1', 'la1'),
-                     ('la2', 'la2'),
-                     ('oc1', 'oc1'),
-                     ('ru', 'ru'),
-                     ('tr1', 'tr1')]
+platformChoices = [
+    ("euw1", "euw1"),
+    ("br1", "br1"),
+    ("eun1", "eun1"),
+    ("jp1", "jp1"),
+    ("kr1", "kr1"),
+    ("la1", "la1"),
+    ("la2", "la2"),
+    ("oc1", "oc1"),
+    ("ru", "ru"),
+    ("tr1", "tr1"),
+]
 
-regionChoices = [('europe', 'europe'),
-                     ("americas","americas"),
-                     ("asia", "asia"),]
+regionChoices = [
+    ("europe", "europe"),
+    ("americas", "americas"),
+    ("asia", "asia"),
+]
 
-tierChoices = [('UNRANKED', 'UNRANKED'),
-                ('IRON', 'IRON'),
-                ('BRONZE', 'BRONZE'),
-                ('SILVER', 'SILVER'),
-                ('GOLD', 'GOLD'),
-                ('PLATINUM', 'PLATINUM'),
-                ('DIAMOND', 'DIAMOND'),
-                ('MASTER', 'MASTER'),
-                ('GRANDMASTER', 'GRANDMASTER'),
-                ('CHALLENGER', 'CHALLENGER')]
-rankChoices = [('I', 'I'),
-                ('II', 'II'),
-                ('III', 'III'),
-                ('IV', 'IV'),
-                ('NONE', 'NONE')]
+tierChoices = [
+    ("UNRANKED", "UNRANKED"),
+    ("IRON", "IRON"),
+    ("BRONZE", "BRONZE"),
+    ("SILVER", "SILVER"),
+    ("GOLD", "GOLD"),
+    ("PLATINUM", "PLATINUM"),
+    ("DIAMOND", "DIAMOND"),
+    ("MASTER", "MASTER"),
+    ("GRANDMASTER", "GRANDMASTER"),
+    ("CHALLENGER", "CHALLENGER"),
+]
+rankChoices = [("I", "I"), ("II", "II"), ("III", "III"), ("IV", "IV"), ("NONE", "NONE")]
 
 # Settings
 

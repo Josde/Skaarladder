@@ -15,67 +15,90 @@ from .tables import ChallengeTable
 import uuid
 from django_htmx.http import HttpResponseClientRedirect
 from django.utils import timezone
+
 # Create your views here.
-def index(request): 
-    return render(request, 'tracker/index.html')
+def index(request):
+    return render(request, "tracker/index.html")
+
 
 def error(request):
     # FIXME: Use django.messages instead of a error code
     msg = messages.get_messages(request)
     code = ""
     for item in msg:
-        if (item.tags == 'error'):
+        if item.tags == "error":
             code = item
             break
-    return render(request, 'tracker/error.html', context=locals())
+    return render(request, "tracker/error.html", context=locals())
+
+
 async def create_challenge(request):
     form = ChallengeForm()
-    if (request.method == 'POST'):
-        #TODO: Validation. Just testing for now, but needs error handling!
+    if request.method == "POST":
+        # TODO: Validation. Just testing for now, but needs error handling!
         print(request.POST)
         submitted_form = ChallengeForm(request.POST)
-        #print(submitted_form.cleaned_data)
-        #FIXME: Check is_valid and such, we are currently only using this for testing
+        # print(submitted_form.cleaned_data)
+        # FIXME: Check is_valid and such, we are currently only using this for testing
         if not form.is_valid:
-            messages.error(request, '400')
-            return redirect(reverse('error')) 
-        _name = request.POST['name']
-        _start_date = datetime.strptime(request.POST['start_date'], '%Y-%m-%dT%H:%M')
-        _end_date = datetime.strptime(request.POST['end_date'], '%Y-%m-%dT%H:%M')
-        _player_platform = list(zip(request.POST.getlist('player_name'), request.POST.getlist('platform'))) 
-        _is_absolute = request.POST['is_absolute'] # TODO: Test this
-        _ignore_unranked = request.POST['ignore_unranked']
-        challenge = Challenge(name=_name, start_date=_start_date, end_date=_end_date, is_absolute=_is_absolute, ignore_unranked=_ignore_unranked)
+            messages.error(request, "400")
+            return redirect(reverse("error"))
+        _name = request.POST["name"]
+        _start_date = datetime.strptime(request.POST["start_date"], "%Y-%m-%dT%H:%M")
+        _end_date = datetime.strptime(request.POST["end_date"], "%Y-%m-%dT%H:%M")
+        _player_platform = list(
+            zip(request.POST.getlist("player_name"), request.POST.getlist("platform"))
+        )
+        _is_absolute = request.POST["is_absolute"]  # TODO: Test this
+        _ignore_unranked = request.POST["ignore_unranked"]
+        challenge = Challenge(
+            name=_name,
+            start_date=_start_date,
+            end_date=_end_date,
+            is_absolute=_is_absolute,
+            ignore_unranked=_ignore_unranked,
+        )
         await sync_to_async(challenge.save)()
         tasks = []
         players = []
         player_challenges = []
         for item in _player_platform:
-            if (len(item) < 2):
-                messages.error(request, '400')
-                return redirect(reverse('error'))
+            if len(item) < 2:
+                messages.error(request, "400")
+                return redirect(reverse("error"))
             print("Searching player {0} {1}".format(item[0], item[1]))
             try:
-                
-                player = await sync_to_async(Player.objects.get)(name=item[0], platform=item[1])
+
+                player = await sync_to_async(Player.objects.get)(
+                    name=item[0], platform=item[1]
+                )
                 print("Found")
             except Player.DoesNotExist:
                 player = Player.create(name=item[0], platform=item[1])
-                players.append(player) # We only created non existing players to prevent violating PK uniqueness
+                players.append(
+                    player
+                )  # We only created non existing players to prevent violating PK uniqueness
             finally:
                 uh = UpdateHelper(player)
                 tasks.append(uh.update())
                 # Fixme: Add starting rank
-                player_challenge = Challenge_Player(player_id=player, challenge_id=challenge, starting_lp=0, starting_tier='IRON', starting_rank='IV')
+                player_challenge = Challenge_Player(
+                    player_id=player,
+                    challenge_id=challenge,
+                    starting_lp=0,
+                    starting_tier="IRON",
+                    starting_rank="IV",
+                )
                 player_challenges.append(player_challenge)
-        
-        await sync_to_async(Player.objects.bulk_create)(players)  
+
+        await sync_to_async(Player.objects.bulk_create)(players)
         await sync_to_async(Challenge_Player.objects.bulk_create)(player_challenges)
         await asyncio.gather(*tasks)
-              
-        return redirect('challenge', id=challenge.id)
+
+        return redirect("challenge", id=challenge.id)
     else:
-        return render(request, 'tracker/challenge_form.html', {'form': form}) 
+        return render(request, "tracker/challenge_form.html", {"form": form})
+
 
 def create_user_form(request):
     form_id = uuid.uuid4()
@@ -83,46 +106,69 @@ def create_user_form(request):
 
     return render(request, "tracker/partials/user_form.html", context=locals())
 
+
 async def provisional_parse(request):
-    if (request.method == 'POST'):
+    if request.method == "POST":
         print(request.POST)
-        if ('player_name' not in request.POST.keys() or 'platform' not in request.POST.keys()):
-            return HttpResponse('')
-        try: 
-            player = await sync_to_async(Player.objects.get)(name=request.POST['player_name'], platform=request.POST['platform']) #TODO: Cleanup
+        if (
+            "player_name" not in request.POST.keys()
+            or "platform" not in request.POST.keys()
+        ):
+            return HttpResponse("")
+        try:
+            player = await sync_to_async(Player.objects.get)(
+                name=request.POST["player_name"], platform=request.POST["platform"]
+            )  # TODO: Cleanup
             exists = True
-            return render(request, 'tracker/partials/user_validation.html', context=locals())
+            return render(
+                request, "tracker/partials/user_validation.html", context=locals()
+            )
         except Player.DoesNotExist:
-            player = Player.create(request.POST['player_name'], request.POST['platform'])
+            player = Player.create(
+                request.POST["player_name"], request.POST["platform"]
+            )
         finally:
             uh = UpdateHelper(player)
             try:
                 player_data = await uh.get_player_data()
-                player.avatar_id = player_data['profileIconId']
+                player.avatar_id = player_data["profileIconId"]
                 exists = True
             except Exception:
                 exists = False
             finally:
-                return render(request, 'tracker/partials/user_validation.html', context=locals())
-        
-        
-    
+                return render(
+                    request, "tracker/partials/user_validation.html", context=locals()
+                )
+
+
 def challenge(request, id=0):
     if request.htmx and id == 0:
-        id = request.POST.get('search_input', None)
-        return HttpResponseClientRedirect('challenge/{0}/'.format(id)) #FIXME: Janky as fuck
+        id = request.POST.get("search_input", None)
+        return HttpResponseClientRedirect(
+            "challenge/{0}/".format(id)
+        )  # FIXME: Janky as fuck
         # FIXME: Error handling here.
     try:
         challenge_data = Challenge.objects.get(id=id)
-        if (challenge_data.ignore_unranked):
-            player_query = Challenge_Player.objects.filter(challenge_id=id).exclude(player_id__tier="UNRANKED").select_related('player_id').order_by('-progress')
+        if challenge_data.ignore_unranked:
+            player_query = (
+                Challenge_Player.objects.filter(challenge_id=id)
+                .exclude(player_id__tier="UNRANKED")
+                .select_related("player_id")
+                .order_by("-progress")
+            )
         else:
-            player_query = Challenge_Player.objects.filter(challenge_id=id).exclude(ignored=True).select_related('player_id').order_by('-progress')
+            player_query = (
+                Challenge_Player.objects.filter(challenge_id=id)
+                .exclude(ignored=True)
+                .select_related("player_id")
+                .order_by("-progress")
+            )
         table = ChallengeTable(player_query)
         right_now = timezone.now()
         start_date = challenge_data.start_date
         end_date = challenge_data.end_date
-        challenge_name = challenge_data.name 
+        challenge_name = challenge_data.name
         challenge_id = challenge_data.id
         if right_now >= start_date:
             challenge_status = "Ongoing"
@@ -131,9 +177,10 @@ def challenge(request, id=0):
         else:
             challenge_status = "Done"
     except Exception:
-        messages.error(request, '404')
-        return redirect(reverse('error'))    
-    return render(request, 'tracker/challenge.html', context=locals())
+        messages.error(request, "404")
+        return redirect(reverse("error"))
+    return render(request, "tracker/challenge.html", context=locals())
+
 
 def search(request):
-    return render(request, 'tracker/partials/search_modal.html')
+    return render(request, "tracker/partials/search_modal.html")
