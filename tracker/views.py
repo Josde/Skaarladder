@@ -9,13 +9,12 @@ from .forms import PlayerForm
 from .updater.update_helper import UpdateHelper
 from .models import Player, Challenge, Challenge_Player
 from .forms import ChallengeForm
-from .utils.validators import generic_name_validator
 from asgiref.sync import sync_to_async
 from .tables import ChallengeTable
 import uuid
 from django_htmx.http import HttpResponseClientRedirect
 from django.utils import timezone
-from django.views.decorators.http import require_http_methods, require_GET, require_POST
+from django.views.decorators.http import require_http_methods, require_GET
 
 
 @require_GET

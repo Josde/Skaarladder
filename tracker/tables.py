@@ -3,7 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.html import format_html
 
 from tracker.utils import constants
-from .models import Challenge_Player, Challenge, Player
+from .models import Player
 
 # TODO: Once multiple Challenge support is added, add filtering to this table. Else, add one view per challenge.
 # About filtering: https://django-tables2.readthedocs.io/en/latest/pages/filtering.html
@@ -50,7 +50,8 @@ class ChallengeTable(tables.Table):
 
         except ObjectDoesNotExist:
             print(
-                "[LeagueTable] Rendering player {0}, who can't be found in TrackedPlayers. This shouldn't happen.".format(
+                "[LeagueTable] Rendering player {0}, who can't be found in TrackedPlayers. \
+                    This shouldn't happen.".format(
                     value
                 )
             )

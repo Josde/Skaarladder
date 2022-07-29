@@ -1,11 +1,9 @@
-from socket import fromshare
 from django import forms
 from django.utils.translation import gettext as _  # Localization
-from tracker.utils.constants import tierChoices, rankChoices, platformChoices
+from tracker.utils.constants import platformChoices
 from django.utils import timezone
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, Submit, Field, Row, Column, Div
-from .models import Challenge, Player
 from tracker.utils import constants
 
 

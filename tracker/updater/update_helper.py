@@ -1,11 +1,9 @@
 import asyncio
 from django.utils import timezone
 from tracker.utils.league import rank_to_lp
-from tracker.models import Player, Challenge_Player, Challenge
-import datetime
+from tracker.models import Player, Challenge_Player
 import traceback
 from pyot.models import lol
-from pyot.utils.lol.routing import platform_to_region
 from asgiref.sync import sync_to_async
 
 
