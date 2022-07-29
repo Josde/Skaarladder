@@ -1,5 +1,7 @@
 {% load static %}
-</script src="{% static 'tracker/htmx.min.js' %}" type='text/javascript' defer>
-</script src="{% static 'tracker/hyperscript.min.js' %}" type='text/javascript' defer>
-<div id="popup_body" class="fixed top-0 left-0 z-10 items-center justify-center hidden w-screen h-screen transition-all duration-300 ease-in-out" 
-_="on htmx:afterSwap toggle .hidden then settle"></div> 
+<script src="{% static 'tracker/htmx.min.js' %}" type='text/javascript' defer></script>
+<script src="{% static 'tracker/debug.js' %}" type='text/javascript' defer></script>
+<script src="{% static 'tracker/hyperscript.min.js' %}" type='text/javascript' defer></script>
+
+<div id="popup_body" class="fixed top-0 left-0 z-10 items-center justify-center hidden w-screen h-screen" hx-ext="debug"
+_="on htmx:beforeSwap toggle .hidden"></div> 

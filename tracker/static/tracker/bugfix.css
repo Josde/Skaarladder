@@ -1,12 +1,15 @@
 /* Fixes some ugly stuff caused by crispy-tailwind */
 
 select {
-  background-color: #171717 !important; /* Fixes not being able to change the select BG color, 171717 is neutral-900 */ 
-  background-image: none !important; /* Small notch in the background of the select that clips into the text */
+  background-color: #171717 !important;
+  /* Fixes not being able to change the select BG color, 171717 is neutral-900 */
+  background-image: none !important;
+  /* Small notch in the background of the select that clips into the text */
 }
 
-.fill-current.h-4.w-4 { /* Fixes the ugly uncentered arrow left in select by crispy-tailwind that can't be styled */
-  display: none !important; 
+.fill-current.h-4.w-4 {
+  /* Fixes the ugly uncentered arrow left in select by crispy-tailwind that can't be styled */
+  display: none !important;
 }
 
 /* Tailwind doesn't allow to hide scrollbars while keeping scroll on: https://stackoverflow.com/a/66436651 */
@@ -17,6 +20,53 @@ select {
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .no-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+/* Dark mode scrollbar */
+
+html {
+  scrollbar-face-color: #646464;
+  scrollbar-base-color: #646464;
+  scrollbar-3dlight-color: #646464;
+  scrollbar-highlight-color: #646464;
+  scrollbar-track-color: #000;
+  scrollbar-arrow-color: #000;
+  scrollbar-shadow-color: #646464;
+  color-scheme: dark;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 3px;
+}
+
+::-webkit-scrollbar-button {
+  background-color: #666;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #646464;
+}
+
+::-webkit-scrollbar-track-piece {
+  background-color: #000;
+}
+
+::-webkit-scrollbar-thumb {
+  height: 50px;
+  background-color: #666;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-corner {
+  background-color: #646464;
+}
+}
+
+::-webkit-resizer {
+  background-color: #666;
 }

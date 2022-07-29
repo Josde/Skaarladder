@@ -1,7 +1,8 @@
 {% load static %}
 {% load tailwind_filters %}
 {% load crispy_forms_tags %}
-<html data-color-scheme="dark" color-scheme="dark">
+<!DOCTYPE html>
+<html data-color-scheme="dark" color-scheme="dark" lang="en">
     <head>
         <title>Challenge Creation</title>
         <meta charset="UTF-8">
@@ -15,17 +16,17 @@
         <link href="{% static 'tracker/bugfix.css' %}" rel=stylesheet>
         <link href="{% static 'tracker/loader.css' %}" rel=stylesheet>
         <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
-        <script src="{% static 'tracker/htmx.min.js' %}" type='text/javascript' defer><!-- required for some browsers ??? --></script> 
-        <script src="{% static 'tracker/hyperscript.min.js' %}" type='text/javascript' defer><!-- required for some browsers ??? --></script> 
+        <script src="{% static 'tracker/htmx.min.js' %}" type='text/javascript' defer></script> 
+        <script src="{% static 'tracker/hyperscript.min.js' %}" type='text/javascript' defer></script> 
     </head>
-    <body>
+    <body class="overflow-x-hidden">
         <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
         <div>
             {% include 'tracker/partials/navbar.html' %}
             {% include "tracker/partials/modal_div.html" %}   
-            <div class="flex flex-row w-full h-full overflow-auto bg-neutral-900"> 
+            <div class="flex flex-row w-screen h-screen overflow-auto bg-neutral-900"> 
             <form class="flex flex-row mt-16 ml-[10%]"action="/create/" method="post" id='challenge_form'>
                 <div class="flex-col">
                     {% csrf_token %}
@@ -33,7 +34,7 @@
                 </div>
                     <div class="flex flex-col items-start mt-16 text-center">
                         <form id="challenge_form" method="post">
-                            <b class="justify-start px-4 text-white">Players</b>
+                            <strong class="justify-start px-4 text-white">Players</strong>
                             <button class="px-4 py-2 m-4 text-4xl font-bold text-center text-white bg-blue-500 rounded place-self-start" 
                             hx-get="{% url 'player_form' %}" hx-swap="beforeend" hx-target='#player_forms'>+</button>
                             <div id='player_forms' class="max-h-[80%] flex flex-col flex-wrap">
