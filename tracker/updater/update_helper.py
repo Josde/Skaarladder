@@ -93,8 +93,8 @@ class UpdateHelper():
             soloq_dict = item.dict()
             if (soloq_dict is not None and soloq_dict['queueType'] == "RANKED_SOLO_5x5"): # Fiter SoloQ
                 break
-            if soloq_dict is None:
-                raise Exception
+        if soloq_dict is None:
+            raise Exception
         return soloq_dict
         
     

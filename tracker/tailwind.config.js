@@ -4,7 +4,11 @@ module.exports = {
             './**/*.py',
           ],
   theme: {
-    extend: {},
+    extend: {
+      'fontFamily': {
+        'bebas': ['"Bebas Neue"']
+      },
+    },
   },
   plugins: [
     require('@tailwindcss/forms'),

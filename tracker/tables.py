@@ -11,7 +11,7 @@ from .models import Challenge_Player, Challenge, Player
 
 class ChallengeTable(tables.Table):
     # There is no way to set a default column style in django-tables2, apparently. Fuck DRY
-    column_style = {"cell": {"class": "m-2 p-2 border border-white border-collapse whitespace-nowrap"}}
+    column_style = {"cell": {"class": "m-4 p-4 border border-neutral-500 border-collapse whitespace-nowrap"}}
     name = tables.Column(accessor="player_id.name", attrs=column_style)
     tier = tables.Column(accessor="player_id.tier", attrs=column_style)
     rank = tables.Column(accessor="player_id.rank", attrs=column_style)
@@ -23,7 +23,7 @@ class ChallengeTable(tables.Table):
 
     class Meta:
         template_name = "django_tables2/bootstrap.html"
-        attrs = {"class": "table-auto border-collapse border border-white text-white text-start"}
+        attrs = {"class": "table-auto border-collapse border border-neutral-500 text-white text-start "}
         row_attrs = {"class": "border border-white border-collapse"}
         order_by = "-progress"
         orderable = False  # disable header clicking

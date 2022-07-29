@@ -6,14 +6,15 @@
     {% django_htmx_script %}
 </head>
 
-<div name="backdrop" class="flex items-center justify-center w-screen h-screen transition-all duration-700 ease-in-out bg-black bg-opacity-50 place-content-center" 
-    hx-headers={{ csrf_token }} hx-get="" hx-trigger="click" hx-swap="innerHTML" hx-target="#popup_body">
-    <div name="search_window" class="flex flex-col w-[75%] h-[50%] bg-neutral-800 place-self-center">
+<div name="backdrop" class="flex items-center justify-center w-screen h-screen bg-black opacity-0 place-content-center -z-10 visible:opacity-50" 
+    hx-headers={{ csrf_token }}> <!-- hx-get="" hx-trigger="click" hx-swap="innerHTML" hx-target="#popup_body" -->
+    <div name="search_window" class="flex flex-col w-[75%] h-[50%] bg-neutral-800 bg-opacity-0 place-self-center z-10">
         <button class="p-4 m-4 text-2xl text-white rounded place-self-end bg-neutral-700" hx-swap="innerHTML" hx-target="#popup_body" hx-get="">X</button>
         <div name="search_box" class="flex flex-row justify-center w-full h-16 place-self-center rounded-xl">
             <form hx-post="{% url 'challenge' %}" hx-include="#search_input" class="flex flex-row w-[50%]" >
                 {% csrf_token %}
-                <input id="search_input" name="search_input" type='text' class='justify-center flex-grow w-full h-full p-4 m-4 text-white border-none bg-neutral-500 focus:outline-none rounded-xl'>
+                <input id="search_input" name="search_input" type='text' placeholder="Challenge code"
+                  class='justify-center flex-grow w-full h-full p-4 m-4 text-white border-none bg-neutral-500 placeholder-neutral-300 focus:outline-none rounded-xl'>
             </input>
             <button class="justify-center p-4 m-4 btn btn-primary text-white-900" type="submit" action="submit">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="white">
