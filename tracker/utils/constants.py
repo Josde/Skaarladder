@@ -1,4 +1,5 @@
 tierWeights = {
+    "UNRANKED": 0,
     "IRON": 0,
     "BRONZE": 1,
     "SILVER": 2,
@@ -14,7 +15,8 @@ rankWeights = {
     "IV": 0,
     "III": 1,
     "II": 2,
-    "I": 3
+    "I": 3,
+    "NONE": 0,
 }
 
 riotToOPGGRegions = {
@@ -47,17 +49,21 @@ regionChoices = [('europe', 'europe'),
                      ("americas","americas"),
                      ("asia", "asia"),]
 
-tierChoices = [('IRON', 'IRON'),
+tierChoices = [('UNRANKED', 'UNRANKED'),
+                ('IRON', 'IRON'),
                 ('BRONZE', 'BRONZE'),
                 ('SILVER', 'SILVER'),
                 ('GOLD', 'GOLD'),
                 ('PLATINUM', 'PLATINUM'),
                 ('DIAMOND', 'DIAMOND'),
-                ('MASTER_PLUS', 'MASTER_PLUS')]
+                ('MASTER', 'MASTER'),
+                ('GRANDMASTER', 'GRANDMASTER'),
+                ('CHALLENGER', 'CHALLENGER')]
 rankChoices = [('I', 'I'),
                 ('II', 'II'),
                 ('III', 'III'),
-                ('IV', 'IV')]
+                ('IV', 'IV'),
+                ('NONE', 'NONE')]
 
 # Settings
 

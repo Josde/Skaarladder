@@ -42,29 +42,44 @@ class UpdateHelper():
         tasks = [self.get_player_ranked_data(), self.get_streak_data()]     
         try:
             self.ranked_data, self.streak = await asyncio.gather(*tasks)
-            self.queried_player.streak = self.streak
-            self.queried_player.wins = self.ranked_data['wins']
-            self.queried_player.losses = self.ranked_data['losses']
-            self.queried_player.winrate = 100 * self.queried_player.wins / (self.queried_player.wins + self.queried_player.losses) 
-            self.queried_player.tier = self.ranked_data['tier']
-            self.queried_player.rank = self.ranked_data['rank']
-            self.queried_player.lp = self.ranked_data['leaguePoints']
-            self.queried_player.last_ranked_update = timezone.now()
+            current_absolute_lp = 0
+            if self.ranked_data is not None:
+                self.queried_player.streak = self.streak
+                self.queried_player.wins = self.ranked_data['wins']
+                self.queried_player.losses = self.ranked_data['losses']
+                self.queried_player.winrate = 100 * self.queried_player.wins / (self.queried_player.wins + self.queried_player.losses) 
+                self.queried_player.tier = self.ranked_data['tier']
+                self.queried_player.rank = self.ranked_data['rank']
+                self.queried_player.lp = self.ranked_data['leaguePoints']
+                self.queried_player.last_ranked_update = timezone.now()
+                
+                current_absolute_lp = rankToLP(self.queried_player.tier, self.queried_player.rank, self.queried_player.lp)
+            else:
+                self.queried_player.streak = self.queried_player.wins  = self.queried_player.losses = self.queried_player.winrate = 0
+                self.queried_player.tier = "UNRANKED"
+                self.queried_player.rank = "NONE"
+                self.queried_player.lp = 0
+                self.queried_player.last_ranked_update = timezone.now()
             
-            current_absolute_lp = rankToLP(self.queried_player.tier, self.queried_player.rank, self.queried_player.lp)
-            if (previous_absolute_lp != current_absolute_lp):
+            
+            if (previous_absolute_lp != current_absolute_lp or self.queried_player.tier == "UNRANKED"): #FIXME: Change the unranked part to be better
                 # Rank changed, must update all challenges
                 challenges = await sync_to_async(list)(Challenge_Player.objects.filter(player_id=self.queried_player.id).select_related('challenge_id').all())
                 for item in challenges:
                     challenge_details = item.challenge_id
                     previous_progress = item.progress
-                    if (challenge_details.is_absolute):
-                        absolute_starting_lp = 0
+                    if self.queried_player.tier == "UNRANKED":
+                        item.starting_tier = "UNRANKED"
+                        item.starting_rank = "NONE"
                     else:
-                        absolute_starting_lp = rankToLP(item.starting_tier, item.starting_rank, item.starting_lp)
-                    
-                    item.progress = current_absolute_lp - absolute_starting_lp
-                    item.progress_delta = item.progress - previous_progress
+                        if (challenge_details.is_absolute):
+                            absolute_starting_lp = 0
+                        elif item.starting_tier == "UNRANKED" or item.starting_rank == "NONE":
+                            item.starting_tier = self.queried_player.tier
+                            item.starting_rank = self.queried_player.rank
+                            absolute_starting_lp = rankToLP(self.queried_player.tier, self.queried_player.rank, self.queried_player.lp)
+                        item.progress = current_absolute_lp - absolute_starting_lp
+                        item.progress_delta = item.progress - previous_progress
                 #TODO: Change this to abulk_update once it gets to Django release
                 #await sync_to_async(Challenge_Player.objects.bulk_update(challenges, ['progress', 'progress_delta']))
                 await sync_to_async(Challenge_Player.objects.bulk_update)(challenges, ['progress', 'progress_delta']) 
@@ -93,8 +108,6 @@ class UpdateHelper():
             soloq_dict = item.dict()
             if (soloq_dict is not None and soloq_dict['queueType'] == "RANKED_SOLO_5x5"): # Fiter SoloQ
                 break
-        if soloq_dict is None:
-            raise Exception
         return soloq_dict
         
     
