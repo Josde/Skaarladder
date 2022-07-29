@@ -245,4 +245,8 @@ fabric.properties
 # Django static files
 staticfiles/
 
+# PyCharm
 .idea/
+
+# SonarScanner
+.scannerwork/
