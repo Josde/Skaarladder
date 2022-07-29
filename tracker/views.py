@@ -170,5 +170,6 @@ def challenge(request, challenge_id=0):
     return render(request, "tracker/challenge.html", context=locals())
 
 
+@require_GET
 def search(request):
     return render(request, "tracker/partials/search_modal.html")
