@@ -27,6 +27,8 @@ class ChallengeForm(forms.Form):
                         Field('name', css_class="bg-neutral-900 text-white p-4", autocomplete='off'),
                         Field('start_date', css_class="bg-neutral-900 text-white p-4"),
                         Field('end_date', css_class="bg-neutral-900 text-white p-4"),
+                        Field('is_absolute'),
+                        Field('ignore_unranked'),
                         Submit('Submit', 'Submit', css_class="px-4 py-2 m-4 font-bold text-white bg-blue-500 rounded"),
                         css_class="m-4",
                     ),
@@ -37,7 +39,8 @@ class ChallengeForm(forms.Form):
     name = forms.CharField(label=_('ChallengeName'), max_length=50, empty_value="Challenge name")
     start_date = forms.DateTimeField(label=_('StartDate'), widget=DateTimePickerInput, initial=timezone.now())
     end_date = forms.DateTimeField(label=_('EndDate'), widget=DateTimePickerInput)
-   
+    is_absolute = forms.BooleanField(label=_('AbsoluteRanking'))
+    ignore_unranked = forms.BooleanField(label=_('HideUnranked'))
 
 class PlayerForm(forms.Form):
 

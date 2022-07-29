@@ -14,6 +14,7 @@ from asgiref.sync import sync_to_async
 from .tables import ChallengeTable
 import uuid
 from django_htmx.http import HttpResponseClientRedirect
+from django.utils import timezone
 # Create your views here.
 def index(request): 
     return render(request, 'tracker/index.html')
@@ -42,7 +43,9 @@ async def create_challenge(request):
         _start_date = datetime.strptime(request.POST['start_date'], '%Y-%m-%dT%H:%M')
         _end_date = datetime.strptime(request.POST['end_date'], '%Y-%m-%dT%H:%M')
         _player_platform = list(zip(request.POST.getlist('player_name'), request.POST.getlist('platform'))) 
-        challenge = Challenge(name=_name, start_date=_start_date, end_date=_end_date, is_absolute=True)
+        _is_absolute = request.POST['is_absolute'] # TODO: Test this
+        _ignore_unranked = request.POST['ignore_unranked']
+        challenge = Challenge(name=_name, start_date=_start_date, end_date=_end_date, is_absolute=_is_absolute, ignore_unranked=_ignore_unranked)
         await sync_to_async(challenge.save)()
         tasks = []
         players = []
@@ -72,8 +75,6 @@ async def create_challenge(request):
               
         return redirect('challenge', id=challenge.id)
     else:
-        template = loader.get_template('tracker/challenge_form.html')
-        
         return render(request, 'tracker/challenge_form.html', {'form': form}) 
 
 def create_user_form(request):
@@ -118,9 +119,17 @@ def challenge(request, id=0):
         else:
             player_query = Challenge_Player.objects.filter(challenge_id=id).exclude(ignored=True).select_related('player_id').order_by('-progress')
         table = ChallengeTable(player_query)
+        right_now = timezone.now()
         start_date = challenge_data.start_date
         end_date = challenge_data.end_date
         challenge_name = challenge_data.name 
+        challenge_id = challenge_data.id
+        if right_now >= start_date:
+            challenge_status = "Ongoing"
+        elif right_now >= end_date:
+            challenge_status = "Scheduled"
+        else:
+            challenge_status = "Done"
     except Exception:
         messages.error(request, '404')
         return redirect(reverse('error'))    
