@@ -46,9 +46,7 @@ async def create_challenge(request):
         _name = request.POST["name"]
         _start_date = datetime.strptime(request.POST["start_date"], "%Y-%m-%dT%H:%M")
         _end_date = datetime.strptime(request.POST["end_date"], "%Y-%m-%dT%H:%M")
-        _player_platform = list(
-            zip(request.POST.getlist("player_name"), request.POST.getlist("platform"))
-        )
+        _player_platform = list(zip(request.POST.getlist("player_name"), request.POST.getlist("platform")))
         _is_absolute = request.POST["is_absolute"]  # TODO: Test this
         _ignore_unranked = request.POST["ignore_unranked"]
         challenge = Challenge(
@@ -68,16 +66,11 @@ async def create_challenge(request):
                 return redirect(reverse("error"))
             print("Searching player {0} {1}".format(item[0], item[1]))
             try:
-
-                player = await sync_to_async(Player.objects.get)(
-                    name=item[0], platform=item[1]
-                )
+                player = await sync_to_async(Player.objects.get)(name=item[0], platform=item[1])
                 print("Found")
             except Player.DoesNotExist:
                 player = Player.create(name=item[0], platform=item[1])
-                players.append(
-                    player
-                )  # We only created non existing players to prevent violating PK uniqueness
+                players.append(player)  # We only created non existing players to prevent violating PK uniqueness
             finally:
                 uh = UpdateHelper(player)
                 tasks.append(uh.update())
@@ -110,23 +103,16 @@ def create_user_form(request):
 async def provisional_parse(request):
     if request.method == "POST":
         print(request.POST)
-        if (
-            "player_name" not in request.POST.keys()
-            or "platform" not in request.POST.keys()
-        ):
+        if "player_name" not in request.POST.keys() or "platform" not in request.POST.keys():
             return HttpResponse("")
         try:
             player = await sync_to_async(Player.objects.get)(
                 name=request.POST["player_name"], platform=request.POST["platform"]
             )  # TODO: Cleanup
             exists = True
-            return render(
-                request, "tracker/partials/user_validation.html", context=locals()
-            )
+            return render(request, "tracker/partials/user_validation.html", context=locals())
         except Player.DoesNotExist:
-            player = Player.create(
-                request.POST["player_name"], request.POST["platform"]
-            )
+            player = Player.create(request.POST["player_name"], request.POST["platform"])
         finally:
             uh = UpdateHelper(player)
             try:
@@ -136,17 +122,13 @@ async def provisional_parse(request):
             except Exception:
                 exists = False
             finally:
-                return render(
-                    request, "tracker/partials/user_validation.html", context=locals()
-                )
+                return render(request, "tracker/partials/user_validation.html", context=locals())
 
 
 def challenge(request, id=0):
     if request.htmx and id == 0:
         id = request.POST.get("search_input", None)
-        return HttpResponseClientRedirect(
-            "challenge/{0}/".format(id)
-        )  # FIXME: Janky as fuck
+        return HttpResponseClientRedirect("challenge/{0}/".format(id))  # FIXME: Janky as fuck
         # FIXME: Error handling here.
     try:
         challenge_data = Challenge.objects.get(id=id)

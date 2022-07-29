@@ -54,9 +54,7 @@ class UpdateHelper:
                 self.queried_player.wins = self.ranked_data["wins"]
                 self.queried_player.losses = self.ranked_data["losses"]
                 self.queried_player.winrate = (
-                    100
-                    * self.queried_player.wins
-                    / (self.queried_player.wins + self.queried_player.losses)
+                    100 * self.queried_player.wins / (self.queried_player.wins + self.queried_player.losses)
                 )
                 self.queried_player.tier = self.ranked_data["tier"]
                 self.queried_player.rank = self.ranked_data["rank"]
@@ -78,8 +76,7 @@ class UpdateHelper:
                 self.queried_player.last_ranked_update = timezone.now()
 
             if (
-                previous_absolute_lp != current_absolute_lp
-                or self.queried_player.tier == "UNRANKED"
+                previous_absolute_lp != current_absolute_lp or self.queried_player.tier == "UNRANKED"
             ):  # FIXME: Change the unranked part to be better
                 # Rank changed, must update all challenges
                 challenges = await sync_to_async(list)(
@@ -96,10 +93,7 @@ class UpdateHelper:
                     else:
                         if challenge_details.is_absolute:
                             absolute_starting_lp = 0
-                        elif (
-                            item.starting_tier == "UNRANKED"
-                            or item.starting_rank == "NONE"
-                        ):
+                        elif item.starting_tier == "UNRANKED" or item.starting_rank == "NONE":
                             item.starting_tier = self.queried_player.tier
                             item.starting_rank = self.queried_player.rank
                             absolute_starting_lp = rankToLP(
@@ -111,9 +105,7 @@ class UpdateHelper:
                         item.progress_delta = item.progress - previous_progress
                 # TODO: Change this to abulk_update once it gets to Django release
                 # await sync_to_async(Challenge_Player.objects.bulk_update(challenges, ['progress', 'progress_delta']))
-                await sync_to_async(Challenge_Player.objects.bulk_update)(
-                    challenges, ["progress", "progress_delta"]
-                )
+                await sync_to_async(Challenge_Player.objects.bulk_update)(challenges, ["progress", "progress_delta"])
             await sync_to_async(self.queried_player.save)()
         except Exception:  # For debugging, implement errors later.
             traceback.print_exc()
@@ -126,18 +118,12 @@ class UpdateHelper:
         )
         """ Updates the ID, name and such of our Player class.
         Only ran if it's the first time the player has been queried or if last update was a while ago. """
-        res = await lol.Summoner(
-            name=self.queried_player.name, platform=self.queried_player.platform
-        ).get()
+        res = await lol.Summoner(name=self.queried_player.name, platform=self.queried_player.platform).get()
         return res.dict()
 
     async def get_player_ranked_data(self):
         """Queries the player's SoloQ data, getting stats such as LP, winrate and etc."""
-        print(
-            "[{0} UpdateHelper] Running SoloQ data update.".format(
-                self.queried_player.name
-            )
-        )
+        print("[{0} UpdateHelper] Running SoloQ data update.".format(self.queried_player.name))
         queue_data = await lol.SummonerLeague(
             self.queried_player.summoner_id, platform=self.queried_player.platform
         ).get()
@@ -152,27 +138,19 @@ class UpdateHelper:
         soloq_dict = None
         for item in queue_data.entries:
             soloq_dict = item.dict()
-            if (
-                soloq_dict is not None and soloq_dict["queueType"] == "RANKED_SOLO_5x5"
-            ):  # Fiter SoloQ
+            if soloq_dict is not None and soloq_dict["queueType"] == "RANKED_SOLO_5x5":  # Fiter SoloQ
                 break
         return soloq_dict
 
     async def get_streak_data(self):
         """Queries the player's match history and processes his win or loss streak."""
-        print(
-            "[{0} UpdateHelper] Running streak data update".format(
-                self.queried_player.name
-            )
-        )
+        print("[{0} UpdateHelper] Running streak data update".format(self.queried_player.name))
         tasks = []
         matches = []
         result = last_result = None
         streak = 0
         history = (
-            await lol.MatchHistory(
-                self.queried_player.puuid, region=self.queried_player.region
-            )
+            await lol.MatchHistory(self.queried_player.puuid, region=self.queried_player.region)
             .query(count=10, queue=420)
             .get()
         )

@@ -23,8 +23,4 @@ def rankToLP(tier: str, rank: str, points: int) -> int:
     if tier in ["MASTER", "GRANDMASTER", "CHALLENGER"]:
         return (constants.tierWeights[tier.upper()]) * 400 + int(points)
     else:
-        return (
-            (constants.tierWeights[tier.upper()]) * 400
-            + (constants.rankWeights[rank.upper()]) * 100
-            + int(points)
-        )
+        return (constants.tierWeights[tier.upper()]) * 400 + (constants.rankWeights[rank.upper()]) * 100 + int(points)

@@ -12,11 +12,7 @@ from .models import Challenge_Player, Challenge, Player
 
 class ChallengeTable(tables.Table):
     # There is no way to set a default column style in django-tables2, apparently. Fuck DRY
-    column_style = {
-        "cell": {
-            "class": "m-4 p-4 border border-neutral-500 border-collapse whitespace-nowrap"
-        }
-    }
+    column_style = {"cell": {"class": "m-4 p-4 border border-neutral-500 border-collapse whitespace-nowrap"}}
     name = tables.Column(accessor="player_id.name", attrs=column_style)
     tier = tables.Column(accessor="player_id.tier", attrs=column_style)
     rank = tables.Column(accessor="player_id.rank", attrs=column_style)
@@ -28,9 +24,7 @@ class ChallengeTable(tables.Table):
 
     class Meta:
         template_name = "django_tables2/bootstrap.html"
-        attrs = {
-            "class": "table-auto border-collapse border border-neutral-500 text-white text-start "
-        }
+        attrs = {"class": "table-auto border-collapse border border-neutral-500 text-white text-start "}
         row_attrs = {"class": "border border-white border-collapse"}
         order_by = "-progress"
         orderable = False  # disable header clicking
@@ -52,11 +46,7 @@ class ChallengeTable(tables.Table):
                     streak
                 )  # TODO: For some reason styling this with a tailwind class doesn't work, check later.
             elif streak < -1:
-                streak_string = (
-                    '<span style="color:rgb(249,36,114);">{0}L</span>'.format(
-                        abs(streak)
-                    )
-                )
+                streak_string = '<span style="color:rgb(249,36,114);">{0}L</span>'.format(abs(streak))
 
         except ObjectDoesNotExist:
             print(
@@ -85,15 +75,9 @@ class ChallengeTable(tables.Table):
         return format_html('<span style="{0}">{1:.2f}%</span>'.format(style, value))
 
     def render_progress(self, value, record):
-        progress_style = (
-            "color:rgb(180, 210, 115);"
-            if (record.progress >= 0)
-            else "color:rgb(249,36,114);"
-        )
+        progress_style = "color:rgb(180, 210, 115);" if (record.progress >= 0) else "color:rgb(249,36,114);"
         progress_delta_style = (
-            "color:rgb(180, 210, 115);"
-            if (record.progress_delta >= 0)
-            else "color:rgb(249,36,114);"
+            "color:rgb(180, 210, 115);" if (record.progress_delta >= 0) else "color:rgb(249,36,114);"
         )
         progress_sign = "+" if (record.progress >= 0) else ""
         progress_delta_sign = "+" if (record.progress_delta >= 0) else ""
