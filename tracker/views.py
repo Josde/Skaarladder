@@ -2,6 +2,7 @@ import asyncio
 from datetime import datetime
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
+from django.contrib import messages
 from django.urls import reverse
 from django.template import loader
 from .forms import PlayerForm
@@ -17,13 +18,15 @@ from django_htmx.http import HttpResponseClientRedirect
 def index(request): 
     return render(request, 'tracker/index.html')
 
-async def player(request, player=""):
-    if (player != ""):
-        ourPlayer = Player.create(player, 'euw1')
-        uh = UpdateHelper(ourPlayer)
-        await uh.update()
-    return HttpResponse('')
-
+def error(request):
+    # FIXME: Use django.messages instead of a error code
+    msg = messages.get_messages(request)
+    code = ""
+    for item in msg:
+        if (item.tags == 'error'):
+            code = item
+            break
+    return render(request, 'tracker/error.html', context=locals())
 async def create_challenge(request):
     form = ChallengeForm()
     if (request.method == 'POST'):
@@ -33,7 +36,8 @@ async def create_challenge(request):
         #print(submitted_form.cleaned_data)
         #FIXME: Check is_valid and such, we are currently only using this for testing
         if not form.is_valid:
-            return render(request, 'tracker/error.html') 
+            messages.error(request, '400')
+            return redirect(reverse('error')) 
         _name = request.POST['name']
         _start_date = datetime.strptime(request.POST['start_date'], '%Y-%m-%dT%H:%M')
         _end_date = datetime.strptime(request.POST['end_date'], '%Y-%m-%dT%H:%M')
@@ -45,7 +49,8 @@ async def create_challenge(request):
         player_challenges = []
         for item in _player_platform:
             if (len(item) < 2):
-                return render(request, 'tracker/error.html')
+                messages.error(request, '400')
+                return redirect(reverse('error'))
             print("Searching player {0} {1}".format(item[0], item[1]))
             try:
                 
@@ -103,19 +108,22 @@ async def provisional_parse(request):
     
 def challenge(request, id=0):
     if request.htmx and id == 0:
-        id = request.POST.get['search_input', None]
-        if (id == None):
-            return HttpResponse("")
+        id = request.POST.get('search_input', None)
         return HttpResponseClientRedirect('challenge/{0}/'.format(id)) #FIXME: Janky as fuck
         # FIXME: Error handling here.
-    if (id == 0 or id is None): 
-        return render(request, 'tracker/error.html', context=locals())
-    challenge_data = Challenge.objects.filter(id=id).first()
-    player_query = Challenge_Player.objects.filter(challenge_id=id).select_related('player_id').order_by('-progress')
-    table = ChallengeTable(player_query)
-    start_date = challenge_data.start_date
-    end_date = challenge_data.end_date
-    challenge_name = challenge_data.name 
+    try:
+        challenge_data = Challenge.objects.get(id=id)
+        if (challenge_data.ignore_unranked):
+            player_query = Challenge_Player.objects.filter(challenge_id=id).exclude(player_id__tier="UNRANKED").select_related('player_id').order_by('-progress')
+        else:
+            player_query = Challenge_Player.objects.filter(challenge_id=id).exclude(ignored=True).select_related('player_id').order_by('-progress')
+        table = ChallengeTable(player_query)
+        start_date = challenge_data.start_date
+        end_date = challenge_data.end_date
+        challenge_name = challenge_data.name 
+    except Exception:
+        messages.error(request, '404')
+        return redirect(reverse('error'))    
     return render(request, 'tracker/challenge.html', context=locals())
 
 def search(request):
