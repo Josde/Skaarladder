@@ -15,8 +15,10 @@ import uuid
 from django_htmx.http import HttpResponseClientRedirect
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods, require_GET
+from django.views.decorators.cache import cache_page
 
 
+@cache_page(60 * 15)
 @require_GET
 def index(request):
     return render(request, "tracker/index.html")
@@ -24,7 +26,6 @@ def index(request):
 
 @require_GET
 def error(request):
-    # FIXME: Use django.messages instead of a error code
     msg = messages.get_messages(request)
     code = ""
     for item in msg:
@@ -128,7 +129,7 @@ async def provisional_parse(request):
 
         return render(request, "tracker/partials/user_validation.html", context=locals())
 
-
+@cache_page(60 * 15)
 @require_http_methods(["GET", "POST"])
 def challenge(request, challenge_id=0):
     if request.htmx and challenge_id == 0:
@@ -169,6 +170,7 @@ def challenge(request, challenge_id=0):
     return render(request, "tracker/challenge.html", context=locals())
 
 
+@cache_page(60 * 15)
 @require_GET
 def search(request):
     return render(request, "tracker/partials/search_modal.html")

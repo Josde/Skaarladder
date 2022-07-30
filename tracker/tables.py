@@ -39,7 +39,7 @@ class ChallengeTable(tables.Table):
             platform = player.platform
             streak = player.streak
             avatar_id = player.avatar_id
-            if streak < 1 and streak > -1:
+            if 1 > streak > -1:
                 streak_string = ""
             elif streak > 1:
                 streak_string = '<span style="color:rgb(180, 210, 115);">{0}W</span>'.format(

@@ -1,6 +1,7 @@
 {% load static %}
 {% load tailwind_filters %}
 {% load crispy_forms_tags %}
+{% load cache %}
 <!DOCTYPE html>
 <html data-color-scheme="dark" color-scheme="dark" lang="en">
     <head>
@@ -24,8 +25,10 @@
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
         <div>
-            {% include 'tracker/partials/navbar.html' %}
-            {% include "tracker/partials/modal_div.html" %}   
+            {% cache 1000 navbar_modal %}
+                {% include 'tracker/partials/navbar.html' %}
+                {% include "tracker/partials/modal_div.html" %}   
+            {% endcache %}
             <div class="flex flex-row w-screen h-screen overflow-auto bg-neutral-900"> 
             <form class="flex flex-row mt-16 ml-[10%]"action="/create/" method="post" id='challenge_form'>
                 <div class="flex-col">
@@ -47,6 +50,8 @@
             </form>
         </div>
         </div>
-        {% include 'tracker/partials/footer.html' %}    
+        {% cache 1000 footer %}
+            {% include 'tracker/partials/footer.html' %}  
+        {% endcache %}  
     </body>
 </html>

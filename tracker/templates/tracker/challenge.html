@@ -1,5 +1,6 @@
 {% load render_table from django_tables2 %}
 {% load static %}
+{% load cache %}
 <!DOCTYPE html> 
 <html lang="en" data-color-scheme="dark" color-scheme="dark">
     <head>
@@ -18,8 +19,10 @@
         <script src="{% static 'tracker/hyperscript.min.js' %}" type='text/javascript' defer></script> 
     </head>
     <body class="overflow-x-hidden no-scrollbar">
-        {% include "tracker/partials/navbar.html" %}    
-        {% include "tracker/partials/modal_div.html" %}    
+        {% cache 1000 navbar_modal %}
+            {% include 'tracker/partials/navbar.html' %}
+            {% include "tracker/partials/modal_div.html" %}   
+        {% endcache %}
         <div class="flex items-center justify-center w-screen h-screen text-white bg-neutral-900 "> 
             <div class="flex w-[64rem] h-full bg-neutral-800 text-white flex-col drop-shadow-xl z overflow-auto overflow-x-hidden">
                 <!--TODO: Im not currently satisfied with overflow behaviour -->
@@ -41,13 +44,17 @@
             </div>
                 <hr class="bg-neutral-600"></hr>
                 <div class="flex justify-center w-full h-full m-8 ">
-                    {% render_table table %} 
-                    {%csrf_token%} 
+                    {% cache 300 table %}
+                        {% render_table table %} 
+                        {%csrf_token%} 
+                    {% endcache %}
                 </div>
                 
             </div>
         </div>
     </div>
-    {% include "tracker/partials/footer.html" %} 
+    {% cache 1000 footer %}
+        {% include "tracker/partials/footer.html" %} 
+    {% endcache %}
     </body>
 </html>
