@@ -8,7 +8,7 @@ tierWeights = {
     "DIAMOND": 5,
     "MASTER": 6,
     "GRANDMASTER": 6,
-    "CHALLENGER": 6,  # todo: check this
+    "CHALLENGER": 6,
 }
 
 rankWeights = {

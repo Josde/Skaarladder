@@ -5,10 +5,6 @@ from django.utils.html import format_html
 from tracker.utils import constants
 from .models import Player
 
-# TODO: Once multiple Challenge support is added, add filtering to this table. Else, add one view per challenge.
-# About filtering: https://django-tables2.readthedocs.io/en/latest/pages/filtering.html
-# Dynamic views: https://stackoverflow.com/a/49341050
-
 
 class ChallengeTable(tables.Table):
     # There is no way to set a default column style in django-tables2, apparently. Fuck DRY
@@ -42,11 +38,9 @@ class ChallengeTable(tables.Table):
             if 1 > streak > -1:
                 streak_string = ""
             elif streak > 1:
-                streak_string = '<span style="color:rgb(180, 210, 115);">{0}W</span>'.format(
-                    streak
-                )  # TODO: For some reason styling this with a tailwind class doesn't work, check later.
+                streak_string = '<span style="{0}">{1}W</span>'.format(constants.green_text_style, streak)
             elif streak < -1:
-                streak_string = '<span style="color:rgb(249,36,114);">{0}L</span>'.format(abs(streak))
+                streak_string = '<span style="{0}">{1}L</span>'.format(constants.red_text_style, abs(streak))
 
         except ObjectDoesNotExist:
             print(

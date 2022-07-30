@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config("DEBUG", False)
 
 ALLOWED_HOSTS = []
 
@@ -132,6 +132,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+# WhiteNoise
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -149,32 +153,30 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
 
 CRISPY_TEMPLATE_PACK = "tailwind"
 
-# WhiteNoise
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-# heroku config, TODO: config this with env variables? or make the full code platform agnostic
-import django_on_heroku
 
-django_on_heroku.settings(locals(), secret_key=False)
+if config("HEROKU", False):
+    import django_on_heroku
+
+    django_on_heroku.settings(locals(), secret_key=False)
 
 # sentry
-""" import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
+if config("SENTRY", False):
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
 
-sentry_sdk.init(
-    dsn=os.getenv('SENTRY_DSN'),
-    integrations=[
-        DjangoIntegration(),
-    ],
-    # TODO:  Check if 1.0 is viable for production w/small size 
-    # Make this configurable
-    # And also, probably disable PII since I don't use auth.
-    
-    # Set traces_sample_rate to 1.0 to capture 100%
-    # of transactions for performance monitoring.
-    # We recommend adjusting this value in production.
-    traces_sample_rate=1.0,
-
-    # If you wish to associate users to errors (assuming you are using
-    # django.contrib.auth) you may enable sending PII data.
-    send_default_pii=True
-) """
+    sentry_sdk.init(
+        dsn=os.getenv("SENTRY_DSN"),
+        integrations=[
+            DjangoIntegration(),
+        ],
+        # TODO:  Check if 1.0 is viable for production w/small size
+        # Make this configurable
+        # And also, probably disable PII since I don't use auth.
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        # We recommend adjusting this value in production.
+        traces_sample_rate=1.0,
+        # If you wish to associate users to errors (assuming you are using
+        # django.contrib.auth) you may enable sending PII data.
+        send_default_pii=True,
+    )

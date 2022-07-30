@@ -36,6 +36,7 @@ def error(request):
 
 
 # Async views can't have required method decorators, so this will show up as an issue on SonarQube for a while.
+# TODO: This can be problematic since it runs on the server thread and makes API calls, maybe do all updates on UpdaterThread?
 async def create_challenge(request):
     form = ChallengeForm()
     if request.method == "POST":
@@ -51,8 +52,8 @@ async def create_challenge(request):
         _start_date = datetime.strptime(request.POST["start_date"], "%Y-%m-%dT%H:%M")
         _end_date = datetime.strptime(request.POST["end_date"], "%Y-%m-%dT%H:%M")
         _player_platform = list(zip(request.POST.getlist("player_name"), request.POST.getlist("platform")))
-        _is_absolute = request.POST["is_absolute"]  # TODO: Test this
-        _ignore_unranked = request.POST["ignore_unranked"]
+        _is_absolute = "is_absolute" in request.POST.keys()
+        _ignore_unranked = "ignore_unranked" in request.POST.keys()
         challenge = Challenge(
             name=_name,
             start_date=_start_date,
@@ -78,7 +79,6 @@ async def create_challenge(request):
             finally:
                 uh = UpdateHelper(player)
                 tasks.append(uh.update())
-                # Fixme: Add starting rank
                 player_challenge = Challenge_Player(
                     player_id=player,
                     challenge_id=challenge,
@@ -91,8 +91,16 @@ async def create_challenge(request):
         await sync_to_async(Player.objects.bulk_create)(players)
         await sync_to_async(Challenge_Player.objects.bulk_create)(player_challenges)
         await asyncio.gather(*tasks)
+        for item in player_challenges:
+            # TODO: Check how efficient this is in terms of queries and DB access time. Also, test this (battery is running out lol)
+            item.starting_lp = item.player_id.lp
+            item.starting_tier = item.player_id.tier
+            item.starting_rank = item.player_id.rank
+        await sync_to_async(Challenge_Player.objects.bulk_update)(
+            player_challenges, ["starting_tier", "starting_rank", "starting_lp"]
+        )
 
-        return redirect("challenge", id=challenge.id)
+        return redirect("challenge", challenge_id=challenge.id)
     else:
         return render(request, "tracker/challenge_form.html", {"form": form})
 
@@ -110,14 +118,15 @@ async def provisional_parse(request):
         print(request.POST)
         if "player_name" not in request.POST.keys() or "platform" not in request.POST.keys():
             return HttpResponse("")
+        player_name = request.POST.get("player_name", "")
+        platform = request.POST.get("platform", "")
         try:
-            player = await sync_to_async(Player.objects.get)(
-                name=request.POST["player_name"], platform=request.POST["platform"]
-            )  # TODO: Cleanup
+            player = await sync_to_async(Player.objects.get)(name=player_name, platform=platform)
             exists = True
+            # TODO: We return here to prevent an unneeded update in finally. Maybe take this out of try to prevent a code smell.
             return render(request, "tracker/partials/user_validation.html", context=locals())
         except Player.DoesNotExist:
-            player = Player.create(request.POST["player_name"], request.POST["platform"])
+            player = Player.create(player_name, platform)
         finally:
             uh = UpdateHelper(player)
             try:
@@ -128,6 +137,7 @@ async def provisional_parse(request):
                 exists = False
 
         return render(request, "tracker/partials/user_validation.html", context=locals())
+
 
 @cache_page(60 * 15)
 @require_http_methods(["GET", "POST"])
