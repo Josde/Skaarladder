@@ -250,3 +250,6 @@ staticfiles/
 
 # SonarScanner
 .scannerwork/
+
+# WhiteNoise staticfiles
+/static/
