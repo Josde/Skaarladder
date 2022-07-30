@@ -1,7 +1,4 @@
 {% load static %}
-<script src="{% static 'tracker/htmx.min.js' %}" type='text/javascript' defer></script>
-<script src="{% static 'tracker/debug.js' %}" type='text/javascript' defer></script>
-<script src="{% static 'tracker/hyperscript.min.js' %}" type='text/javascript' defer></script>
-
+<!DOCTYPE html>
 <div id="popup_body" class="fixed top-0 left-0 z-10 items-center justify-center hidden w-screen h-screen" hx-ext="debug"
 _="on htmx:beforeSwap toggle .hidden"></div> 

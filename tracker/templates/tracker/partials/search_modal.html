@@ -1,11 +1,5 @@
 {% load static %}
-{% load django_htmx %}
 <!DOCTYPE html>
-
-<script src="{% static 'tracker/htmx.min.js' %}" type='text/javascript' defer><!-- required for some browsers ??? --></script> 
-<script src="{% static 'tracker/hyperscript.min.js' %}" type='text/javascript' defer><!-- required for some browsers ??? --></script> 
-{% django_htmx_script %}
-
 <div name="backdrop" class="flex items-center justify-center w-screen h-screen transition-all duration-300 ease-in-out bg-black place-content-center -z-10" 
     hx-headers={{ csrf_token }}> <!-- hx-get="" hx-trigger="click" hx-swap="innerHTML" hx-target="#popup_body" -->
     <div name="search_window" class="flex flex-col w-[75%] h-[50%] bg-neutral-800 place-self-center z-10">
