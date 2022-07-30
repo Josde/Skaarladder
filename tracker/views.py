@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.urls import reverse
 from django.template import loader
 from .forms import PlayerForm
-from .updater.update_helper import UpdateHelper
+from .updater.user_updater import UserUpdater
 from .models import Player, Challenge, Challenge_Player
 from .forms import ChallengeForm
 from asgiref.sync import sync_to_async
@@ -77,8 +77,8 @@ async def create_challenge(request):
                 player = Player.create(name=item[0], platform=item[1])
                 players.append(player)  # We only created non existing players to prevent violating PK uniqueness
             finally:
-                uh = UpdateHelper(player)
-                tasks.append(uh.update())
+                uu = UserUpdater(player)
+                tasks.append(uu.update())
                 player_challenge = Challenge_Player(
                     player_id=player,
                     challenge_id=challenge,
@@ -128,9 +128,9 @@ async def provisional_parse(request):
         except Player.DoesNotExist:
             player = Player.create(player_name, platform)
         finally:
-            uh = UpdateHelper(player)
+            uu = UserUpdater(player)
             try:
-                player_data = await uh.get_player_data(player)
+                player_data = await uu.get_player_data(player)
                 player.avatar_id = player_data["profileIconId"]
                 exists = True
             except Exception:

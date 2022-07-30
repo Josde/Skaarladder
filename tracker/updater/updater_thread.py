@@ -1,9 +1,10 @@
 import threading
 from tracker.models import Player
-from .update_helper import UpdateHelper
+from tracker.updater.user_updater import UserUpdater
 import asyncio
 import tracker.utils.constants as constants
 from asgiref.sync import sync_to_async
+from tracker.updater.user_updater import UserUpdater
 
 
 class UpdaterThread(threading.Thread):
@@ -28,6 +29,6 @@ class UpdaterThread(threading.Thread):
     def build_task_list(self):
         task_list = []
         for player in Player.objects.all():
-            uh = UpdateHelper(player)
-            task_list.append(uh.update())
+            uu = UserUpdater(player)
+            task_list.append(uu.update())
         return task_list

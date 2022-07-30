@@ -5,18 +5,24 @@ from tracker.models import Player, Challenge_Player
 import traceback
 from pyot.models import lol
 from asgiref.sync import sync_to_async
+from tracker.updater import api_update_helper, test_update_helper
 
 
-class UpdateHelper:
+class UserUpdater:
     """Class that will take a Player as argument and will make the appropiate calls to return updated values for that user (helper functions) or update and commit it (update)."""
 
     queried_player = None
     player_data = None
     ranked_data = None
     streak_data = None
+    backend = None
 
-    def __init__(self, player: Player):
+    def __init__(self, player: Player, test=False):
         self.queried_player = player
+        if test:
+            self.backend = test_update_helper.TestUpdateHelper()  # TPDP: Pass content here
+        else:
+            self.backend = api_update_helper.ApiUpdateHelper()
 
     async def update(self):
         """Function that gets the updated data for a user and returns it."""
@@ -32,7 +38,7 @@ class UpdateHelper:
             previous_absolute_lp = 0
         if self.queried_player.puuid == "" or time_since_last_update.days >= 7 or DEBUG:
             try:
-                self.player_data = await self.get_player_data(self.queried_player)
+                self.player_data = await self.backend.get_player_data(self.queried_player)
                 await sync_to_async(self.update_fields)(
                     self.queried_player,
                     self.player_data,
@@ -49,7 +55,10 @@ class UpdateHelper:
             except Exception:
                 traceback.print_exc()
         # Create tasks, since we can do everything else asynchronously
-        tasks = [self.get_player_ranked_data(self.queried_player), self.get_streak_data(self.queried_player)]
+        tasks = [
+            self.backend.get_player_ranked_data(self.queried_player),
+            self.backend.get_streak_data(self.queried_player),
+        ]
         try:
             self.ranked_data, self.streak = await asyncio.gather(*tasks)
             current_absolute_lp = 0
@@ -120,67 +129,6 @@ class UpdateHelper:
             await sync_to_async(self.queried_player.save)()
         except Exception:  # For debugging, implement errors later.
             traceback.print_exc()
-
-    async def get_player_data(self, player):
-        print(
-            "[{0} UpdateHelper] Running player data update, either this is the first update or last update was over 7 days ago (lu: {1})".format(
-                player.name, player.last_data_update
-            )
-        )
-        """ Updates the ID, name and such of our Player class.
-        Only ran if it's the first time the player has been queried or if last update was a while ago. """
-        res = await lol.Summoner(name=player.name, platform=player.platform).get()
-        return res.dict()
-
-    async def get_player_ranked_data(self, player):
-        """Queries the player's SoloQ data, getting stats such as LP, winrate and etc."""
-        print("[{0} UpdateHelper] Running SoloQ data update.".format(player.name))
-        queue_data = await lol.SummonerLeague(player.summoner_id, platform=player.platform).get()
-        soloq_dict = None
-        for item in queue_data.entries:
-            soloq_dict = item.dict()
-            if soloq_dict is not None and soloq_dict["queueType"] == "RANKED_SOLO_5x5":  # Fiter SoloQ
-                break
-        return soloq_dict
-
-    async def get_streak_data(self, player):
-        """Queries the player's match history and processes his win or loss streak."""
-        print("[{0} UpdateHelper] Running streak data update".format(player.name))
-        matches = []
-        result = last_result = None
-        streak = 0
-
-        matches = await self.get_match_history_details(player, count=10, queue=420)
-
-        for match_data in matches:
-            if (result != last_result) and last_result is not None:
-                break
-            won = await self.get_match_result(player, match_data)
-            last_result = result
-            result = won
-            if result == last_result:
-                streak += 1 if won else -1
-
-        return streak
-
-    async def get_match_history_details(self, player, count, queue):
-        tasks = []
-        history = await lol.MatchHistory(player.puuid, region=player.region).query(count=count, queue=queue).get()
-
-        for match in history.matches:
-            tasks.append(match.get())
-
-        return await asyncio.gather(*tasks)
-
-    async def get_match_result(self, player, match_data):
-        teams = match_data.info.teams
-        for t in teams:
-            participant_ids = [p.puuid for p in t.participants]
-            if player.puuid in participant_ids:
-                if t.win:
-                    return True
-                else:
-                    return False
 
     def update_fields(self, obj, data_dict: dict, data_to_obj_fields: dict):
         for field in data_to_obj_fields.keys():
