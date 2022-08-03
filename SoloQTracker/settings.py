@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
+    "django_rq",
     "django_tables2",
     "django_htmx",
     "django_browser_reload",
@@ -152,6 +153,33 @@ PYOT_CONFS = ["tracker.pyotconf"]
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
 
 CRISPY_TEMPLATE_PACK = "tailwind"
+if config("REDIS", False):
+    host = config("REDIS_HOST")
+    port = config("REDIS_PORT")
+    db = config("REDIS_DB")
+    password = config("REDIS_PASSWORD")
+    RQ_QUEUES = {
+        "default": {
+            "HOST": host,
+            "PORT": port,
+            "DB": db,
+            "PASSWORD": password,
+            "DEFAULT_TIMEOUT": 360,
+        },
+        "high": {
+            "HOST": host,
+            "PORT": port,
+            "DB": db,
+            "PASSWORD": password,
+            "DEFAULT_TIMEOUT": 500,
+        },
+        "low": {
+            "HOST": host,
+            "PORT": port,
+            "DB": db,
+            "PASSWORD": password,
+        },
+    }
 
 
 if config("HEROKU", False):

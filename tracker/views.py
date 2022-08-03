@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.template import loader
 from .forms import PlayerForm
 from .updater.user_updater import UserUpdater
+from .updater import updater_jobs
 from .models import Player, Challenge, Challenge_Player
 from .forms import ChallengeForm
 from asgiref.sync import sync_to_async
@@ -16,6 +17,7 @@ from django_htmx.http import HttpResponseClientRedirect
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods, require_GET
 from django.views.decorators.cache import cache_page
+from django_rq import get_queue
 
 
 @cache_page(60 * 15)
@@ -54,52 +56,18 @@ async def create_challenge(request):
         _player_platform = list(zip(request.POST.getlist("player_name"), request.POST.getlist("platform")))
         _is_absolute = "is_absolute" in request.POST.keys()
         _ignore_unranked = "ignore_unranked" in request.POST.keys()
-        challenge = Challenge(
-            name=_name,
-            start_date=_start_date,
-            end_date=_end_date,
-            is_absolute=_is_absolute,
-            ignore_unranked=_ignore_unranked,
+        queue = get_queue("high")
+        job = queue.enqueue(
+            updater_jobs.create_challenge_job,
+            kwargs={
+                "name": _name,
+                "start_date": _start_date,
+                "end_date": _end_date,
+                "player_platform": _player_platform,
+                "is_absolute": _is_absolute,
+                "ignore_unranked": _ignore_unranked,
+            },
         )
-        await sync_to_async(challenge.save)()
-        tasks = []
-        players = []
-        player_challenges = []
-        for item in _player_platform:
-            if len(item) < 2:
-                messages.error(request, "400")
-                return redirect(reverse("error"))
-            print("Searching player {0} {1}".format(item[0], item[1]))
-            try:
-                player = await sync_to_async(Player.objects.get)(name=item[0], platform=item[1])
-                print("Found")
-            except Player.DoesNotExist:
-                player = Player.create(name=item[0], platform=item[1])
-                players.append(player)  # We only created non existing players to prevent violating PK uniqueness
-            finally:
-                uu = UserUpdater(player)
-                tasks.append(uu.update())
-                player_challenge = Challenge_Player(
-                    player_id=player,
-                    challenge_id=challenge,
-                    starting_lp=0,
-                    starting_tier="IRON",
-                    starting_rank="IV",
-                )
-                player_challenges.append(player_challenge)
-
-        await sync_to_async(Player.objects.bulk_create)(players)
-        await sync_to_async(Challenge_Player.objects.bulk_create)(player_challenges)
-        await asyncio.gather(*tasks)
-        for item in player_challenges:
-            # TODO: Check how efficient this is in terms of queries and DB access time. Also, test this (battery is running out lol)
-            item.starting_lp = item.player_id.lp
-            item.starting_tier = item.player_id.tier
-            item.starting_rank = item.player_id.rank
-        await sync_to_async(Challenge_Player.objects.bulk_update)(
-            player_challenges, ["starting_tier", "starting_rank", "starting_lp"]
-        )
-
         return redirect("challenge", challenge_id=challenge.id)
     else:
         return render(request, "tracker/challenge_form.html", {"form": form})
@@ -114,6 +82,7 @@ def create_user_form(request):
 
 
 async def provisional_parse(request):
+    # FIXME: Broken
     if request.method == "POST":
         print(request.POST)
         if "player_name" not in request.POST.keys() or "platform" not in request.POST.keys():
@@ -130,7 +99,7 @@ async def provisional_parse(request):
         finally:
             uu = UserUpdater(player)
             try:
-                player_data = await uu.get_player_data(player)
+                player_data = await uu.backend.get_player_data(player)
                 player.avatar_id = player_data["profileIconId"]
                 exists = True
             except Exception:
