@@ -253,3 +253,6 @@ staticfiles/
 
 # WhiteNoise staticfiles
 /static/
+
+# A venv for WSL development and usage of djangorq
+linux_venv/
