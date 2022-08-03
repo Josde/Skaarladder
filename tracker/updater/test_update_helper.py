@@ -1,7 +1,7 @@
-from tracker.updater.abstract_update_helper import AbstractUpdateHelper
+from . import abstract_update_helper
 
 
-class TestUpdateHelper(AbstractUpdateHelper):
+class TestUpdateHelper(abstract_update_helper.AbstractUpdateHelper):
     def __init__(
         self,
         player_content=None,

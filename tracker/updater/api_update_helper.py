@@ -1,5 +1,9 @@
-from tracker.updater.abstract_update_helper import AbstractUpdateHelper
-class ApiUpdateHelper(AbstractUpdateHelper):
+from . import abstract_update_helper
+from pyot.models import lol
+import asyncio
+
+
+class ApiUpdateHelper(abstract_update_helper.AbstractUpdateHelper):
     async def get_player_data(self, player):
         print(
             "[{0} UserUpdater] Running player data update, either this is the first update or last update was over 7 days ago (lu: {1})".format(
