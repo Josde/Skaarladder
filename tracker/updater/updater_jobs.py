@@ -30,7 +30,7 @@ async def periodic_update():
     await sync_to_async(queue.enqueue_in)(timedelta(seconds=constants.UPDATE_DELAY), periodic_update)
 
 
-async def create_challenge_job(name, start_date, end_date, player_platform, is_absolute, ignore_unranked):
+def create_challenge_job(name, start_date, end_date, player_platform, is_absolute, ignore_unranked):
     # TODO: Validations here etc
     challenge = Challenge(
         name=name,
@@ -39,7 +39,7 @@ async def create_challenge_job(name, start_date, end_date, player_platform, is_a
         is_absolute=is_absolute,
         ignore_unranked=ignore_unranked,
     )
-    await sync_to_async(challenge.save)()
+    challenge.save()
     tasks = []
     players = []
     player_challenges = []
@@ -48,13 +48,17 @@ async def create_challenge_job(name, start_date, end_date, player_platform, is_a
             print("ERROR IN CHALLENGE_CREATION")
         print("Searching player {0} {1}".format(item[0], item[1]))
         try:
-            player = await sync_to_async(Player.objects.get)(name=item[0], platform=item[1])
+            player = Player.objects.get(name=item[0], platform=item[1])
         except Player.DoesNotExist:
             player = Player.create(name=item[0], platform=item[1])
+            player.save()
             players.append(player)  # We only created non existing players to prevent violating PK uniqueness
-        finally:
             uu = UserUpdater(player)
-            tasks.append(uu.update())
+            tasks.append(uu.update())  # Only update if not in DB
+        except Player.MultipleObjectsReturned:
+            query = Player.objects.all().filter(name=item[0], platform=item[1])
+            player = query[0]
+        finally:
             player_challenge = Challenge_Player(
                 player_id=player,
                 challenge_id=challenge,
@@ -64,15 +68,14 @@ async def create_challenge_job(name, start_date, end_date, player_platform, is_a
             )
             player_challenges.append(player_challenge)
 
-    await sync_to_async(Player.objects.bulk_create)(players)
-    await sync_to_async(Challenge_Player.objects.bulk_create)(player_challenges)
-    await asyncio.gather(*tasks)
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(asyncio.gather(*tasks))
     for item in player_challenges:
         # TODO: Check how efficient this is in terms of queries and DB access time. Also, test this (battery is running out lol)
+        # Bulk_update errors out for some reason here
         item.starting_lp = item.player_id.lp
         item.starting_tier = item.player_id.tier
         item.starting_rank = item.player_id.rank
-    await sync_to_async(Challenge_Player.objects.bulk_update)(
-        player_challenges, ["starting_tier", "starting_rank", "starting_lp"]
-    )
+        item.save()
+
     return challenge.id

@@ -17,5 +17,8 @@ class TrackerConfig(AppConfig):
 
             # eventually change this to be a singleton connection for efficiency
             queue = get_queue("default")
+            print([x.func for x in queue.jobs])
+            # FIXME: Temporarily disabled to test other stuff.
             if updater_jobs.periodic_update not in [x.func for x in queue.jobs]:
-                queue.enqueue(updater_jobs.periodic_update)
+                print(["[AppConfig] Periodic updater not found, registering."])
+                # queue.enqueue(updater_jobs.periodic_update)
