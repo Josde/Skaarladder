@@ -1,0 +1,38 @@
+{% load render_table from django_tables2 %}
+{% load static %}
+{% load cache %}
+<!DOCTYPE html> 
+<html lang="en" data-color-scheme="dark" color-scheme="dark">
+    <head>
+        <title>Skaarladder :: {{ challenge_name }}</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="http://fonts.cdnfonts.com/css/edo-sz" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+        <link href="{% static 'tracker/deploy/tailwind.css' %}" rel="stylesheet">
+        <link href="{% static 'tracker/bugfix.css' %}" rel="stylesheet">
+        <link href="{% static 'tracker/loader.css' %}" rel="stylesheet">
+        <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
+        <meta http-equiv="refresh" content="3">
+        <script src="{% static 'tracker/htmx.min.js' %}" type='text/javascript' defer></script> 
+        <script src="{% static 'tracker/hyperscript.min.js' %}" type='text/javascript' defer></script> 
+    </head>
+    <body class="overflow-x-hidden no-scrollbar">
+        {% cache 1000 navbar_modal %}
+            {% include 'tracker/partials/navbar.html' %}
+            {% include "tracker/partials/modal_div.html" %}   
+        {% endcache %}
+        <div class="flex items-center justify-center w-screen h-screen text-white bg-neutral-900 "> 
+            <div class="flex w-[64rem] h-full bg-neutral-800 text-white flex-col drop-shadow-xl z overflow-auto overflow-x-hidden">
+                <!--TODO: Im not currently satisfied with overflow behaviour -->
+                    <span class="loader"></span>
+        </div>
+    </div>
+    {% cache 1000 footer %}
+        {% include "tracker/partials/footer.html" %} 
+    {% endcache %}
+    </body>
+</html>

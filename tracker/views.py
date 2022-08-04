@@ -68,7 +68,7 @@ async def create_challenge(request):
                 "ignore_unranked": _ignore_unranked,
             },
         )
-        return redirect("challenge", challenge_id=challenge.id)
+        return redirect("challenge_loading", job_id=job.id)
     else:
         return render(request, "tracker/challenge_form.html", {"form": form})
 
@@ -96,6 +96,9 @@ async def provisional_parse(request):
             return render(request, "tracker/partials/user_validation.html", context=locals())
         except Player.DoesNotExist:
             player = Player.create(player_name, platform)
+        except Player.MultipleObjectsReturned:
+            query = await sync_to_async(Player.objects.all().filter)(name=player_name, platform=platform)
+            player = await sync_to_async(query[0])()  # TODO: Test this
         finally:
             uu = UserUpdater(player)
             try:
@@ -108,7 +111,6 @@ async def provisional_parse(request):
         return render(request, "tracker/partials/user_validation.html", context=locals())
 
 
-@cache_page(60 * 15)
 @require_http_methods(["GET", "POST"])
 def challenge(request, challenge_id=0):
     if request.htmx and challenge_id == 0:
@@ -116,7 +118,7 @@ def challenge(request, challenge_id=0):
         return HttpResponseClientRedirect(reverse("challenge") + "{0}/".format(challenge_id))  # FIXME: Janky as fuck
         # FIXME: Error handling here.
     try:
-        challenge_data = Challenge.objects.get(id=challenge_id)
+        challenge_data = Challenge.objects.get(id=challenge_id)  # TODO: Maybe cover multipleobjectsfound?
         if challenge_data.ignore_unranked:
             player_query = (
                 Challenge_Player.objects.filter(challenge_id=challenge_id)
@@ -153,3 +155,12 @@ def challenge(request, challenge_id=0):
 @require_GET
 def search(request):
     return render(request, "tracker/partials/search_modal.html")
+
+
+def challenge_loading(request, job_id):
+    queue = get_queue("high")
+    job = queue.fetch_job(job_id)
+    if job.is_finished:
+        challenge_id = job.result
+        return redirect("challenge", challenge_id=challenge_id)
+    return render(request, "tracker/challenge_loading.html", context=locals())
