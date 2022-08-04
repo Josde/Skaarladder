@@ -180,7 +180,7 @@ if config("REDIS", False):
             "PASSWORD": password,
         },
     }
-
+    RQ_SHOW_ADMIN_LINK = True
 
 if config("HEROKU", False):
     import django_on_heroku
