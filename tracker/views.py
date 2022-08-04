@@ -5,8 +5,9 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.urls import reverse
 from django.template import loader
+
+from tracker.updater import api_update_helper
 from .forms import PlayerForm
-from .updater.user_updater import UserUpdater
 from .updater import updater_jobs
 from .models import Player, Challenge, Challenge_Player
 from .forms import ChallengeForm
@@ -82,7 +83,6 @@ def create_user_form(request):
 
 
 async def provisional_parse(request):
-    # FIXME: Broken
     if request.method == "POST":
         print(request.POST)
         if "player_name" not in request.POST.keys() or "platform" not in request.POST.keys():
@@ -100,9 +100,10 @@ async def provisional_parse(request):
             query = await sync_to_async(Player.objects.all().filter)(name=player_name, platform=platform)
             player = await sync_to_async(query[0])()  # TODO: Test this
         finally:
-            uu = UserUpdater(player)
             try:
-                player_data = await uu.backend.get_player_data(player)
+                player_data = await api_update_helper.ApiUpdateHelper.get_player_data(
+                    player
+                )  # Change this to allow for testing.
                 player.avatar_id = player_data["profileIconId"]
                 exists = True
             except Exception:
