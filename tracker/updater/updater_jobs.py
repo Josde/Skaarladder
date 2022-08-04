@@ -1,33 +1,32 @@
 import threading
 from tracker.models import Player, Challenge, Challenge_Player
-from tracker.updater.user_updater import UserUpdater
 import asyncio
 import tracker.utils.constants as constants
 from asgiref.sync import sync_to_async
-from tracker.updater.user_updater import UserUpdater
+from tracker.updater.user_updater import update
 from datetime import datetime, timedelta
 from django_rq import get_queue
+from rq.job import Dependency
+
+# FIXME: Django 4.1 has been released! Finally, there are async functions for ORM operations. Change to use them.
+# See: https://docs.djangoproject.com/en/4.1/releases/4.1/#asynchronous-orm-interface
 
 
 async def periodic_update():
-    task_list = []
     now = datetime.utcnow()
-    player_query = Player.objects.all()
+    player_query = Player.objects.all().only("name")
     players = await sync_to_async(list)(player_query)
-    for player in players:
-        uu = UserUpdater(player)
-        task_list.append(uu.update())
-    # FIXME: For some reason this causes rate limiting
-    # await asyncio.gather(*tasks)
-    # FIXME: Enqueue the tasks and wait for them to end.
-    # FIXME 2: To enqueue them, I need to make UserUpdater fully functional rather than a class.
-    # As in, it must be stateless.
-    for item in task_list:
-        await item
-        await asyncio.sleep(2)
-    # TODO: Make this a generic func in rq.py? maybe idk
     queue = await sync_to_async(get_queue)()
-    await sync_to_async(queue.enqueue_in)(timedelta(seconds=constants.UPDATE_DELAY), periodic_update)
+    jobs = []
+    for player in players:
+        jobs.append(queue.prepare_data(update, [player.name]))
+    with queue.connection.pipeline() as pipe:
+        enqueued_jobs = await sync_to_async(queue.enqueue_many)(jobs, pipeline=pipe)
+        await sync_to_async(pipe.execute)()
+    dependency = Dependency(jobs=enqueued_jobs)
+    await sync_to_async(queue.enqueue_in)(
+        timedelta(seconds=constants.UPDATE_DELAY), periodic_update, depends_on=dependency
+    )
 
 
 def create_challenge_job(name, start_date, end_date, player_platform, is_absolute, ignore_unranked):
@@ -53,8 +52,7 @@ def create_challenge_job(name, start_date, end_date, player_platform, is_absolut
             player = Player.create(name=item[0], platform=item[1])
             player.save()
             players.append(player)  # We only created non existing players to prevent violating PK uniqueness
-            uu = UserUpdater(player)
-            tasks.append(uu.update())  # Only update if not in DB
+            tasks.append(update(player))  # Only update if not in DB
         except Player.MultipleObjectsReturned:
             query = Player.objects.all().filter(name=item[0], platform=item[1])
             player = query[0]
