@@ -49,6 +49,8 @@ class ChallengeTable(tables.Table):
                     value
                 )
             )
+        except Player.MultipleObjectsReturned:
+            player = Player.objects.all().filter(name=player_name)[0]
         sanitized_name = value.replace(" ", "+")
         return format_html(
             """<img class="inline w-10 h-10" onerror="this.style.display='none'" 
