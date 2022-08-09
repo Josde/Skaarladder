@@ -10,8 +10,12 @@ class TrackerConfig(AppConfig):
 
         if os.environ.get("RUN_MAIN", None) != "true":
             # Prevents this from running twice when using development server. See: https://stackoverflow.com/a/52430581
-            from tracker.updater.updater_thread import UpdaterThread
-            from concurrent.futures import ThreadPoolExecutor, as_completed
+            import tracker.updater.updater_jobs as updater_jobs
+            from tracker.utils import constants
+            from django_rq import get_queue
+            from datetime import datetime
 
-            t = UpdaterThread(daemon=True)  # FIXME: Get a better fix than daemon=True for closing
-            t.start()
+            # eventually change this to be a singleton connection for efficiency
+            queue = get_queue("default")
+            if updater_jobs.periodic_update not in [x.func for x in queue.jobs]:
+                queue.enqueue(updater_jobs.periodic_update)

@@ -1,12 +1,11 @@
-from socket import fromshare
 from django import forms
 from django.utils.translation import gettext as _  # Localization
-from tracker.utils.constants import tierChoices, rankChoices, platformChoices
+from tracker.utils.constants import platformChoices
 from django.utils import timezone
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, Submit, Field, Row, Column, Div
-from .models import Challenge, Player
 from tracker.utils import constants
+from django.core.exceptions import ValidationError
 
 
 class DatePickerInput(forms.DateInput):
@@ -22,7 +21,15 @@ class DateTimePickerInput(forms.DateTimeInput):
 
 
 class ChallengeForm(forms.Form):
-    # TODO: Default datetimes
+    # TODO: Default datetimes do not show up for some reason
+    def clean(self):
+        cleaned_data = super().clean()
+        start_date = cleaned_data.get("start_date")
+        end_date = cleaned_data.get("end_date")
+        print(start_date, end_date)
+        if start_date and end_date and start_date > end_date:
+            raise ValidationError("Start date must be previous to end date.")
+        return cleaned_data
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -39,7 +46,9 @@ class ChallengeForm(forms.Form):
                     ),
                     Field("start_date", css_class=constants.default_form_style),
                     Field("end_date", css_class=constants.default_form_style),
-                    Field("is_absolute"),
+                    Field(
+                        "is_absolute",
+                    ),
                     Field("ignore_unranked"),
                     Submit(
                         "Submit",
@@ -48,20 +57,23 @@ class ChallengeForm(forms.Form):
                     ),
                     css_class="m-4",
                 ),
-                css_class="flex flex-col text-white",
+                css_class="flex flex-col text-white place-content-end items-end",
             ),
         )
 
-    name = forms.CharField(label=_("ChallengeName"), max_length=50, empty_value="Challenge name")
-    start_date = forms.DateTimeField(label=_("StartDate"), widget=DateTimePickerInput, initial=timezone.now())
-    end_date = forms.DateTimeField(label=_("EndDate"), widget=DateTimePickerInput)
-    is_absolute = forms.BooleanField(label=_("AbsoluteRanking"))
-    ignore_unranked = forms.BooleanField(label=_("HideUnranked"))
+    name = forms.CharField(label=("Ladder name"), max_length=16, empty_value="Ladder name")
+    start_date = forms.DateTimeField(label=("Start date"), widget=DateTimePickerInput, initial=timezone.now())
+    end_date = forms.DateTimeField(label=("End date"), widget=DateTimePickerInput)
+    is_absolute = forms.BooleanField(label=("Absolute ranking"), required=False)
+    ignore_unranked = forms.BooleanField(label=("Hide unranked"), required=False)
 
 
 class PlayerForm(forms.Form):
+    form_id = ""
+
     def __init__(self, form_id="", *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.form_id = form_id
         self.helper = FormHelper(self)
         self.helper.form_tag = False
         self.helper.disable_csrf = True
@@ -73,6 +85,7 @@ class PlayerForm(forms.Form):
                     autocomplete="off",
                 ),
                 Field("platform"),
+                Field("valid", css_class="hidden"),
                 css_class="flex flex-row text-white bg-neutral-900",
             ),
             css_class="flex flex-col",
@@ -84,7 +97,7 @@ class PlayerForm(forms.Form):
                 "hx-trigger": "keyup delay:500ms changed",
                 "hx-swap": "innerhtml",
                 "form": "challenge_form",
-                "hx-target": "#results-{0}".format(form_id),
+                "hx-target": "#results-{0}".format(self.form_id),
             }
         )
 
@@ -94,9 +107,10 @@ class PlayerForm(forms.Form):
                 "hx-trigger": "changed",
                 "hx-swap": "innerhtml",
                 "form": "challenge_form",
-                "hx-target": "#results-{0}".format(form_id),
+                "hx-target": "#results-{0}".format(self.form_id),
             }
         )
 
-    platform = forms.ChoiceField(label=_("platform"), choices=platformChoices)
-    player_name = forms.CharField(label=_("PlayerName"), max_length=16)
+    platform = forms.ChoiceField(label="Platform", choices=platformChoices)
+    player_name = forms.CharField(label="Name", max_length=16, min_length=3)
+    valid = forms.BooleanField(required=False, label="", show_hidden_initial=True)

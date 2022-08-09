@@ -8,7 +8,7 @@ tierWeights = {
     "DIAMOND": 5,
     "MASTER": 6,
     "GRANDMASTER": 6,
-    "CHALLENGER": 6,  # todo: check this
+    "CHALLENGER": 6,
 }
 
 rankWeights = {
@@ -76,4 +76,4 @@ UPDATE_DELAY = 600
 
 red_text_style = "color:rgb(249,36,114);"
 green_text_style = "color:rgb(180, 210, 115);"
-default_form_style = "bg-neutral-900 text-white p-4"
+default_form_style = "bg-neutral-900 text-white m-4"

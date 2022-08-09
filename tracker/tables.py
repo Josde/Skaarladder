@@ -3,11 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.html import format_html
 
 from tracker.utils import constants
-from .models import Challenge_Player, Challenge, Player
-
-# TODO: Once multiple Challenge support is added, add filtering to this table. Else, add one view per challenge.
-# About filtering: https://django-tables2.readthedocs.io/en/latest/pages/filtering.html
-# Dynamic views: https://stackoverflow.com/a/49341050
+from .models import Player
 
 
 class ChallengeTable(tables.Table):
@@ -39,21 +35,22 @@ class ChallengeTable(tables.Table):
             platform = player.platform
             streak = player.streak
             avatar_id = player.avatar_id
-            if streak < 1 and streak > -1:
+            if 1 > streak > -1:
                 streak_string = ""
             elif streak > 1:
-                streak_string = '<span style="color:rgb(180, 210, 115);">{0}W</span>'.format(
-                    streak
-                )  # TODO: For some reason styling this with a tailwind class doesn't work, check later.
+                streak_string = '<span style="{0}">{1}W</span>'.format(constants.green_text_style, streak)
             elif streak < -1:
-                streak_string = '<span style="color:rgb(249,36,114);">{0}L</span>'.format(abs(streak))
+                streak_string = '<span style="{0}">{1}L</span>'.format(constants.red_text_style, abs(streak))
 
         except ObjectDoesNotExist:
             print(
-                "[LeagueTable] Rendering player {0}, who can't be found in TrackedPlayers. This shouldn't happen.".format(
+                "[LeagueTable] Rendering player {0}, who can't be found in TrackedPlayers. \
+                    This shouldn't happen.".format(
                     value
                 )
             )
+        except Player.MultipleObjectsReturned:
+            player = Player.objects.all().filter(name=player_name)[0]
         sanitized_name = value.replace(" ", "+")
         return format_html(
             """<img class="inline w-10 h-10" onerror="this.style.display='none'" 

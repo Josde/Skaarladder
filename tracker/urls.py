@@ -12,6 +12,7 @@ urlpatterns = [
     ),
     path("challenge/", views.challenge, name="challenge"),
     path("challenge/<int:challenge_id>/", views.challenge, name="challenge"),
+    path("challenge_loading/<str:job_id>/", views.challenge_loading, name="challenge_loading"),
     path("htmx/search/", views.search, name="search"),
     path("error/", views.error, name="error"),
 ]

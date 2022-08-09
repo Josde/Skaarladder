@@ -5,19 +5,23 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.urls import reverse
 from django.template import loader
+
+from tracker.updater import api_update_helper
 from .forms import PlayerForm
-from .updater.update_helper import UpdateHelper
+from .updater import updater_jobs
 from .models import Player, Challenge, Challenge_Player
 from .forms import ChallengeForm
-from .utils.validators import generic_name_validator
 from asgiref.sync import sync_to_async
 from .tables import ChallengeTable
 import uuid
 from django_htmx.http import HttpResponseClientRedirect
 from django.utils import timezone
-from django.views.decorators.http import require_http_methods, require_GET, require_POST
+from django.views.decorators.http import require_http_methods, require_GET
+from django.views.decorators.cache import cache_page
+from django_rq import get_queue
 
 
+@cache_page(60 * 15)
 @require_GET
 def index(request):
     return render(request, "tracker/index.html")
@@ -25,7 +29,6 @@ def index(request):
 
 @require_GET
 def error(request):
-    # FIXME: Use django.messages instead of a error code
     msg = messages.get_messages(request)
     code = ""
     for item in msg:
@@ -35,65 +38,59 @@ def error(request):
     return render(request, "tracker/error.html", context=locals())
 
 
-# Async views can't have required method decorators, so this will show up as an issue on SonarQube for a while.
 async def create_challenge(request):
-    form = ChallengeForm()
     if request.method == "POST":
-        # TODO: Validation. Just testing for now, but needs error handling!
         print(request.POST)
         submitted_form = ChallengeForm(request.POST)
-        # print(submitted_form.cleaned_data)
-        # FIXME: Check is_valid and such, we are currently only using this for testing
-        if not form.is_valid:
-            messages.error(request, "400")
-            return redirect(reverse("error"))
+        player_forms = []
+        valid_player_forms = True
+        _player_platform = list(
+            zip(
+                request.POST.getlist("player_name"),
+                request.POST.getlist("platform"),
+                request.POST.getlist("initial-valid"),
+            )
+        )
+        for item in _player_platform:
+            player_form = PlayerForm(
+                form_id=uuid.uuid4(), initial={"player_name": item[0], "platform": item[1], "valid": item[2]}
+            )
+            player_form.data["player_name"] = item[0]
+            player_form.data["platform"] = item[1]
+            player_form.data["valid"] = item[2]
+            """ if not player_form.is_valid():  # use the is_valid attribute to check if user exists too
+                print(item[0], item[1], item[2], "not valid")
+                valid_player_forms = False """
+            player_forms.append(player_form)
+        if len(player_forms) < 2:
+            submitted_form.add_error(error="Must have at least 2 players in your ladder.")
+        if not submitted_form.is_valid() or not valid_player_forms:
+            return render(
+                request, "tracker/challenge_form.html", {"form": submitted_form, "player_forms": player_forms}
+            )
+
         _name = request.POST["name"]
         _start_date = datetime.strptime(request.POST["start_date"], "%Y-%m-%dT%H:%M")
         _end_date = datetime.strptime(request.POST["end_date"], "%Y-%m-%dT%H:%M")
-        _player_platform = list(zip(request.POST.getlist("player_name"), request.POST.getlist("platform")))
-        _is_absolute = request.POST["is_absolute"]  # TODO: Test this
-        _ignore_unranked = request.POST["ignore_unranked"]
-        challenge = Challenge(
-            name=_name,
-            start_date=_start_date,
-            end_date=_end_date,
-            is_absolute=_is_absolute,
-            ignore_unranked=_ignore_unranked,
+
+        _is_absolute = "is_absolute" in request.POST.keys()
+        _ignore_unranked = "ignore_unranked" in request.POST.keys()
+        # if ()
+        queue = get_queue("high")
+        job = queue.enqueue(
+            updater_jobs.create_challenge_job,
+            kwargs={
+                "name": _name,
+                "start_date": _start_date,
+                "end_date": _end_date,
+                "player_platform": _player_platform,
+                "is_absolute": _is_absolute,
+                "ignore_unranked": _ignore_unranked,
+            },
         )
-        await sync_to_async(challenge.save)()
-        tasks = []
-        players = []
-        player_challenges = []
-        for item in _player_platform:
-            if len(item) < 2:
-                messages.error(request, "400")
-                return redirect(reverse("error"))
-            print("Searching player {0} {1}".format(item[0], item[1]))
-            try:
-                player = await sync_to_async(Player.objects.get)(name=item[0], platform=item[1])
-                print("Found")
-            except Player.DoesNotExist:
-                player = Player.create(name=item[0], platform=item[1])
-                players.append(player)  # We only created non existing players to prevent violating PK uniqueness
-            finally:
-                uh = UpdateHelper(player)
-                tasks.append(uh.update())
-                # Fixme: Add starting rank
-                player_challenge = Challenge_Player(
-                    player_id=player,
-                    challenge_id=challenge,
-                    starting_lp=0,
-                    starting_tier="IRON",
-                    starting_rank="IV",
-                )
-                player_challenges.append(player_challenge)
-
-        await sync_to_async(Player.objects.bulk_create)(players)
-        await sync_to_async(Challenge_Player.objects.bulk_create)(player_challenges)
-        await asyncio.gather(*tasks)
-
-        return redirect("challenge", id=challenge.id)
+        return redirect("challenge_loading", job_id=job.id)
     else:
+        form = ChallengeForm()
         return render(request, "tracker/challenge_form.html", {"form": form})
 
 
@@ -106,26 +103,30 @@ def create_user_form(request):
 
 
 async def provisional_parse(request):
+    exists = False
     if request.method == "POST":
         print(request.POST)
         if "player_name" not in request.POST.keys() or "platform" not in request.POST.keys():
             return HttpResponse("")
+        player_name = request.POST.get("player_name", "")
+        platform = request.POST.get("platform", "")
         try:
-            player = await sync_to_async(Player.objects.get)(
-                name=request.POST["player_name"], platform=request.POST["platform"]
-            )  # TODO: Cleanup
+            player = await sync_to_async(Player.objects.get)(name=player_name, platform=platform)
             exists = True
-            return render(request, "tracker/partials/user_validation.html", context=locals())
         except Player.DoesNotExist:
-            player = Player.create(request.POST["player_name"], request.POST["platform"])
+            player = Player.create(player_name, platform)
+        except Player.MultipleObjectsReturned:
+            player = await Player.objects.all().afilter(name=player_name, platform=platform).afirst()
         finally:
-            uh = UpdateHelper(player)
-            try:
-                player_data = await uh.get_player_data(player)
-                player.avatar_id = player_data["profileIconId"]
-                exists = True
-            except Exception:
-                exists = False
+            if not exists:
+                try:
+                    player_data = await api_update_helper.ApiUpdateHelper.get_player_data(
+                        player
+                    )  # Change this to allow for testing.
+                    player.avatar_id = player_data["profileIconId"]
+                    exists = True
+                except Exception:
+                    exists = False
 
         return render(request, "tracker/partials/user_validation.html", context=locals())
 
@@ -135,9 +136,8 @@ def challenge(request, challenge_id=0):
     if request.htmx and challenge_id == 0:
         challenge_id = request.POST.get("search_input", None)
         return HttpResponseClientRedirect(reverse("challenge") + "{0}/".format(challenge_id))  # FIXME: Janky as fuck
-        # FIXME: Error handling here.
     try:
-        challenge_data = Challenge.objects.get(id=challenge_id)
+        challenge_data = Challenge.objects.filter(id=challenge_id).first()
         if challenge_data.ignore_unranked:
             player_query = (
                 Challenge_Player.objects.filter(challenge_id=challenge_id)
@@ -164,11 +164,25 @@ def challenge(request, challenge_id=0):
             challenge_status = "Scheduled"
         else:
             challenge_status = "Done"
-    except Exception:
+    except Challenge.DoesNotExist:
         messages.error(request, "404")
+        return redirect(reverse("error"))
+    except Exception:
+        messages.error(request, "400")
         return redirect(reverse("error"))
     return render(request, "tracker/challenge.html", context=locals())
 
 
+@cache_page(60 * 15)
+@require_GET
 def search(request):
     return render(request, "tracker/partials/search_modal.html")
+
+
+def challenge_loading(request, job_id):
+    queue = get_queue("high")
+    job = queue.fetch_job(job_id)
+    if job.is_finished:
+        challenge_id = job.result
+        return redirect("challenge", challenge_id=challenge_id)
+    return render(request, "tracker/challenge_loading.html", context=locals())

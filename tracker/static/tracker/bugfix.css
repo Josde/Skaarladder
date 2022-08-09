@@ -7,6 +7,11 @@ select {
   /* Small notch in the background of the select that clips into the text */
 }
 
+/* Fixes the textinput from crispy-tailwind taking too much space for names */
+#id_name {
+  max-width: 60% !important;
+}
+
 .fill-current.h-4.w-4 {
   /* Fixes the ugly uncentered arrow left in select by crispy-tailwind that can't be styled */
   display: none !important;
@@ -31,7 +36,6 @@ select {
 html {
   scrollbar-face-color: #646464;
   scrollbar-base-color: #646464;
-  scrollbar-3dlight-color: #646464;
   scrollbar-highlight-color: #646464;
   scrollbar-track-color: #000;
   scrollbar-arrow-color: #000;
@@ -65,7 +69,7 @@ html {
 ::-webkit-scrollbar-corner {
   background-color: #646464;
 }
-}
+
 
 ::-webkit-resizer {
   background-color: #666;
