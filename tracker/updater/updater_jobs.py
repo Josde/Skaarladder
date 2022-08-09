@@ -25,7 +25,6 @@ async def periodic_update():
 
 
 def create_challenge_job(name, start_date, end_date, player_platform, is_absolute, ignore_unranked):
-    # TODO: Validations here etc
     challenge = Challenge(
         name=name,
         start_date=start_date,

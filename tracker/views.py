@@ -38,11 +38,8 @@ def error(request):
     return render(request, "tracker/error.html", context=locals())
 
 
-# Async views can't have required method decorators, so this will show up as an issue on SonarQube for a while.
-# TODO: This can be problematic since it runs on the server thread and makes API calls, maybe do all updates on UpdaterThread?
 async def create_challenge(request):
     if request.method == "POST":
-        # TODO: Validation. Just testing for now, but needs error handling!
         print(request.POST)
         submitted_form = ChallengeForm(request.POST)
         player_forms = []
@@ -105,6 +102,7 @@ def create_user_form(request):
 
 
 async def provisional_parse(request):
+    exists = False
     if request.method == "POST":
         print(request.POST)
         if "player_name" not in request.POST.keys() or "platform" not in request.POST.keys():
@@ -114,22 +112,20 @@ async def provisional_parse(request):
         try:
             player = await sync_to_async(Player.objects.get)(name=player_name, platform=platform)
             exists = True
-            # TODO: We return here to prevent an unneeded update in finally. Maybe take this out of try to prevent a code smell.
-            return render(request, "tracker/partials/user_validation.html", context=locals())
         except Player.DoesNotExist:
             player = Player.create(player_name, platform)
         except Player.MultipleObjectsReturned:
-            query = await sync_to_async(Player.objects.all().filter)(name=player_name, platform=platform)
-            player = await sync_to_async(query[0])()  # TODO: Test this
+            player = await Player.objects.all().afilter(name=player_name, platform=platform).afirst()
         finally:
-            try:
-                player_data = await api_update_helper.ApiUpdateHelper.get_player_data(
-                    player
-                )  # Change this to allow for testing.
-                player.avatar_id = player_data["profileIconId"]
-                exists = True
-            except Exception:
-                exists = False
+            if not exists:
+                try:
+                    player_data = await api_update_helper.ApiUpdateHelper.get_player_data(
+                        player
+                    )  # Change this to allow for testing.
+                    player.avatar_id = player_data["profileIconId"]
+                    exists = True
+                except Exception:
+                    exists = False
 
         return render(request, "tracker/partials/user_validation.html", context=locals())
 
@@ -140,7 +136,7 @@ def challenge(request, challenge_id=0):
         challenge_id = request.POST.get("search_input", None)
         return HttpResponseClientRedirect(reverse("challenge") + "{0}/".format(challenge_id))  # FIXME: Janky as fuck
     try:
-        challenge_data = Challenge.objects.get(id=challenge_id)  # TODO: Maybe cover multipleobjectsfound?
+        challenge_data = Challenge.objects.filter(id=challenge_id).first()
         if challenge_data.ignore_unranked:
             player_query = (
                 Challenge_Player.objects.filter(challenge_id=challenge_id)

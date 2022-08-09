@@ -21,7 +21,7 @@ class DateTimePickerInput(forms.DateTimeInput):
 
 
 class ChallengeForm(forms.Form):
-    # TODO: Default datetimes
+    # TODO: Default datetimes do not show up for some reason
     def clean(self):
         cleaned_data = super().clean()
         start_date = cleaned_data.get("start_date")

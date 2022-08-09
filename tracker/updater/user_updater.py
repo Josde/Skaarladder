@@ -1,4 +1,5 @@
 import asyncio
+import re
 from django.utils import timezone
 from tracker.utils.league import rank_to_lp
 from tracker.models import Player, Challenge_Player
@@ -18,15 +19,12 @@ async def update(player_name, test=False):
     else:
         backend = api_update_helper.ApiUpdateHelper()
     time_since_last_update = timezone.now() - queried_player.last_data_update
-    try:
-        # TODO: Make rank_to_lp fail silently so I don't have to use try/except here?
-        previous_absolute_lp = rank_to_lp(
-            queried_player.tier,
-            queried_player.rank,
-            queried_player.lp,
-        )
-    except Exception:
-        previous_absolute_lp = 0
+
+    previous_absolute_lp = rank_to_lp(
+        queried_player.tier,
+        queried_player.rank,
+        queried_player.lp,
+    )
     if queried_player.puuid == "" or time_since_last_update.days >= 7 or DEBUG:
         # Parse user data )name, id, profile pic...)
         try:
@@ -40,7 +38,8 @@ async def update(player_name, test=False):
     await queried_player.asave()
     if previous_absolute_lp != current_absolute_lp or queried_player.tier == "UNRANKED":
         # TODO: Change the unranked part to be a "first time" thing instead.
-        await update_player_challenge_data(queried_player, current_absolute_lp)
+        challenges = await update_player_challenge_data(queried_player, current_absolute_lp)
+        await Challenge_Player.objects.abulk_update(challenges, ["progress", "progress_delta"])
 
 
 def update_fields(obj, data_dict: dict, data_to_obj_fields: dict):
@@ -139,6 +138,4 @@ async def update_player_challenge_data(queried_player, current_absolute_lp):
                 absolute_starting_lp = rank_to_lp(item.starting_tier, item.starting_rank, item.starting_lp)
             item.progress = current_absolute_lp - absolute_starting_lp
             item.progress_delta = item.progress - previous_progress
-    # TODO: Change this to abulk_update once it gets to Django release
-    # await sync_to_async(Challenge_Player.objects.bulk_update(challenges, ['progress', 'progress_delta']))
-    await Challenge_Player.objects.abulk_update(challenges, ["progress", "progress_delta"])
+    return challenges

@@ -17,9 +17,9 @@ def rank_to_lp(tier: str, rank: str, points: int) -> int:
             Please note that this ignores promos, since they don't affect LP.
     """
     if not (isinstance(points, int)):
-        raise TypeError("Points must be an int.")
+        return 0
     if (rank not in constants.rankWeights) or (tier not in constants.tierWeights):
-        raise ValueError("Rank or tier not found.")
+        return 0
     if tier in ["MASTER", "GRANDMASTER", "CHALLENGER"]:
         return (constants.tierWeights[tier.upper()]) * 400 + int(points)
     else:
