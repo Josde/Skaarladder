@@ -58,11 +58,11 @@ class ChallengeForm(forms.Form):
                     ),
                     css_class="m-4",
                 ),
-                css_class="flex flex-col text-white",
+                css_class="flex flex-col text-white place-content-end items-end",
             ),
         )
 
-    name = forms.CharField(label=("Ladder name"), max_length=50, empty_value="Ladder name")
+    name = forms.CharField(label=("Ladder name"), max_length=16, empty_value="Ladder name")
     start_date = forms.DateTimeField(label=("Start date"), widget=DateTimePickerInput, initial=timezone.now())
     end_date = forms.DateTimeField(label=("End date"), widget=DateTimePickerInput)
     is_absolute = forms.BooleanField(label=("Absolute ranking"), required=False)

@@ -30,8 +30,8 @@
                 {% include "tracker/partials/modal_div.html" %}   
             {% endcache %}
             <div class="flex flex-row w-screen h-screen overflow-auto bg-neutral-900"> 
-            <form class="flex flex-row mt-16 ml-[10%]"action="/create/" method="post" id='challenge_form'>
-                <div class="flex-col">
+            <form class="flex flex-row mt-16 ml-[10%] flex-nowrap"action="/create/" method="post" id='challenge_form'>
+                <div class="flex flex-col p-16">
                     {% csrf_token %}
                     {% crispy form form.helper %}
                 </div>
