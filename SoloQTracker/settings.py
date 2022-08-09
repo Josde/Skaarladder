@@ -209,4 +209,4 @@ if config("SENTRY", False):
     )
 
 if config("DEBUG", False):
-    INSTALLED_APPS += ("django_browser_reload")
+    INSTALLED_APPS.append("django_browser_reload")
