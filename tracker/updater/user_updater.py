@@ -29,8 +29,13 @@ async def update(player_name, test=False):
         previous_absolute_lp = 0
     if queried_player.puuid == "" or time_since_last_update.days >= 7 or DEBUG:
         # Parse user data )name, id, profile pic...)
-        await update_player_data(queried_player, backend)
-        # Create tasks, since we can do everything else asynchronously
+        try:
+            await update_player_data(queried_player, backend)
+        except Exception:  # same as below
+            return
+    if queried_player.puuid == "":  # invalid player
+        return
+    # Create tasks, since we can do everything else asynchronously
     current_absolute_lp = await update_ranked_data(queried_player, backend)
     await sync_to_async(queried_player.save)()
     if previous_absolute_lp != current_absolute_lp or queried_player.tier == "UNRANKED":

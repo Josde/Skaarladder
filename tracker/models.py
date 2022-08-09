@@ -53,8 +53,7 @@ class Player(models.Model):
 
 
 # TODO: Implement django-model-history so I can get stadistics out of this model.
-
-
+# TODO: Refactor every vocabulary on the app to use Ladder rather than challenge, to prevent confusion
 class Challenge(models.Model):
     name = models.CharField(max_length=100)
     start_date = models.DateTimeField()

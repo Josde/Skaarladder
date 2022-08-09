@@ -55,7 +55,6 @@ async def create_challenge(request):
             )
         )
         for item in _player_platform:
-            print("creating form")
             player_form = PlayerForm(
                 form_id=uuid.uuid4(), initial={"player_name": item[0], "platform": item[1], "is_valid": item[2]}
             )
@@ -65,12 +64,13 @@ async def create_challenge(request):
             if not player_form.is_valid():  # use the is_valid attribute to check if user exists too
                 valid_player_forms = False
             player_forms.append(player_form)
-
+        if len(player_forms) < 2:
+            submitted_form.add_error("Must have at least 2 players in your ladder.")
         if not submitted_form.is_valid() or not valid_player_forms:
             return render(
                 request, "tracker/challenge_form.html", {"form": submitted_form, "player_forms": player_forms}
             )
-            # FIXME" Add another parameter to pass the player_forms again? so that you dont have to reinput all of them
+
         _name = request.POST["name"]
         _start_date = datetime.strptime(request.POST["start_date"], "%Y-%m-%dT%H:%M")
         _end_date = datetime.strptime(request.POST["end_date"], "%Y-%m-%dT%H:%M")
