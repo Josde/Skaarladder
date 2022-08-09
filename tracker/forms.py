@@ -5,6 +5,7 @@ from django.utils import timezone
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, Submit, Field, Row, Column, Div
 from tracker.utils import constants
+from django.core.exceptions import ValidationError
 
 
 class DatePickerInput(forms.DateInput):
@@ -21,6 +22,15 @@ class DateTimePickerInput(forms.DateTimeInput):
 
 class ChallengeForm(forms.Form):
     # TODO: Default datetimes
+    def clean(self):
+        cleaned_data = super().clean()
+        start_date = cleaned_data.get("start_date")
+        end_date = cleaned_data.get("end_date")
+        print(start_date, end_date)
+        if start_date and end_date:
+            if start_date > end_date:
+                raise ValidationError("Start date must be previous to end date.")
+        return cleaned_data
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -37,7 +47,9 @@ class ChallengeForm(forms.Form):
                     ),
                     Field("start_date", css_class=constants.default_form_style),
                     Field("end_date", css_class=constants.default_form_style),
-                    Field("is_absolute"),
+                    Field(
+                        "is_absolute",
+                    ),
                     Field("ignore_unranked"),
                     Submit(
                         "Submit",
@@ -58,8 +70,11 @@ class ChallengeForm(forms.Form):
 
 
 class PlayerForm(forms.Form):
+    form_id = ""
+
     def __init__(self, form_id="", *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.form_id = form_id
         self.helper = FormHelper(self)
         self.helper.form_tag = False
         self.helper.disable_csrf = True
@@ -71,6 +86,7 @@ class PlayerForm(forms.Form):
                     autocomplete="off",
                 ),
                 Field("platform"),
+                Field("is_valid", css_class="hidden"),
                 css_class="flex flex-row text-white bg-neutral-900",
             ),
             css_class="flex flex-col",
@@ -82,7 +98,7 @@ class PlayerForm(forms.Form):
                 "hx-trigger": "keyup delay:500ms changed",
                 "hx-swap": "innerhtml",
                 "form": "challenge_form",
-                "hx-target": "#results-{0}".format(form_id),
+                "hx-target": "#results-{0}".format(self.form_id),
             }
         )
 
@@ -92,9 +108,10 @@ class PlayerForm(forms.Form):
                 "hx-trigger": "changed",
                 "hx-swap": "innerhtml",
                 "form": "challenge_form",
-                "hx-target": "#results-{0}".format(form_id),
+                "hx-target": "#results-{0}".format(self.form_id),
             }
         )
 
     platform = forms.ChoiceField(label=_("platform"), choices=platformChoices)
-    player_name = forms.CharField(label=_("PlayerName"), max_length=16)
+    player_name = forms.CharField(label=_("PlayerName"), max_length=16, min_length=3)
+    is_valid = forms.BooleanField(required=False, label="", show_hidden_initial=True)

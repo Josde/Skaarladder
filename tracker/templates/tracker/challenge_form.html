@@ -42,6 +42,11 @@
                             hx-get="{% url 'player_form' %}" hx-swap="beforeend" hx-target='#player_forms'>+</button>
                             <div id='player_forms' class="max-h-[80%] flex flex-col flex-wrap">
                                 <!-- forms get added here programmatically through htmx on the + button -->
+                                {% for form in player_forms %}
+                                    {% with form_id=form.form_id %}
+                                        {% include 'tracker/partials/user_form.html' %}
+                                    {% endwith %}
+                                {% endfor %}
                             </div>
                         </form>
                 </div>

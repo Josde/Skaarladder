@@ -41,22 +41,43 @@ def error(request):
 # Async views can't have required method decorators, so this will show up as an issue on SonarQube for a while.
 # TODO: This can be problematic since it runs on the server thread and makes API calls, maybe do all updates on UpdaterThread?
 async def create_challenge(request):
-    form = ChallengeForm()
     if request.method == "POST":
         # TODO: Validation. Just testing for now, but needs error handling!
         print(request.POST)
         submitted_form = ChallengeForm(request.POST)
-        # print(submitted_form.cleaned_data)
-        # FIXME: Check is_valid and such, we are currently only using this for testing
-        if not form.is_valid:
-            messages.error(request, "400")
-            return redirect(reverse("error"))
+        player_forms = []
+        valid_player_forms = True
+        _player_platform = list(
+            zip(
+                request.POST.getlist("player_name"),
+                request.POST.getlist("platform"),
+                request.POST.getlist("initial-is_valid"),
+            )
+        )
+        for item in _player_platform:
+            print("creating form")
+            player_form = PlayerForm(
+                form_id=uuid.uuid4(), initial={"player_name": item[0], "platform": item[1], "is_valid": item[2]}
+            )
+            player_form.data["player_name"] = item[0]
+            player_form.data["platform"] = item[1]
+            player_form.data["is_valid"] = item[2]
+            if not player_form.is_valid():  # use the is_valid attribute to check if user exists too
+                valid_player_forms = False
+            player_forms.append(player_form)
+
+        if not submitted_form.is_valid() or not valid_player_forms:
+            return render(
+                request, "tracker/challenge_form.html", {"form": submitted_form, "player_forms": player_forms}
+            )
+            # FIXME" Add another parameter to pass the player_forms again? so that you dont have to reinput all of them
         _name = request.POST["name"]
         _start_date = datetime.strptime(request.POST["start_date"], "%Y-%m-%dT%H:%M")
         _end_date = datetime.strptime(request.POST["end_date"], "%Y-%m-%dT%H:%M")
-        _player_platform = list(zip(request.POST.getlist("player_name"), request.POST.getlist("platform")))
+
         _is_absolute = "is_absolute" in request.POST.keys()
         _ignore_unranked = "ignore_unranked" in request.POST.keys()
+        # if ()
         queue = get_queue("high")
         job = queue.enqueue(
             updater_jobs.create_challenge_job,
@@ -71,6 +92,7 @@ async def create_challenge(request):
         )
         return redirect("challenge_loading", job_id=job.id)
     else:
+        form = ChallengeForm()
         return render(request, "tracker/challenge_form.html", {"form": form})
 
 
