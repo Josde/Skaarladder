@@ -15,10 +15,9 @@ from rq.job import Dependency
 async def periodic_update():
     now = datetime.utcnow()
     player_query = Player.objects.all().only("name")
-    players = await sync_to_async(list)(player_query)
     queue = await sync_to_async(get_queue)()
     jobs = []
-    for player in players:
+    async for player in player_query:
         jobs.append(queue.prepare_data(update, [player.name]))
     with queue.connection.pipeline() as pipe:
         enqueued_jobs = await sync_to_async(queue.enqueue_many)(jobs, pipeline=pipe)

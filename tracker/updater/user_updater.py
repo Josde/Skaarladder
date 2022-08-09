@@ -37,7 +37,7 @@ async def update(player_name, test=False):
         return
     # Create tasks, since we can do everything else asynchronously
     current_absolute_lp = await update_ranked_data(queried_player, backend)
-    await sync_to_async(queried_player.save)()
+    await queried_player.asave()
     if previous_absolute_lp != current_absolute_lp or queried_player.tier == "UNRANKED":
         # TODO: Change the unranked part to be a "first time" thing instead.
         await update_player_challenge_data(queried_player, current_absolute_lp)
@@ -120,10 +120,9 @@ async def update_ranked_data(queried_player, backend):
 
 async def update_player_challenge_data(queried_player, current_absolute_lp):
     # TODO: Move queries out of these functions?
-    challenges = await sync_to_async(list)(
-        Challenge_Player.objects.filter(player_id=queried_player.id).select_related("challenge_id").all()
-    )
-    for item in challenges:
+    challenges = Challenge_Player.objects.filter(player_id=queried_player.id).select_related("challenge_id").all()
+
+    async for item in challenges:
         challenge_details = item.challenge_id
         previous_progress = item.progress
         if queried_player.tier == "UNRANKED":
@@ -142,4 +141,4 @@ async def update_player_challenge_data(queried_player, current_absolute_lp):
             item.progress_delta = item.progress - previous_progress
     # TODO: Change this to abulk_update once it gets to Django release
     # await sync_to_async(Challenge_Player.objects.bulk_update(challenges, ['progress', 'progress_delta']))
-    await sync_to_async(Challenge_Player.objects.bulk_update)(challenges, ["progress", "progress_delta"])
+    await Challenge_Player.objects.abulk_update(challenges, ["progress", "progress_delta"])
