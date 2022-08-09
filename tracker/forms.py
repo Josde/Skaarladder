@@ -27,9 +27,8 @@ class ChallengeForm(forms.Form):
         start_date = cleaned_data.get("start_date")
         end_date = cleaned_data.get("end_date")
         print(start_date, end_date)
-        if start_date and end_date:
-            if start_date > end_date:
-                raise ValidationError("Start date must be previous to end date.")
+        if start_date and end_date and start_date > end_date:
+            raise ValidationError("Start date must be previous to end date.")
         return cleaned_data
 
     def __init__(self, *args, **kwargs):

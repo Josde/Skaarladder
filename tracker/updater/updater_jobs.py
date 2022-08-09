@@ -8,12 +8,8 @@ from datetime import datetime, timedelta
 from django_rq import get_queue
 from rq.job import Dependency
 
-# FIXME: Django 4.1 has been released! Finally, there are async functions for ORM operations. Change to use them.
-# See: https://docs.djangoproject.com/en/4.1/releases/4.1/#asynchronous-orm-interface
-
 
 async def periodic_update():
-    now = datetime.utcnow()
     player_query = Player.objects.all().only("name")
     queue = await sync_to_async(get_queue)()
     jobs = []
@@ -42,8 +38,6 @@ def create_challenge_job(name, start_date, end_date, player_platform, is_absolut
     players = []
     player_challenges = []
     for item in player_platform:
-        if len(item) < 2:  # FIXME: this should be checked on view anyways so this is temp
-            print("ERROR IN CHALLENGE_CREATION")
         print("Searching player {0} {1}".format(item[0], item[1]))
         try:
             player = Player.objects.get(name=item[0], platform=item[1])

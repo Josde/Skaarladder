@@ -139,7 +139,6 @@ def challenge(request, challenge_id=0):
     if request.htmx and challenge_id == 0:
         challenge_id = request.POST.get("search_input", None)
         return HttpResponseClientRedirect(reverse("challenge") + "{0}/".format(challenge_id))  # FIXME: Janky as fuck
-        # FIXME: Error handling here.
     try:
         challenge_data = Challenge.objects.get(id=challenge_id)  # TODO: Maybe cover multipleobjectsfound?
         if challenge_data.ignore_unranked:
@@ -168,8 +167,11 @@ def challenge(request, challenge_id=0):
             challenge_status = "Scheduled"
         else:
             challenge_status = "Done"
-    except Exception:
+    except Challenge.DoesNotExist:
         messages.error(request, "404")
+        return redirect(reverse("error"))
+    except Exception:
+        messages.error(request, "400")
         return redirect(reverse("error"))
     return render(request, "tracker/challenge.html", context=locals())
 

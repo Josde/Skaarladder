@@ -11,7 +11,7 @@ from tracker.updater import api_update_helper, test_update_helper
 async def update(player_name, test=False):
     """Function that gets the updated data for a user and returns it."""
     DEBUG = True
-    current_absolute_lp = previous_absolute_lp = absolute_starting_lp = 0
+    current_absolute_lp = previous_absolute_lp = 0
     queried_player = await sync_to_async(Player.objects.all().get)(name=player_name)
     if test:
         backend = test_update_helper.TestUpdateHelper()
