@@ -62,11 +62,11 @@ class ChallengeForm(forms.Form):
             ),
         )
 
-    name = forms.CharField(label=_("ChallengeName"), max_length=50, empty_value="Challenge name")
-    start_date = forms.DateTimeField(label=_("StartDate"), widget=DateTimePickerInput, initial=timezone.now())
-    end_date = forms.DateTimeField(label=_("EndDate"), widget=DateTimePickerInput)
-    is_absolute = forms.BooleanField(label=_("AbsoluteRanking"), required=False)
-    ignore_unranked = forms.BooleanField(label=_("HideUnranked"), required=False)
+    name = forms.CharField(label=("Ladder name"), max_length=50, empty_value="Ladder name")
+    start_date = forms.DateTimeField(label=("Start date"), widget=DateTimePickerInput, initial=timezone.now())
+    end_date = forms.DateTimeField(label=("End date"), widget=DateTimePickerInput)
+    is_absolute = forms.BooleanField(label=("Absolute ranking"), required=False)
+    ignore_unranked = forms.BooleanField(label=("Hide unranked"), required=False)
 
 
 class PlayerForm(forms.Form):
@@ -112,6 +112,6 @@ class PlayerForm(forms.Form):
             }
         )
 
-    platform = forms.ChoiceField(label=_("platform"), choices=platformChoices)
-    player_name = forms.CharField(label=_("PlayerName"), max_length=16, min_length=3)
+    platform = forms.ChoiceField(label="Platform", choices=platformChoices)
+    player_name = forms.CharField(label="Name", max_length=16, min_length=3)
     is_valid = forms.BooleanField(required=False, label="", show_hidden_initial=True)
