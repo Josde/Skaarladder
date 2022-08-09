@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     "django_rq",
     "django_tables2",
     "django_htmx",
-    "django_browser_reload",
     "crispy_forms",
     "crispy_tailwind",
     "tracker",
@@ -208,3 +207,6 @@ if config("SENTRY", False):
         # django.contrib.auth) you may enable sending PII data.
         send_default_pii=True,
     )
+
+if config("DEBUG", False):
+    INSTALLED_APPS += ("django_browser_reload")
