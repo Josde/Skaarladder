@@ -85,7 +85,7 @@ class PlayerForm(forms.Form):
                     autocomplete="off",
                 ),
                 Field("platform"),
-                Field("is_valid", css_class="hidden"),
+                Field("valid", css_class="hidden"),
                 css_class="flex flex-row text-white bg-neutral-900",
             ),
             css_class="flex flex-col",
@@ -113,4 +113,4 @@ class PlayerForm(forms.Form):
 
     platform = forms.ChoiceField(label="Platform", choices=platformChoices)
     player_name = forms.CharField(label="Name", max_length=16, min_length=3)
-    is_valid = forms.BooleanField(required=False, label="", show_hidden_initial=True)
+    valid = forms.BooleanField(required=False, label="", show_hidden_initial=True)

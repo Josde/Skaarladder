@@ -48,21 +48,22 @@ async def create_challenge(request):
             zip(
                 request.POST.getlist("player_name"),
                 request.POST.getlist("platform"),
-                request.POST.getlist("initial-is_valid"),
+                request.POST.getlist("initial-valid"),
             )
         )
         for item in _player_platform:
             player_form = PlayerForm(
-                form_id=uuid.uuid4(), initial={"player_name": item[0], "platform": item[1], "is_valid": item[2]}
+                form_id=uuid.uuid4(), initial={"player_name": item[0], "platform": item[1], "valid": item[2]}
             )
             player_form.data["player_name"] = item[0]
             player_form.data["platform"] = item[1]
-            player_form.data["is_valid"] = item[2]
-            if not player_form.is_valid():  # use the is_valid attribute to check if user exists too
-                valid_player_forms = False
+            player_form.data["valid"] = item[2]
+            """ if not player_form.is_valid():  # use the is_valid attribute to check if user exists too
+                print(item[0], item[1], item[2], "not valid")
+                valid_player_forms = False """
             player_forms.append(player_form)
         if len(player_forms) < 2:
-            submitted_form.add_error("Must have at least 2 players in your ladder.")
+            submitted_form.add_error(error="Must have at least 2 players in your ladder.")
         if not submitted_form.is_valid() or not valid_player_forms:
             return render(
                 request, "tracker/challenge_form.html", {"form": submitted_form, "player_forms": player_forms}
