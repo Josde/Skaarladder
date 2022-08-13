@@ -36,7 +36,8 @@ async def update(player_name, is_first_run=False, test=False):
     # Create tasks, since we can do everything else asynchronously
     current_absolute_lp = await update_ranked_data(queried_player, backend, is_first_run)
     await sync_to_async(queried_player.save)()
-    if previous_absolute_lp != current_absolute_lp or is_first_run:
+    if (previous_absolute_lp != current_absolute_lp) or is_first_run:
+        print("Entering ladder_update")
         ladders = await update_player_ladder_data(queried_player, current_absolute_lp)
         await Ladder_Player.objects.abulk_update(ladders, ["progress", "progress_delta"])
 
@@ -70,13 +71,15 @@ async def update_player_data(queried_player, backend):
 
 
 async def update_ranked_data(queried_player, backend, is_first_run=False):
-    tasks = [
-        backend.get_player_ranked_data(queried_player),
-    ]
     if not is_first_run:  # Do not update streaks on challenge creation to make it faster.
-        tasks.append(backend.get_streak_data(queried_player))
+        tasks = [backend.get_player_ranked_data(queried_player), backend.get_streak_data(queried_player)]
     try:
-        ranked_data, streak = await asyncio.gather(*tasks)
+        # TODO: Ugly af, fixme
+        if not is_first_run:
+            ranked_data, streak = await asyncio.gather(*tasks)
+        else:
+            ranked_data = await backend.get_player_ranked_data(queried_player)
+            streak = 0
         current_absolute_lp = 0
         if ranked_data is not None:
             complete_ranked_data = {
@@ -111,8 +114,9 @@ async def update_ranked_data(queried_player, backend, is_first_run=False):
         await sync_to_async(update_fields)(
             queried_player, complete_ranked_data, dict([tuple([x, x]) for x in complete_ranked_data.keys()])
         )
+        print("Current absolute lp: ", current_absolute_lp)
         return current_absolute_lp
-    except Exception:  # For debugging, implement errors later.
+    except Exception:  # TODO: For debugging, implement errors later. For example, getting the streak may fail and we just end with an empty object even though it's perfectly usable.
         traceback.print_exc()
         return None
 
@@ -125,9 +129,11 @@ async def update_player_ladder_data(queried_player, current_absolute_lp):
         ladder_details = item.ladder_id
         previous_progress = item.progress
         if queried_player.tier == "UNRANKED":
+            print("Entered if")
             item.starting_tier = "UNRANKED"
             item.starting_rank = "NONE"
         else:
+            print("Entered else")
             if ladder_details.is_absolute:
                 absolute_starting_lp = 0
             elif item.starting_tier == "UNRANKED" or item.starting_rank == "NONE":
@@ -137,5 +143,6 @@ async def update_player_ladder_data(queried_player, current_absolute_lp):
             else:
                 absolute_starting_lp = rank_to_lp(item.starting_tier, item.starting_rank, item.starting_lp)
             item.progress = current_absolute_lp - absolute_starting_lp
+            print("item.progress = ", item.progress)
             item.progress_delta = item.progress - previous_progress
     return ladders

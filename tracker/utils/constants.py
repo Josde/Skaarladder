@@ -23,6 +23,7 @@ riotToOPGGRegions = {
     "BR1": "BR",
     "EUN1": "EUNE",
     "EUW1": "EUW",
+    "NA1": "NA",
     "JP1": "JP",
     "KR": "www",  # instead of kr.op.gg its www.op.gg
     "LA1": "LAN",
@@ -35,16 +36,17 @@ riotToOPGGRegions = {
 # Form choices
 
 platformChoices = [
-    ("euw1", "euw1"),
-    ("br1", "br1"),
-    ("eun1", "eun1"),
-    ("jp1", "jp1"),
-    ("kr1", "kr1"),
-    ("la1", "la1"),
-    ("la2", "la2"),
-    ("oc1", "oc1"),
-    ("ru", "ru"),
-    ("tr1", "tr1"),
+    ("euw1", "EUW"),
+    ("na1", "NA"),
+    ("br1", "BR"),
+    ("eun1", "EUNE"),
+    ("jp1", "JP"),
+    ("kr", "KR"),
+    ("la1", "LAN"),
+    ("la2", "LAS"),
+    ("oc1", "OCE"),
+    ("ru", "RU"),
+    ("tr1", "TR"),
 ]
 
 regionChoices = [
