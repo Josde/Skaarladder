@@ -75,7 +75,7 @@ async def update_ranked_data(queried_player, backend):
 
     try:
         # TODO: Ugly af, fixme
-        ranked_data = backend.get_player_ranked_data(queried_player)
+        ranked_data = await backend.get_player_ranked_data(queried_player)
         if ranked_data is not None:
             current_absolute_lp = rank_to_lp(
                 ranked_data["tier"],
@@ -129,17 +129,13 @@ async def update_streak_data(queried_player, backend):
 async def update_player_ladder_data(queried_player, current_absolute_lp):
     # TODO: Move queries out of these functions?
     ladders = Ladder_Player.objects.filter(player_id=queried_player).select_related("ladder_id").all()
-    print("Entered func")
     async for item in ladders:
-        print("Entered for")
         ladder_details = item.ladder_id
         previous_progress = item.progress
         if queried_player.tier == "UNRANKED":
-            print("Entered if")
             item.starting_tier = "UNRANKED"
             item.starting_rank = "NONE"
         else:
-            print("Entered else")
             if ladder_details.is_absolute:
                 absolute_starting_lp = 0
             elif item.starting_tier == "UNRANKED" or item.starting_rank == "NONE":
@@ -149,6 +145,5 @@ async def update_player_ladder_data(queried_player, current_absolute_lp):
             else:
                 absolute_starting_lp = rank_to_lp(item.starting_tier, item.starting_rank, item.starting_lp)
             item.progress = current_absolute_lp - absolute_starting_lp
-            print("item.progress = ", item.progress)
             item.progress_delta = item.progress - previous_progress
     return ladders
