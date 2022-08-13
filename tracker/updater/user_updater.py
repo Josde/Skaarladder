@@ -30,14 +30,17 @@ async def update(player_name, is_first_run=False, test=False):
     if queried_player.puuid == "":  # invalid player
         return
     # Create tasks, since we can do everything else asynchronously
-    current_absolute_lp = await update_ranked_data(queried_player, backend, is_first_run)
-    await sync_to_async(queried_player.save)()
+    current_absolute_lp = await update_ranked_data(queried_player, backend)
+
     if (previous_absolute_lp != current_absolute_lp) or is_first_run:
-        print("Entering ladder_update")
+        await update_streak_data(queried_player, backend)
+        await sync_to_async(queried_player.save)()
         ladders = await update_player_ladder_data(queried_player, current_absolute_lp)
         async for item in ladders:
             await sync_to_async(item.save)()
             # Ladder_Player.objects.abulk_update(ladders, ["progress", "progress_delta"]) doesn't work idk why
+    else:
+        await sync_to_async(queried_player.save)()
 
 
 def update_fields(obj, data_dict: dict, data_to_obj_fields: dict):
@@ -68,17 +71,11 @@ async def update_player_data(queried_player, backend):
         traceback.print_exc()
 
 
-async def update_ranked_data(queried_player, backend, is_first_run=False):
-    if not is_first_run:  # Do not update streaks on challenge creation to make it faster.
-        tasks = [backend.get_player_ranked_data(queried_player), backend.get_streak_data(queried_player)]
+async def update_ranked_data(queried_player, backend):
+
     try:
         # TODO: Ugly af, fixme
-        if not is_first_run:
-            ranked_data, streak = await asyncio.gather(*tasks)
-        else:
-            ranked_data = await backend.get_player_ranked_data(queried_player)
-            streak = 0
-        current_absolute_lp = 0
+        ranked_data = backend.get_player_ranked_data(queried_player)
         if ranked_data is not None:
             current_absolute_lp = rank_to_lp(
                 ranked_data["tier"],
@@ -87,7 +84,6 @@ async def update_ranked_data(queried_player, backend, is_first_run=False):
             )
 
             complete_ranked_data = {
-                "streak": streak,
                 "wins": ranked_data["wins"],
                 "losses": ranked_data["losses"],
                 "winrate": 100 * ranked_data["wins"] / (ranked_data["wins"] + ranked_data["losses"]),
@@ -100,7 +96,6 @@ async def update_ranked_data(queried_player, backend, is_first_run=False):
 
         else:
             complete_ranked_data = {
-                "streak": 0,
                 "wins": 0,
                 "losses": 0,
                 "winrate": 0,
@@ -115,11 +110,20 @@ async def update_ranked_data(queried_player, backend, is_first_run=False):
         await sync_to_async(update_fields)(
             queried_player, complete_ranked_data, dict([tuple([x, x]) for x in complete_ranked_data.keys()])
         )
-        print("Current absolute lp: ", current_absolute_lp)
         return current_absolute_lp
-    except Exception:  # TODO: For debugging, implement errors later. For example, getting the streak may fail and we just end with an empty object even though it's perfectly usable.
+    except Exception:
         traceback.print_exc()
         return 0
+
+
+async def update_streak_data(queried_player, backend):
+    try:
+        streak = await backend.get_streak_data(queried_player)
+        queried_player.streak = streak
+    except Exception:
+        traceback.print_exc()
+        return 0
+    return streak
 
 
 async def update_player_ladder_data(queried_player, current_absolute_lp):
