@@ -17,5 +17,5 @@ class TrackerConfig(AppConfig):
             # eventually change this to be a singleton connection for efficiency
             queue = get_queue("default")
             if updater_jobs.periodic_update not in [x.func for x in queue.jobs] and not (os.getenv("DEBUG", False)):
-                pass
-                # queue.enqueue(updater_jobs.periodic_update)
+                # pass
+                queue.enqueue(updater_jobs.periodic_update)
