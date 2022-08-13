@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
     <head>
-        <title>Skaarladder :: {{ challenge_name }}</title>
+        <title>Skaarladder :: {{ ladder_name }}</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -37,7 +37,7 @@
                     </div>
                     <div name="how" class="flex flex-col mt-16 ml-32">
                         <strong class="text-xl font-bold drop-shadow-lg">How do I use it?</strong>
-                        <p class="mt-4 font-medium">Click on the '+' button at the top or <a class='font-bold' href="{% url 'create_challenge' %}">here</a> to begin.</p>
+                        <p class="mt-4 font-medium">Click on the '+' button at the top or <a class='font-bold' href="{% url 'create_ladder' %}">here</a> to begin.</p>
                     </div>
                     <div name="contribute" class="flex flex-col mt-16 ml-32 mr-32">
                         <strong class="text-xl font-bold drop-shadow-lg">Can I contribute?</strong>

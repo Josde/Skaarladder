@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
     <head>
-        <title>Skaarladder :: {{ challenge_name }}</title>
+        <title>Skaarladder :: {{ ladder_name }}</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -33,14 +33,13 @@
                         <strong class="text-xl font-bold drop-shadow-lg">To return to the last page, <a href="{{request.META.HTTP_REFERER}}">click here</a></strong>
                         {% if code != "" %}
                             <p class="mt-4 font-medium">You found an error with code {{ code }}. Go back and try again, and if it happens again report it to the developers, <a href="https://github.com/Josde/SimpleSoloQTracker/issues/new"> clicking here.</a></p>
-                            <p class="mt-4 font-medium">Error code {{ code }} means TODO AÑADIR DESCRIPCION</p>
                         {% else %}
                             <p class="mt-4 font-medium">This error has no description attached. Go back and try again, and if it happens again report it to the developers, <a href="https://github.com/Josde/SimpleSoloQTracker/issues/new"> clicking here.</a></p>
                         {% endif %}
                     </div>
                     <div name="image" class="flex flex-col mt-16 ml-32">
                         <strong class="text-xl font-bold drop-shadow-lg">How do I use it?</stro>
-                        <p class="mt-4 font-medium">Click on the '+' button at the top or <a class='font-bold' href="{% url 'create_challenge' %}">here</a> to begin.</p>
+                        <p class="mt-4 font-medium">Click on the '+' button at the top or <a class='font-bold' href="{% url 'create_ladder' %}">here</a> to begin.</p>
                     </div>
                 </div>
             </div>

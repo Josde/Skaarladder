@@ -1,5 +1,6 @@
 import asyncio
 from datetime import datetime
+import traceback
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -9,10 +10,10 @@ from django.template import loader
 from tracker.updater import api_update_helper
 from .forms import PlayerForm
 from .updater import updater_jobs
-from .models import Player, Challenge, Challenge_Player
-from .forms import ChallengeForm
+from .models import Player, Ladder, Ladder_Player
+from .forms import LadderForm
 from asgiref.sync import sync_to_async
-from .tables import ChallengeTable
+from .tables import LadderTable
 import uuid
 from django_htmx.http import HttpResponseClientRedirect
 from django.utils import timezone
@@ -38,10 +39,10 @@ def error(request):
     return render(request, "tracker/error.html", context=locals())
 
 
-async def create_challenge(request):
+async def create_ladder(request):
     if request.method == "POST":
         print(request.POST)
-        submitted_form = ChallengeForm(request.POST)
+        submitted_form = LadderForm(request.POST)
         player_forms = []
         valid_player_forms = True
         _player_platform = list(
@@ -58,16 +59,11 @@ async def create_challenge(request):
             player_form.data["player_name"] = item[0]
             player_form.data["platform"] = item[1]
             player_form.data["valid"] = item[2]
-            """ if not player_form.is_valid():  # use the is_valid attribute to check if user exists too
-                print(item[0], item[1], item[2], "not valid")
-                valid_player_forms = False """
             player_forms.append(player_form)
         if len(player_forms) < 2:
             submitted_form.add_error(error="Must have at least 2 players in your ladder.")
         if not submitted_form.is_valid() or not valid_player_forms:
-            return render(
-                request, "tracker/challenge_form.html", {"form": submitted_form, "player_forms": player_forms}
-            )
+            return render(request, "tracker/ladder_form.html", {"form": submitted_form, "player_forms": player_forms})
 
         _name = request.POST["name"]
         _start_date = datetime.strptime(request.POST["start_date"], "%Y-%m-%dT%H:%M")
@@ -78,7 +74,7 @@ async def create_challenge(request):
         # if ()
         queue = get_queue("high")
         job = queue.enqueue(
-            updater_jobs.create_challenge_job,
+            updater_jobs.create_ladder_job,
             kwargs={
                 "name": _name,
                 "start_date": _start_date,
@@ -88,10 +84,10 @@ async def create_challenge(request):
                 "ignore_unranked": _ignore_unranked,
             },
         )
-        return redirect("challenge_loading", job_id=job.id)
+        return redirect("ladder_loading", job_id=job.id)
     else:
-        form = ChallengeForm()
-        return render(request, "tracker/challenge_form.html", {"form": form})
+        form = LadderForm()
+        return render(request, "tracker/ladder_form.html", {"form": form})
 
 
 @require_GET
@@ -120,9 +116,8 @@ async def provisional_parse(request):
         finally:
             if not exists:
                 try:
-                    player_data = await api_update_helper.ApiUpdateHelper.get_player_data(
-                        player
-                    )  # Change this to allow for testing.
+                    api = api_update_helper.ApiUpdateHelper()
+                    player_data = await api.get_player_data(player)  # Change this to allow for testing.
                     player.avatar_id = player_data["profileIconId"]
                     exists = True
                 except Exception:
@@ -132,57 +127,64 @@ async def provisional_parse(request):
 
 
 @require_http_methods(["GET", "POST"])
-def challenge(request, challenge_id=0):
-    if request.htmx and challenge_id == 0:
-        challenge_id = request.POST.get("search_input", None)
-        return HttpResponseClientRedirect(reverse("challenge") + "{0}/".format(challenge_id))  # FIXME: Janky as fuck
+def ladder(request, ladder_id=0):
+    if request.htmx and ladder_id == 0:
+        ladder_id = request.POST.get("search_input", None)
+        return HttpResponseClientRedirect(reverse("ladder") + "{0}/".format(ladder_id))  # FIXME: Janky as fuck
     try:
-        challenge_data = Challenge.objects.filter(id=challenge_id).first()
-        if challenge_data.ignore_unranked:
-            player_query = (
-                Challenge_Player.objects.filter(challenge_id=challenge_id)
-                .exclude(player_id__tier="UNRANKED")
-                .select_related("player_id")
-                .order_by("-progress")
-            )
+        ladder_data = Ladder.objects.filter(id=ladder_id).first()
+        if ladder_data.is_absolute:
+            order = "-player_id__absolute_lp"
         else:
+            order = "-progress", "-player_id__absolute_lp"
+        if ladder_data.ignore_unranked:
             player_query = (
-                Challenge_Player.objects.filter(challenge_id=challenge_id)
+                Ladder_Player.objects.filter(ladder_id=ladder_id)
+                .exclude(player_id__tier="UNRANKED")
                 .exclude(ignored=True)
                 .select_related("player_id")
-                .order_by("-progress")
+                .order_by(order)
             )
-        table = ChallengeTable(player_query)
-        right_now = timezone.now()
-        start_date = challenge_data.start_date
-        end_date = challenge_data.end_date
-        challenge_name = challenge_data.name
-        challenge_id = challenge_data.id
-        if right_now >= start_date:
-            challenge_status = "Ongoing"
-        elif right_now >= end_date:
-            challenge_status = "Scheduled"
         else:
-            challenge_status = "Done"
-    except Challenge.DoesNotExist:
+            player_query = (
+                Ladder_Player.objects.filter(ladder_id=ladder_id)
+                .exclude(ignored=True)
+                .select_related("player_id")
+                .order_by(order)
+            )
+        table = LadderTable(player_query)
+        if ladder_data.is_absolute:
+            table.exclude = "progress"
+        right_now = timezone.now()
+        start_date = ladder_data.start_date
+        end_date = ladder_data.end_date
+        ladder_name = ladder_data.name
+        ladder_id = ladder_data.id
+        if right_now >= start_date:
+            ladder_status = "Ongoing"
+        elif right_now >= end_date:
+            ladder_status = "Scheduled"
+        else:
+            ladder_status = "Done"
+    except Ladder.DoesNotExist:
         messages.error(request, "404")
+        traceback.print_exc()
         return redirect(reverse("error"))
     except Exception:
         messages.error(request, "400")
+        traceback.print_exc()
         return redirect(reverse("error"))
-    return render(request, "tracker/challenge.html", context=locals())
+    return render(request, "tracker/ladder.html", context=locals())
 
 
-@cache_page(60 * 15)
-@require_GET
 def search(request):
     return render(request, "tracker/partials/search_modal.html")
 
 
-def challenge_loading(request, job_id):
+def ladder_loading(request, job_id):
     queue = get_queue("high")
     job = queue.fetch_job(job_id)
     if job.is_finished:
-        challenge_id = job.result
-        return redirect("challenge", challenge_id=challenge_id)
-    return render(request, "tracker/challenge_loading.html", context=locals())
+        ladder_id = job.result
+        return redirect("ladder", ladder_id=ladder_id)
+    return render(request, "tracker/ladder_loading.html", context=locals())

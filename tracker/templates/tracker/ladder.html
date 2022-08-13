@@ -4,7 +4,7 @@
 <!DOCTYPE html> 
 <html lang="en" data-color-scheme="dark" color-scheme="dark">
     <head>
-        <title>Skaarladder :: {{ challenge_name }}</title>
+        <title>Skaarladder :: {{ ladder_name }}</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -26,17 +26,17 @@
         <div class="flex items-center justify-center w-screen h-screen text-white bg-neutral-900 "> 
             <div class="flex w-[64rem] h-full bg-neutral-800 text-white flex-col drop-shadow-xl z overflow-auto overflow-x-hidden">
                 <!--TODO: Im not currently satisfied with overflow behaviour -->
-                <h1 id="title" class="pt-16 m-8 text-4xl font-bold text-center text-white shadow-sm font-bebas">{{ challenge_name }}</h1>
+                <h1 id="title" class="pt-16 m-8 text-4xl font-bold text-center text-white shadow-sm font-bebas">{{ ladder_name }}</h1>
                 <div class='flex flex-col justify-end'>
                     
-                    <span class="text-center">The code to access this ladder is: <strong>{{  challenge_id }}</strong></span>
+                    <span class="text-center">The code to access this ladder is: <strong>{{  ladder_id }}</strong></span>
                     <!-- <a class="text-center">Last update: <strong>{{ currentDate }}</strong></a> -->
-                    <span class="text-center">The ladder is currently: <strong>{{  challenge_status }}</strong></span>
-                    {% if challenge_status == "Ongoing" %}
+                    <span class="text-center">The ladder is currently: <strong>{{  ladder_status }}</strong></span>
+                    {% if ladder_status == "Ongoing" %}
                     <span class="text-center">Ends on <strong>{{ end_date }}</strong></span>
-                    {% elif challenge_status == "Future" %}
+                    {% elif ladder_status == "Future" %}
                     <span class="text-center">Starts on <strong>{{ start_date }}</strong> and ends on <strong>{{ end_date }}</strong></span>
-                    {% elif challenge_status == "Done"%}
+                    {% elif ladder_status == "Done"%}
                     <span class="text-center">Started on <strong>{{ start_date }}</strong> and ended on <strong>{{ end_date }}</strong></span>
                     {% endif %}
                     <p><strong class="text-center">{{ bottomMessage }}</strong></p>
@@ -44,10 +44,8 @@
             </div>
                 <hr class="bg-neutral-600"></hr>
                 <div class="flex justify-center w-full h-full m-8 ">
-                    {% cache 300 table %}
                         {% render_table table %} 
                         {%csrf_token%} 
-                    {% endcache %}
                 </div>
                 
             </div>
