@@ -115,7 +115,8 @@ async def provisional_parse(request):
         finally:
             if not exists:
                 try:
-                    player_data = await api_update_helper.ApiUpdateHelper.get_player_data(
+                    api = api_update_helper.ApiUpdateHelper()
+                    player_data = await api.get_player_data(
                         player
                     )  # Change this to allow for testing.
                     player.avatar_id = player_data["profileIconId"]
