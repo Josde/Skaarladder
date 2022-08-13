@@ -22,7 +22,6 @@ class LadderTable(tables.Table):
         template_name = "django_tables2/bootstrap.html"
         attrs = {"class": "table-auto border-collapse border border-neutral-500 text-white text-start "}
         row_attrs = {"class": "border border-white border-collapse"}
-        order_by = "-progress"
         orderable = False  # disable header clicking
 
     def render_name(self, value, record):

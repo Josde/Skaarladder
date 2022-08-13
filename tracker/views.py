@@ -1,5 +1,6 @@
 import asyncio
 from datetime import datetime
+import traceback
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -116,9 +117,7 @@ async def provisional_parse(request):
             if not exists:
                 try:
                     api = api_update_helper.ApiUpdateHelper()
-                    player_data = await api.get_player_data(
-                        player
-                    )  # Change this to allow for testing.
+                    player_data = await api.get_player_data(player)  # Change this to allow for testing.
                     player.avatar_id = player_data["profileIconId"]
                     exists = True
                 except Exception:
@@ -134,22 +133,28 @@ def ladder(request, ladder_id=0):
         return HttpResponseClientRedirect(reverse("ladder") + "{0}/".format(ladder_id))  # FIXME: Janky as fuck
     try:
         ladder_data = Ladder.objects.filter(id=ladder_id).first()
+        if ladder_data.is_absolute:
+            order = "-player_id__absolute_lp"
+        else:
+            order = "-progress", "-player_id__absolute_lp"
         if ladder_data.ignore_unranked:
-            # FIXMES: Sort these by absolute_lp too to fix ties.
             player_query = (
                 Ladder_Player.objects.filter(ladder_id=ladder_id)
                 .exclude(player_id__tier="UNRANKED")
+                .exclude(ignored=True)
                 .select_related("player_id")
-                .order_by("-progress")
+                .order_by(order)
             )
         else:
             player_query = (
                 Ladder_Player.objects.filter(ladder_id=ladder_id)
                 .exclude(ignored=True)
                 .select_related("player_id")
-                .order_by("-progress")
+                .order_by(order)
             )
         table = LadderTable(player_query)
+        if ladder_data.is_absolute:
+            table.exclude = "progress"
         right_now = timezone.now()
         start_date = ladder_data.start_date
         end_date = ladder_data.end_date
@@ -163,9 +168,11 @@ def ladder(request, ladder_id=0):
             ladder_status = "Done"
     except Ladder.DoesNotExist:
         messages.error(request, "404")
+        traceback.print_exc()
         return redirect(reverse("error"))
     except Exception:
         messages.error(request, "400")
+        traceback.print_exc()
         return redirect(reverse("error"))
     return render(request, "tracker/ladder.html", context=locals())
 
