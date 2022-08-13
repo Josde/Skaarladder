@@ -58,9 +58,6 @@ async def create_ladder(request):
             player_form.data["player_name"] = item[0]
             player_form.data["platform"] = item[1]
             player_form.data["valid"] = item[2]
-            """ if not player_form.is_valid():  # use the is_valid attribute to check if user exists too
-                print(item[0], item[1], item[2], "not valid")
-                valid_player_forms = False """
             player_forms.append(player_form)
         if len(player_forms) < 2:
             submitted_form.add_error(error="Must have at least 2 players in your ladder.")

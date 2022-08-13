@@ -113,4 +113,4 @@ class PlayerForm(forms.Form):
 
     platform = forms.ChoiceField(label="Platform", choices=platformChoices)
     player_name = forms.CharField(label="Name", max_length=16, min_length=3)
-    valid = forms.BooleanField(required=False, label="", show_hidden_initial=True)
+    valid = forms.BooleanField(required=False, label="", show_hidden_initial=True)  # Unused for now
