@@ -9,13 +9,13 @@ from .models import Player
 class LadderTable(tables.Table):
     # There is no way to set a default column style in django-tables2, apparently. Fuck DRY
     column_style = {"cell": {"class": "m-4 p-4 border border-neutral-500 border-collapse whitespace-nowrap"}}
-    name = tables.Column(accessor="player_id.name", attrs=column_style)
-    tier = tables.Column(accessor="player_id.tier", attrs=column_style)
-    rank = tables.Column(accessor="player_id.rank", attrs=column_style)
-    lp = tables.Column(accessor="player_id.lp", attrs=column_style)
-    wins = tables.Column(accessor="player_id.wins", attrs=column_style)
-    losses = tables.Column(accessor="player_id.losses", attrs=column_style)
-    winrate = tables.Column(accessor="player_id.winrate", attrs=column_style)
+    name = tables.Column(accessor="player_id__name", attrs=column_style)
+    tier = tables.Column(accessor="player_id__tier", attrs=column_style)
+    rank = tables.Column(accessor="player_id__rank", attrs=column_style)
+    lp = tables.Column(accessor="player_id__lp", attrs=column_style)
+    wins = tables.Column(accessor="player_id__wins", attrs=column_style)
+    losses = tables.Column(accessor="player_id__losses", attrs=column_style)
+    winrate = tables.Column(accessor="player_id__winrate", attrs=column_style)
     progress = tables.Column(accessor="progress", attrs=column_style)
 
     class Meta:

@@ -256,3 +256,5 @@ staticfiles/
 
 # A venv for WSL development and usage of djangorq
 linux_venv/
+
+new_venv/
