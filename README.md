@@ -17,6 +17,7 @@ Configure the following config vars or put them in a .env file in the project ro
   - HEROKU: With whatever value, if you are deploying on Heroku
   - SENTRY: With whatever value, if you are using Sentry
     - SENTRY_DSN: Your sentry URL
+    - RQ_SENTRY_DSN: Same as above, or different DSN. Used only for updater jobs.
 
 # Deploying through Heroku
 After completing the previous step, go into Heroku bash and run:  

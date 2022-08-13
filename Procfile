@@ -1,2 +1,2 @@
 web: gunicorn SoloQTracker.wsgi:application
-worker: python -u run_worker.py
+worker: python manage.py rqworker high default --with-scheduler
