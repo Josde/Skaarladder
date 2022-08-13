@@ -1,5 +1,5 @@
 import threading
-from tracker.models import Player, Challenge, Challenge_Player
+from tracker.models import Player, Ladder, Ladder_Player
 import asyncio
 import tracker.utils.constants as constants
 from asgiref.sync import sync_to_async
@@ -24,18 +24,18 @@ async def periodic_update():
     )
 
 
-def create_challenge_job(name, start_date, end_date, player_platform, is_absolute, ignore_unranked):
-    challenge = Challenge(
+def create_ladder_job(name, start_date, end_date, player_platform, is_absolute, ignore_unranked):
+    ladder = Ladder(
         name=name,
         start_date=start_date,
         end_date=end_date,
         is_absolute=is_absolute,
         ignore_unranked=ignore_unranked,
     )
-    challenge.save()
+    ladder.save()
     tasks = []
     players = []
-    player_challenges = []
+    player_ladders = []
     for item in player_platform:
         print("Searching player {0} {1}".format(item[0], item[1]))
         try:
@@ -44,23 +44,23 @@ def create_challenge_job(name, start_date, end_date, player_platform, is_absolut
             player = Player.create(name=item[0], platform=item[1])
             player.save()
             players.append(player)  # We only created non existing players to prevent violating PK uniqueness
-            tasks.append(update(player))  # Only update if not in DB
+            tasks.append(update(player, is_first_run=True))  # Only update if not in DB
         except Player.MultipleObjectsReturned:
             query = Player.objects.all().filter(name=item[0], platform=item[1])
             player = query[0]
         finally:
-            player_challenge = Challenge_Player(
+            player_ladder = Ladder_Player(
                 player_id=player,
-                challenge_id=challenge,
+                ladder_id=ladder,
                 starting_lp=0,
                 starting_tier="UNRANKED",
                 starting_rank="NONE",
             )
-            player_challenges.append(player_challenge)
+            player_ladders.append(player_ladder)
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(asyncio.gather(*tasks))
-    for item in player_challenges:
+    for item in player_ladders:
         # TODO: Check how efficient this is in terms of queries and DB access time. Also, test this (battery is running out lol)
         # Bulk_update errors out for some reason here
         item.starting_lp = item.player_id.lp
@@ -68,4 +68,4 @@ def create_challenge_job(name, start_date, end_date, player_platform, is_absolut
         item.starting_rank = item.player_id.rank
         item.save()
 
-    return challenge.id
+    return ladder.id

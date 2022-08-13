@@ -20,7 +20,7 @@ class DateTimePickerInput(forms.DateTimeInput):
     input_type = "datetime-local"
 
 
-class ChallengeForm(forms.Form):
+class LadderForm(forms.Form):
     # TODO: Default datetimes do not show up for some reason
     def clean(self):
         cleaned_data = super().clean()
@@ -37,7 +37,7 @@ class ChallengeForm(forms.Form):
         self.helper.form_tag = False
         self.helper.layout = Layout(
             Fieldset(
-                "Create a new challenge",
+                "Create a new ladder",
                 Column(
                     Field(
                         "name",
@@ -96,7 +96,7 @@ class PlayerForm(forms.Form):
                 "hx-post": "/create/htmx/provisional_parse/",
                 "hx-trigger": "keyup delay:500ms changed",
                 "hx-swap": "innerhtml",
-                "form": "challenge_form",
+                "form": "ladder_form",
                 "hx-target": "#results-{0}".format(self.form_id),
             }
         )
@@ -106,7 +106,7 @@ class PlayerForm(forms.Form):
                 "hx-post": "/create/htmx/provisional_parse/",
                 "hx-trigger": "changed",
                 "hx-swap": "innerhtml",
-                "form": "challenge_form",
+                "form": "ladder_form",
                 "hx-target": "#results-{0}".format(self.form_id),
             }
         )

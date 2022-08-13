@@ -6,9 +6,9 @@
         <button class="justify-start p-4 m-4 text-2xl text-white rounded-xl place-self-end bg-neutral-700" hx-swap="innerHTML" hx-target="#popup_body" hx-get="">X</button>
         <div name="search_box" class="flex flex-row justify-center w-full h-16 place-self-center rounded-xl">
             <!-- TODO: Make this symmetric -->
-            <form hx-post="{% url 'challenge' %}" hx-include="#search_input" class="flex flex-row w-[50%]" >
+            <form hx-post="{% url 'ladder' %}" hx-include="#search_input" class="flex flex-row w-[50%]" >
                 {% csrf_token %}
-                <input id="search_input" name="search_input" type='text' placeholder="Challenge code"
+                <input id="search_input" name="search_input" type='text' placeholder="Ladder code"
                   class='justify-center flex-grow w-full h-full p-4 m-4 text-white border-none bg-neutral-500 placeholder-neutral-300 focus:outline-none rounded-xl'>
             </input>
             <button class="justify-center p-4 m-4 btn btn-primary text-white-900" type="submit" action="submit">

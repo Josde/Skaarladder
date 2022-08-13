@@ -53,8 +53,7 @@ class Player(models.Model):
 
 
 # TODO: Implement django-model-history so I can get stadistics out of this model.
-# TODO: Refactor every vocabulary on the app to use Ladder rather than challenge, to prevent confusion
-class Challenge(models.Model):
+class Ladder(models.Model):
     name = models.CharField(max_length=100)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
@@ -63,10 +62,10 @@ class Challenge(models.Model):
     ignore_unranked = models.BooleanField(default=True)
 
 
-class Challenge_Player(models.Model):
-    # Foreign keys to relate a challenge and a player
+class Ladder_Player(models.Model):
+    # Foreign keys to relate a ladder and a player
     player_id = models.ForeignKey(Player, on_delete=models.CASCADE)
-    challenge_id = models.ForeignKey(Challenge, on_delete=models.CASCADE)
+    ladder_id = models.ForeignKey(Ladder, on_delete=models.CASCADE)
     # Starting state and settings.
     starting_rank = models.CharField(max_length=20, choices=rankChoices)
     starting_tier = models.CharField(
@@ -80,7 +79,7 @@ class Challenge_Player(models.Model):
     last_update = models.DateTimeField(default=timezone.now)
 
     def __str__(self):  # For admin panel aesthetics
-        return "{0}-{1}".format(self.challenge_id.id, self.player_id.name)
+        return "{0}-{1}".format(self.ladder_id.id, self.player_id.name)
 
     class Meta:
-        indexes = [models.Index(fields=["player_id", "challenge_id"])]
+        indexes = [models.Index(fields=["player_id", "ladder_id"])]

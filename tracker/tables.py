@@ -6,7 +6,7 @@ from tracker.utils import constants
 from .models import Player
 
 
-class ChallengeTable(tables.Table):
+class LadderTable(tables.Table):
     # There is no way to set a default column style in django-tables2, apparently. Fuck DRY
     column_style = {"cell": {"class": "m-4 p-4 border border-neutral-500 border-collapse whitespace-nowrap"}}
     name = tables.Column(accessor="player_id.name", attrs=column_style)
