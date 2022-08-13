@@ -20,11 +20,7 @@ async def update(player_name, is_first_run=False, test=False):
         backend = api_update_helper.ApiUpdateHelper()
     time_since_last_update = timezone.now() - queried_player.last_data_update
 
-    previous_absolute_lp = rank_to_lp(
-        queried_player.tier,
-        queried_player.rank,
-        queried_player.lp,
-    )
+    previous_absolute_lp = queried_player.absolute_lp
     if queried_player.puuid == "" or time_since_last_update.days >= 3 or DEBUG:
         # Parse user data )name, id, profile pic...)
         try:
@@ -39,7 +35,9 @@ async def update(player_name, is_first_run=False, test=False):
     if (previous_absolute_lp != current_absolute_lp) or is_first_run:
         print("Entering ladder_update")
         ladders = await update_player_ladder_data(queried_player, current_absolute_lp)
-        await Ladder_Player.objects.abulk_update(ladders, ["progress", "progress_delta"])
+        async for item in ladders:
+            await sync_to_async(item.save)()
+            # Ladder_Player.objects.abulk_update(ladders, ["progress", "progress_delta"]) doesn't work idk why
 
 
 def update_fields(obj, data_dict: dict, data_to_obj_fields: dict):
@@ -82,6 +80,12 @@ async def update_ranked_data(queried_player, backend, is_first_run=False):
             streak = 0
         current_absolute_lp = 0
         if ranked_data is not None:
+            current_absolute_lp = rank_to_lp(
+                ranked_data["tier"],
+                ranked_data["rank"],
+                ranked_data["leaguePoints"],
+            )
+
             complete_ranked_data = {
                 "streak": streak,
                 "wins": ranked_data["wins"],
@@ -91,13 +95,9 @@ async def update_ranked_data(queried_player, backend, is_first_run=False):
                 "rank": ranked_data["rank"],
                 "lp": ranked_data["leaguePoints"],
                 "last_ranked_update": timezone.now(),
+                "absolute_lp": current_absolute_lp,
             }
 
-            current_absolute_lp = rank_to_lp(
-                complete_ranked_data["tier"],
-                complete_ranked_data["rank"],
-                complete_ranked_data["lp"],
-            )
         else:
             complete_ranked_data = {
                 "streak": 0,
@@ -108,6 +108,7 @@ async def update_ranked_data(queried_player, backend, is_first_run=False):
                 "rank": "NONE",
                 "lp": 0,
                 "last_ranked_update": timezone.now(),
+                "absolute_lp": 0,
             }
             current_absolute_lp = 0
 
@@ -118,14 +119,15 @@ async def update_ranked_data(queried_player, backend, is_first_run=False):
         return current_absolute_lp
     except Exception:  # TODO: For debugging, implement errors later. For example, getting the streak may fail and we just end with an empty object even though it's perfectly usable.
         traceback.print_exc()
-        return None
+        return 0
 
 
 async def update_player_ladder_data(queried_player, current_absolute_lp):
     # TODO: Move queries out of these functions?
-    ladders = Ladder_Player.objects.filter(player_id=queried_player.id).select_related("ladder_id").all()
-
+    ladders = Ladder_Player.objects.filter(player_id=queried_player).select_related("ladder_id").all()
+    print("Entered func")
     async for item in ladders:
+        print("Entered for")
         ladder_details = item.ladder_id
         previous_progress = item.progress
         if queried_player.tier == "UNRANKED":

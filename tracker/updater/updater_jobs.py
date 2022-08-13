@@ -57,15 +57,9 @@ def create_ladder_job(name, start_date, end_date, player_platform, is_absolute, 
                 starting_rank="NONE",
             )
             player_ladders.append(player_ladder)
-
+    for item in player_ladders:
+        item.save()
     loop = asyncio.get_event_loop()
     loop.run_until_complete(asyncio.gather(*tasks))
-    for item in player_ladders:
-        # TODO: Check how efficient this is in terms of queries and DB access time. Also, test this (battery is running out lol)
-        # Bulk_update errors out for some reason here
-        item.starting_lp = item.player_id.lp
-        item.starting_tier = item.player_id.tier
-        item.starting_rank = item.player_id.rank
-        item.save()
 
     return ladder.id
