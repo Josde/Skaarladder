@@ -1,5 +1,3 @@
-import asyncio
-import re
 from django.utils import timezone
 from tracker.utils.league import rank_to_lp
 from tracker.models import Ladder, Player, Ladder_Player
@@ -11,7 +9,7 @@ from tracker.updater import api_update_helper, test_update_helper
 
 async def update(player_name, is_first_run=False, test=False):
     """Function that gets the updated data for a user and returns it."""
-    DEBUG = True
+    # Prettify this function.
     current_absolute_lp = previous_absolute_lp = 0
     queried_player = await Player.objects.all().aget(name=player_name)
     if test:
@@ -22,7 +20,7 @@ async def update(player_name, is_first_run=False, test=False):
 
     previous_absolute_lp = queried_player.absolute_lp
     if queried_player.puuid == "" or time_since_last_update.days >= 3 or DEBUG:
-        # Parse user data )name, id, profile pic...)
+        # Parse user data (name, id, profile pic...)
         try:
             await update_player_data(queried_player, backend)
         except Exception:  # same as below
@@ -35,7 +33,8 @@ async def update(player_name, is_first_run=False, test=False):
     if (previous_absolute_lp != current_absolute_lp) or is_first_run:
         await update_streak_data(queried_player, backend)
         await sync_to_async(queried_player.save)()
-        ladders = await update_player_ladder_data(queried_player, current_absolute_lp)
+        ladders = Ladder_Player.objects.filter(player_id=queried_player).select_related("ladder_id").all()
+        ladders = await update_player_ladder_data(queried_player, ladders, current_absolute_lp)
         async for item in ladders:
             await sync_to_async(item.save)()
             # Ladder_Player.objects.abulk_update(ladders, ["progress", "progress_delta"]) doesn't work idk why
@@ -72,9 +71,7 @@ async def update_player_data(queried_player, backend):
 
 
 async def update_ranked_data(queried_player, backend):
-
     try:
-        # TODO: Ugly af, fixme
         ranked_data = await backend.get_player_ranked_data(queried_player)
         if ranked_data is not None:
             current_absolute_lp = rank_to_lp(
@@ -126,9 +123,7 @@ async def update_streak_data(queried_player, backend):
     return streak
 
 
-async def update_player_ladder_data(queried_player, current_absolute_lp):
-    # TODO: Move queries out of these functions?
-    ladders = Ladder_Player.objects.filter(player_id=queried_player).select_related("ladder_id").all()
+async def update_player_ladder_data(queried_player, ladders, current_absolute_lp):
     async for item in ladders:
         ladder_details = item.ladder_id
         previous_progress = item.progress

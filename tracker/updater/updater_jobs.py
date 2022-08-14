@@ -1,10 +1,9 @@
-import threading
 from tracker.models import Player, Ladder, Ladder_Player
 import asyncio
 import tracker.utils.constants as constants
 from asgiref.sync import sync_to_async
 from tracker.updater.user_updater import update
-from datetime import datetime, timedelta
+from datetime import timedelta
 from django_rq import get_queue
 from rq.job import Dependency
 

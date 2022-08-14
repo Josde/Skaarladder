@@ -1,12 +1,9 @@
-import asyncio
 from datetime import datetime
 import traceback
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.urls import reverse
-from django.template import loader
-
 from tracker.updater import api_update_helper
 from .forms import PlayerForm
 from .updater import updater_jobs
@@ -177,10 +174,12 @@ def ladder(request, ladder_id=0):
     return render(request, "tracker/ladder.html", context=locals())
 
 
+@require_GET
 def search(request):
     return render(request, "tracker/partials/search_modal.html")
 
 
+@require_GET
 def ladder_loading(request, job_id):
     queue = get_queue("high")
     job = queue.fetch_job(job_id)

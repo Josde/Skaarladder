@@ -1,11 +1,10 @@
 {% load static %}
 <!DOCTYPE html>
 <div name="backdrop" class="flex items-center justify-center w-screen h-screen transition-all duration-300 ease-in-out bg-black place-content-center -z-10" 
-    hx-headers={{ csrf_token }}> <!-- hx-get="" hx-trigger="click" hx-swap="innerHTML" hx-target="#popup_body" -->
+    hx-headers={{ csrf_token }}>
     <div name="search_window" class="flex flex-col w-[75%] h-[50%] bg-neutral-800 place-self-center z-10">
         <button class="justify-start p-4 m-4 text-2xl text-white rounded-xl place-self-end bg-neutral-700" hx-swap="innerHTML" hx-target="#popup_body" hx-get="">X</button>
         <div name="search_box" class="flex flex-row justify-center w-full h-16 place-self-center rounded-xl">
-            <!-- TODO: Make this symmetric -->
             <form hx-post="{% url 'ladder' %}" hx-include="#search_input" class="flex flex-row w-[50%]" >
                 {% csrf_token %}
                 <input id="search_input" name="search_input" type='text' placeholder="Ladder code"

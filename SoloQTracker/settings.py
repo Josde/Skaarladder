@@ -133,6 +133,7 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
 # WhiteNoise
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
@@ -152,11 +153,17 @@ PYOT_CONFS = ["tracker.pyotconf"]
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
 
 CRISPY_TEMPLATE_PACK = "tailwind"
+
+# RQ
+
 if config("REDIS", False):
-    host = config("REDIS_HOST")
-    port = config("REDIS_PORT")
-    db = config("REDIS_DB")
-    password = config("REDIS_PASSWORD")
+    host = config("REDIS_HOST", False)
+    port = config("REDIS_PORT", False)
+    db = config("REDIS_DB", False)
+    password = config("REDIS_PASSWORD", False)
+    if not host or not port or not db or not password:
+        raise RuntimeError("Must configure all REDIS env variables.")
+
     RQ_QUEUES = {
         "default": {
             "HOST": host,
@@ -180,11 +187,19 @@ if config("REDIS", False):
         },
     }
     RQ_SHOW_ADMIN_LINK = True
+else:
+    raise RuntimeError("Must configure REDIS env variables.")
+
 
 if config("HEROKU", False):
     import django_on_heroku
 
     django_on_heroku.settings(locals(), secret_key=False)
+
+    RQ = {
+        "JOB_CLASS": "rq.job.Job",
+        "WORKER_CLASS": "rq.worker.HerokuWorker",
+    }
 
 # sentry
 if config("SENTRY", False):

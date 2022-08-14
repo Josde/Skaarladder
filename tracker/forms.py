@@ -1,7 +1,6 @@
+from datetime import datetime
 from django import forms
-from django.utils.translation import gettext as _  # Localization
 from tracker.utils.constants import platformChoices
-from django.utils import timezone
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, Submit, Field, Row, Column, Div
 from tracker.utils import constants
@@ -62,7 +61,7 @@ class LadderForm(forms.Form):
         )
 
     name = forms.CharField(label=("Ladder name"), max_length=16, empty_value="Ladder name")
-    start_date = forms.DateTimeField(label=("Start date"), widget=DateTimePickerInput, initial=timezone.now())
+    start_date = forms.DateTimeField(label=("Start date"), widget=DateTimePickerInput)
     end_date = forms.DateTimeField(label=("End date"), widget=DateTimePickerInput)
     is_absolute = forms.BooleanField(label=("Absolute ranking"), required=False)
     ignore_unranked = forms.BooleanField(label=("Hide unranked"), required=False)
