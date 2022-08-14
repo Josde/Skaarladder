@@ -1,10 +1,10 @@
-from datetime import datetime
-from django import forms
-from tracker.utils.constants import platformChoices
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, Submit, Field, Row, Column, Div
-from tracker.utils import constants
+from crispy_forms.layout import Column, Div, Field, Fieldset, Layout, Row, Submit
+from django import forms
 from django.core.exceptions import ValidationError
+
+from tracker.utils import constants
+from tracker.utils.constants import platformChoices
 
 
 class DatePickerInput(forms.DateInput):

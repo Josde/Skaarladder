@@ -1,11 +1,13 @@
-from tracker.models import Player, Ladder, Ladder_Player
 import asyncio
-import tracker.utils.constants as constants
-from asgiref.sync import sync_to_async
-from tracker.updater.user_updater import update
 from datetime import timedelta
+
+from asgiref.sync import sync_to_async
 from django_rq import get_queue
 from rq.job import Dependency
+
+import tracker.utils.constants as constants
+from tracker.models import Ladder, Ladder_Player, Player
+from tracker.updater.user_updater import update
 
 
 async def periodic_update():

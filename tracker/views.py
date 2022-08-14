@@ -1,22 +1,24 @@
-from datetime import datetime
 import traceback
-from django.http import HttpResponse
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.urls import reverse
-from tracker.updater import api_update_helper
-from .forms import PlayerForm
-from .updater import updater_jobs
-from .models import Player, Ladder, Ladder_Player
-from .forms import LadderForm
-from asgiref.sync import sync_to_async
-from .tables import LadderTable
 import uuid
-from django_htmx.http import HttpResponseClientRedirect
+from datetime import datetime
+
+from asgiref.sync import sync_to_async
+from django.contrib import messages
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.utils import timezone
-from django.views.decorators.http import require_http_methods, require_GET
 from django.views.decorators.cache import cache_page
+from django.views.decorators.http import require_GET, require_http_methods
+from django_htmx.http import HttpResponseClientRedirect
 from django_rq import get_queue
+
+from tracker.updater import api_update_helper
+
+from .forms import LadderForm, PlayerForm
+from .models import Ladder, Ladder_Player, Player
+from .tables import LadderTable
+from .updater import updater_jobs
 
 
 @cache_page(60 * 15)

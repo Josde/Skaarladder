@@ -3,6 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.html import format_html
 
 from tracker.utils import constants
+
 from .models import Player
 
 

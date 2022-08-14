@@ -1,6 +1,8 @@
-from . import abstract_update_helper
-from pyot.models import lol
 import asyncio
+
+from pyot.models import lol
+
+from . import abstract_update_helper
 
 
 class ApiUpdateHelper(abstract_update_helper.AbstractUpdateHelper):

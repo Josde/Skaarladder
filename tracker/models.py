@@ -1,13 +1,9 @@
-from django.utils import timezone
-from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db import models
+from django.utils import timezone
 from pyot.utils.lol.routing import platform_to_region
-from tracker.utils.constants import (
-    regionChoices,
-    platformChoices,
-    tierChoices,
-    rankChoices,
-)
+
+from tracker.utils.constants import platformChoices, rankChoices, regionChoices, tierChoices
 
 # Choices for ease of use on choice fields.
 # Could be stored in constants.py, but isn't done since usage is constrained to this file for now.

@@ -1,10 +1,11 @@
-from django.utils import timezone
-from tracker.utils.league import rank_to_lp
-from tracker.models import Ladder, Player, Ladder_Player
 import traceback
 
 from asgiref.sync import sync_to_async
+from django.utils import timezone
+
+from tracker.models import Ladder, Ladder_Player, Player
 from tracker.updater import api_update_helper, test_update_helper
+from tracker.utils.league import rank_to_lp
 
 
 async def update(player_name, is_first_run=False, test=False):

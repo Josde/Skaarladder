@@ -1,6 +1,6 @@
 from decouple import config
-from pyot.conf.model import activate_model, ModelConf
-from pyot.conf.pipeline import activate_pipeline, PipelineConf
+from pyot.conf.model import ModelConf, activate_model
+from pyot.conf.pipeline import PipelineConf, activate_pipeline
 
 API_KEY = config("API_KEY")
 
