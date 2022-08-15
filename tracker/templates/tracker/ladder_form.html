@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html data-color-scheme="dark" color-scheme="dark" lang="en">
     <head>
-        <title>Ladder Creation</title>
+        <title>Skaarladder :: Create Ladder</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -20,7 +20,7 @@
         <script src="{% static 'tracker/htmx.min.js' %}" type='text/javascript' defer></script> 
         <script src="{% static 'tracker/hyperscript.min.js' %}" type='text/javascript' defer></script> 
     </head>
-    <body class="overflow-x-hidden">
+    <body class="md:overflow-x-hidden">
         <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
@@ -29,16 +29,16 @@
                 {% include 'tracker/partials/navbar.html' %}
                 {% include "tracker/partials/modal_div.html" %}   
             {% endcache %}
-            <div class="flex flex-row w-screen h-screen overflow-auto bg-neutral-900"> 
-            <form class="flex flex-row mt-16 ml-[10%] flex-nowrap"action="/create/" method="post" id='ladder_form'>
-                <div class="flex flex-col p-16">
+            <div class="flex items-center justify-center w-screen h-screen overflow-auto text-center align-middle md:justify-start bg-neutral-900"> 
+            <form class="flex flex-col md:flex-row md:ml-[10%] flex-nowrap" action="/create/" method="post" id='ladder_form'>
+                <div class="flex flex-col md:p-16">
                     {% csrf_token %}
                     {% crispy form form.helper %}
                 </div>
-                    <div class="flex flex-col items-start mt-16 text-center">
+                    <div class="flex flex-col items-center text-center md:mt-16 md:items-start md:place-self-start">
                         <form id="ladder_form" method="post">
                             <strong class="justify-start px-4 text-white">Players</strong>
-                            <button class="px-4 py-2 m-4 text-4xl font-bold text-center text-white bg-blue-500 rounded place-self-start" 
+                            <button class="px-4 py-2 m-4 text-4xl font-bold text-center text-white bg-blue-500 rounded" 
                             hx-get="{% url 'player_form' %}" hx-swap="beforeend" hx-target='#player_forms'>+</button>
                             <div id='player_forms' class="max-h-[80%] flex flex-col flex-wrap">
                                 <!-- forms get added here programmatically through htmx on the + button -->

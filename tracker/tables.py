@@ -9,7 +9,9 @@ from .models import Player
 
 class LadderTable(tables.Table):
     # There is no way to set a default column style in django-tables2, apparently. Fuck DRY
-    column_style = {"cell": {"class": "m-4 p-4 border border-neutral-500 border-collapse whitespace-nowrap"}}
+    column_style = {
+        "cell": {"class": "md:p-4 text-center border border-neutral-500 border-collapse sm:whitespace-nowrap"}
+    }
     name = tables.Column(accessor="player_id__name", attrs=column_style)
     tier = tables.Column(accessor="player_id__tier", attrs=column_style)
     rank = tables.Column(accessor="player_id__rank", attrs=column_style)
@@ -53,7 +55,7 @@ class LadderTable(tables.Table):
             player = Player.objects.all().filter(name=player_name)[0]
         sanitized_name = value.replace(" ", "+")
         return format_html(
-            """<img class="inline w-10 h-10" onerror="this.style.display='none'" 
+            """<img class="inline w-5 h-5 md:h-10 md:w-10" onerror="this.style.display='none'" 
                            src="https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/{0}.jpg"> </img>
                            <a href=https://{1}.op.gg/summoner/userName={2}>{3}</a> {4}""".format(
                 avatar_id,

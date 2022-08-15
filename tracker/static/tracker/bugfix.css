@@ -12,6 +12,10 @@ select {
   max-width: 60% !important;
 }
 
+input[type=text] {
+  background-color: #171717 !important;
+}
+
 .fill-current.h-4.w-4 {
   /* Fixes the ugly uncentered arrow left in select by crispy-tailwind that can't be styled */
   display: none !important;

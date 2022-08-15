@@ -84,4 +84,4 @@ RELEASE_REPO = config("RELEASE_REPO", "Skaarladder")  # Name of the repo
 
 red_text_style = "color:rgb(249,36,114);"
 green_text_style = "color:rgb(180, 210, 115);"
-default_form_style = "bg-neutral-900 text-white m-4 invalid:border-pink-500 invalid:text-pink-600"
+default_form_style = "bg-neutral-900 text-white m-4 invalid:border-pink-500"
