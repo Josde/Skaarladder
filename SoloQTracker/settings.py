@@ -205,12 +205,13 @@ if config("HEROKU", False):
 if config("SENTRY", False):
     import sentry_sdk
     from sentry_sdk.integrations.django import DjangoIntegration
+    from sentry_sdk.integrations.redis import RedisIntegration
+    from sentry_sdk.integrations.rq import RqIntegration
+    from sentry_sdk.integrations.httpx import HttpxIntegration
 
     sentry_sdk.init(
         dsn=os.getenv("SENTRY_DSN"),
-        integrations=[
-            DjangoIntegration(),
-        ],
+        integrations=[RedisIntegration(), RqIntegration(), DjangoIntegration(), HttpxIntegration()],
         # TODO:  Check if 1.0 is viable for production w/small size
         # Make this configurable
         # And also, probably disable PII since I don't use auth.
