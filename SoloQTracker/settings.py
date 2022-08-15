@@ -208,8 +208,13 @@ if config("SENTRY", False):
     from sentry_sdk.integrations.redis import RedisIntegration
     from sentry_sdk.integrations.rq import RqIntegration
 
+    dsn = config("SENTRY_DSN", False)
+
+    if not dsn:
+        raise RuntimeError("Looks like you forgot to configure the SENTRY_DSN environment variable.")
+
     sentry_sdk.init(
-        dsn=os.getenv("SENTRY_DSN"),
+        dsn=dsn,
         integrations=[RedisIntegration(), RqIntegration(), DjangoIntegration()],
         # TODO:  Check if 1.0 is viable for production w/small size
         # Make this configurable
@@ -222,6 +227,10 @@ if config("SENTRY", False):
         # django.contrib.auth) you may enable sending PII data.
         send_default_pii=True,
     )
+
+    RQ_SENTRY_DSN = config("RQ_SENTRY_DSN", False)
+    if not RQ_SENTRY_DSN:
+        RQ_SENTRY_SDN = dsn
 
 if config("DEBUG", False):
     INSTALLED_APPS.append("django_browser_reload")
