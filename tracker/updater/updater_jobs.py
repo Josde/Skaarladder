@@ -6,7 +6,7 @@ import aiohttp
 from asgiref.sync import sync_to_async
 from django_rq import get_queue
 from rq.job import Dependency
-from sentry_sdk import capture_message
+import sentry_sdk
 
 from SoloQTracker.settings import BASE_DIR
 import tracker.utils.constants as constants
@@ -103,10 +103,11 @@ async def check_releases():
                     current_release, new_release, RELEASE_URL
                 )
                 print(message)
-                capture_message(message)
+                sentry_sdk.capture_message(message)
             else:
                 print("No updates found!")
-        except Exception:
+        except Exception as err:
+            sentry_sdk.capture_exception(err)
             traceback.print_exc()
         queue = get_queue("low")
         queue.enqueue_in(time_delta=timedelta(minutes=constants.RELEASE_CHECK_DELAY), func=check_releases)

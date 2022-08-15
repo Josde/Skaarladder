@@ -2,6 +2,7 @@ import traceback
 
 from asgiref.sync import sync_to_async
 from django.utils import timezone
+import sentry_sdk
 
 from tracker.models import Ladder, Ladder_Player, Player
 from tracker.updater import api_update_helper, test_update_helper
@@ -67,7 +68,8 @@ async def update_player_data(queried_player, backend):
             },
         )
 
-    except Exception:
+    except Exception as err:
+        sentry_sdk.capture_exception(err)
         traceback.print_exc()
 
 
@@ -109,7 +111,8 @@ async def update_ranked_data(queried_player, backend):
             queried_player, complete_ranked_data, dict([tuple([x, x]) for x in complete_ranked_data.keys()])
         )
         return current_absolute_lp
-    except Exception:
+    except Exception as err:
+        sentry_sdk.capture_exception(err)
         traceback.print_exc()
         return 0
 
@@ -118,7 +121,8 @@ async def update_streak_data(queried_player, backend):
     try:
         streak = await backend.get_streak_data(queried_player)
         queried_player.streak = streak
-    except Exception:
+    except Exception as err:
+        sentry_sdk.capture_exception(err)
         traceback.print_exc()
         return 0
     return streak
