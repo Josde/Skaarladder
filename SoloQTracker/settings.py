@@ -26,8 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config("DEBUG", False)
-
+DEBUG = bool(config("DEBUG", False))
 
 ALLOWED_HOSTS = []
 
@@ -227,3 +226,8 @@ if config("SENTRY", False):
 
 if DEBUG:
     INSTALLED_APPS.append("django_browser_reload")
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+        }
+    }
