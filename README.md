@@ -38,4 +38,4 @@ After completing the general setup, do the following:
     - If you are running on Windows, you have to execute the previous command in WSL. 
   - Run the application through your server of choice. Using Gunicorn as an example, run `gunicorn SoloQTracker.wsgi:application`
 ## Demo
-You can check out a demo of this running at http://soloq.josde.me/
+You can check out a demo of this running at http://skaarl.josde.me/
