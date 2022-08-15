@@ -17,5 +17,5 @@ class TrackerConfig(AppConfig):
             low_queue = get_queue("low")
             if updater_jobs.periodic_update not in [x.func for x in queue.jobs] and not (os.getenv("DEBUG", False)):
                 # pass
-                queue.enqueue(updater_jobs.periodic_update)
                 low_queue.enqueue(updater_jobs.check_releases)
+                queue.enqueue(updater_jobs.periodic_update)

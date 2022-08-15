@@ -103,7 +103,7 @@ async def check_releases():
                     current_release, new_release, RELEASE_URL
                 )
                 print(message)
-                capture_message(message, level="warning")
+                capture_message(message)
             else:
                 print("No updates found!")
         except Exception:
