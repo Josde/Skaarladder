@@ -1,5 +1,7 @@
 from decouple import config
 
+# League of Legends
+
 tierWeights = {
     "UNRANKED": 0,
     "IRON": 0,
@@ -77,8 +79,11 @@ rankChoices = [("I", "I"), ("II", "II"), ("III", "III"), ("IV", "IV"), ("NONE", 
 UPDATE_DELAY = int(config("UPDATE_DELAY", 10))
 RELEASE_CHECK = bool(config("RELEASE_CHECK", True))
 RELEASE_CHECK_DELAY = int(config("RELEASE_CHECK_DELAY", 3600))
-RELEASE_USER = config("RELEASE_USER", "Josde")  # User that uploaded this to github
-RELEASE_REPO = config("RELEASE_REPO", "Skaarladder")  # Name of the repo
+
+# Obviously, change these two constants if you are forking the repo to make your own.
+
+RELEASE_USER = "Josde"  # User that uploaded this to github.
+RELEASE_REPO = "Skaarladder"  # Name of the repo
 
 # HTML Attrs
 
