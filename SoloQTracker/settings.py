@@ -28,6 +28,7 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", False)
 
+
 ALLOWED_HOSTS = []
 
 
@@ -156,13 +157,11 @@ CRISPY_TEMPLATE_PACK = "tailwind"
 
 # RQ
 
-if config("REDIS"):
+if config("REDIS"):  # Since these are necessary, not configuring them will throw an error.
     host = config("REDIS_HOST")
     port = config("REDIS_PORT")
     db = config("REDIS_DB")
     password = config("REDIS_PASSWORD")
-    if not host or not port or not db or not password:
-        raise RuntimeError("Must configure all REDIS env variables.")
 
     RQ_QUEUES = {
         "default": {
@@ -207,10 +206,11 @@ if config("SENTRY", False):
     from sentry_sdk.integrations.rq import RqIntegration
 
     dsn = config("SENTRY_DSN")
-
+    env = "development" if DEBUG else "production"
     sentry_sdk.init(
         dsn=dsn,
         integrations=[RedisIntegration(), RqIntegration(), DjangoIntegration()],
+        environment=env,
         # TODO:  Check if 1.0 is viable for production w/small size
         # Make this configurable
         # And also, probably disable PII since I don't use auth.
@@ -225,5 +225,5 @@ if config("SENTRY", False):
 
     RQ_SENTRY_DSN = config("RQ_SENTRY_DSN", dsn)
 
-if config("DEBUG", False):
+if DEBUG:
     INSTALLED_APPS.append("django_browser_reload")
