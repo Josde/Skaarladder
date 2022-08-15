@@ -20,7 +20,7 @@ async def update(player_name, is_first_run=False, test=False):
     time_since_last_update = timezone.now() - queried_player.last_data_update
 
     previous_absolute_lp = queried_player.absolute_lp
-    if queried_player.puuid == "" or time_since_last_update.days >= 3 or DEBUG:
+    if queried_player.puuid == "" or time_since_last_update.days >= 3:
         # Parse user data (name, id, profile pic...)
         try:
             await update_player_data(queried_player, backend)

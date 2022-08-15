@@ -1,3 +1,5 @@
+from decouple import config
+
 tierWeights = {
     "UNRANKED": 0,
     "IRON": 0,
@@ -70,9 +72,13 @@ tierChoices = [
 rankChoices = [("I", "I"), ("II", "II"), ("III", "III"), ("IV", "IV"), ("NONE", "NONE")]
 
 # Settings
+# Delays are in minutes
 
-UPDATE_DELAY = 1800
-
+UPDATE_DELAY = int(config("UPDATE_DELAY", 10))
+RELEASE_CHECK = bool(config("RELEASE_CHECK", True))
+RELEASE_CHECK_DELAY = int(config("RELEASE_CHECK_DELAY", 3600))
+RELEASE_USER = config("RELEASE_USER", "Josde")  # User that uploaded this to github
+RELEASE_REPO = config("RELEASE_REPO", "Skaarladder")  # Name of the repo
 
 # HTML Attrs
 

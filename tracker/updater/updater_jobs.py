@@ -1,13 +1,28 @@
 import asyncio
 from datetime import timedelta
+import traceback
 
+import aiohttp
 from asgiref.sync import sync_to_async
 from django_rq import get_queue
 from rq.job import Dependency
+from sentry_sdk import capture_message
 
+from SoloQTracker.settings import BASE_DIR
 import tracker.utils.constants as constants
 from tracker.models import Ladder, Ladder_Player, Player
 from tracker.updater.user_updater import update
+
+
+def enqueue_periodic():
+    """
+    Helper function to enqueue the periodic update after all jobs have been completed.
+    This only exists because rq enqueue_in takes the time when it is called, rather than when dependencies are finished.
+    Therefore, to enqueue a job X minutes after its dependencies complete, we have to use a complementary job.
+    This could probably be turned into a generic function that takes the function to enqueue but I'm too lazy for it right now.
+    """
+    queue = get_queue()
+    queue.enqueue_in(time_delta=timedelta(minutes=constants.UPDATE_DELAY), func=periodic_update)
 
 
 async def periodic_update():
@@ -20,9 +35,7 @@ async def periodic_update():
         enqueued_jobs = await sync_to_async(queue.enqueue_many)(jobs, pipeline=pipe)
         await sync_to_async(pipe.execute)()
     dependency = Dependency(jobs=enqueued_jobs)
-    await sync_to_async(queue.enqueue_in)(
-        timedelta(seconds=constants.UPDATE_DELAY), periodic_update, depends_on=dependency
-    )
+    await sync_to_async(queue.enqueue)(enqueue_periodic, depends_on=dependency)
 
 
 def create_ladder_job(name, start_date, end_date, player_platform, is_absolute, ignore_unranked):
@@ -64,3 +77,47 @@ def create_ladder_job(name, start_date, end_date, player_platform, is_absolute, 
     loop.run_until_complete(asyncio.gather(*tasks))
 
     return ladder.id
+
+
+# TODO: Maybe move these two functions below to a file in utils.
+
+
+async def check_releases():
+    if constants.RELEASE_CHECK:
+        print("Checking if new releases exist...")
+        URL = "https://api.github.com/repos/{0}/{1}/releases/latest".format(
+            constants.RELEASE_USER, constants.RELEASE_REPO
+        )
+        try:
+            current_release = await get_current_release()
+            async with aiohttp.ClientSession() as session:
+                async with session.get(URL) as response:
+                    content = await response.json()
+                    new_release = content["tag_name"]
+            if current_release != new_release:
+                RELEASE_URL = "https://github.com/{0}/{1}/releases/latest".format(
+                    constants.RELEASE_USER, constants.RELEASE_REPO
+                )
+                message = """New version found. You are running {0} and {1} is available in GitHub.
+                Go to {2} to download the newest version.""".format(
+                    current_release, new_release, RELEASE_URL
+                )
+                print(message)
+                capture_message(message, level="warning")
+            else:
+                print("No updates found!")
+        except Exception:
+            traceback.print_exc()
+        queue = get_queue("low")
+        queue.enqueue_in(time_delta=timedelta(minutes=constants.RELEASE_CHECK_DELAY), func=check_releases)
+
+
+@sync_to_async
+def get_current_release():
+    file_path = BASE_DIR / "RELEASE"
+
+    with open(file_path) as f:
+        content = f.readline()
+        clean_content = content.strip()
+
+    return clean_content
