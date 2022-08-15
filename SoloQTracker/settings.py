@@ -156,11 +156,11 @@ CRISPY_TEMPLATE_PACK = "tailwind"
 
 # RQ
 
-if config("REDIS", False):
-    host = config("REDIS_HOST", False)
-    port = config("REDIS_PORT", False)
-    db = config("REDIS_DB", False)
-    password = config("REDIS_PASSWORD", False)
+if config("REDIS"):
+    host = config("REDIS_HOST")
+    port = config("REDIS_PORT")
+    db = config("REDIS_DB")
+    password = config("REDIS_PASSWORD")
     if not host or not port or not db or not password:
         raise RuntimeError("Must configure all REDIS env variables.")
 
@@ -187,8 +187,6 @@ if config("REDIS", False):
         },
     }
     RQ_SHOW_ADMIN_LINK = True
-else:
-    raise RuntimeError("Must configure REDIS env variables.")
 
 
 if config("HEROKU", False):
@@ -208,10 +206,7 @@ if config("SENTRY", False):
     from sentry_sdk.integrations.redis import RedisIntegration
     from sentry_sdk.integrations.rq import RqIntegration
 
-    dsn = config("SENTRY_DSN", False)
-
-    if not dsn:
-        raise RuntimeError("Looks like you forgot to configure the SENTRY_DSN environment variable.")
+    dsn = config("SENTRY_DSN")
 
     sentry_sdk.init(
         dsn=dsn,
@@ -228,9 +223,7 @@ if config("SENTRY", False):
         send_default_pii=True,
     )
 
-    RQ_SENTRY_DSN = config("RQ_SENTRY_DSN", False)
-    if not RQ_SENTRY_DSN:
-        RQ_SENTRY_SDN = dsn
+    RQ_SENTRY_DSN = config("RQ_SENTRY_DSN", dsn)
 
 if config("DEBUG", False):
     INSTALLED_APPS.append("django_browser_reload")
