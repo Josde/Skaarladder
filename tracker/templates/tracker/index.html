@@ -1,11 +1,10 @@
 {% load render_table from django_tables2 %}
 {% load static %}
 {% load cache %}
-<!-- TODO: FIXME: !!! IMPORTANT !!! page is broken on other displays, check out tailwind responsize sizing-->
 <!DOCTYPE html>
 <html lang="en" class="dark">
     <head>
-        <title>Skaarladder :: {{ ladder_name }}</title>
+        <title>Skaarladder :: Index</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -30,16 +29,16 @@
                     <img alt="Skaarladder logo" src="{% static 'tracker/logo.png' %}" class="duration-300 hover:animate-spin"></img>
                     <strong class="font-mono text-4xl drop-shadow-md">Skaarladder </strong>
                 </div>
-                <div name="callouts" class="flex flex-row w-full h-full mt-16">
-                    <div name="what" class="flex flex-col mt-16 ml-32">
+                <div name="callouts" class="flex flex-col w-full h-full mt-8 mb-8 lg:mb-16 lg:mt-16 lg:flex-row">
+                    <div name="what" class="flex flex-col m-8 lg:ml-32 lg:mt-16">
                         <strong class="text-xl font-bold drop-shadow-lg">What is Skaarladder?</strong>
                         <p class="mt-4 font-medium">Skaarladder is a online service that lets you create League of Legends ladders and competitions for SoloQ.</p>
                     </div>
-                    <div name="how" class="flex flex-col mt-16 ml-32">
+                    <div name="how" class="flex flex-col m-8 lg:mt-16 lg:ml-32">
                         <strong class="text-xl font-bold drop-shadow-lg">How do I use it?</strong>
                         <p class="mt-4 font-medium">Click on the '+' button at the top or <a class='font-bold' href="{% url 'create_ladder' %}">here</a> to begin.</p>
                     </div>
-                    <div name="contribute" class="flex flex-col mt-16 ml-32 mr-32">
+                    <div name="contribute" class="flex flex-col m-8 lg:mt-16 lg:mr-32 lg:ml-32">
                         <strong class="text-xl font-bold drop-shadow-lg">Can I contribute?</strong>
                         <p class="mt-4 font-medium">Yes! Skaarladder is open-source and contributions can be made <a class='font-bold' href='https://github.com/Josde/SimpleSoloQTracker'>here.</a>
                             <br>

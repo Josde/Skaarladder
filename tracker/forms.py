@@ -1,11 +1,10 @@
-from django import forms
-from django.utils.translation import gettext as _  # Localization
-from tracker.utils.constants import platformChoices
-from django.utils import timezone
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, Submit, Field, Row, Column, Div
-from tracker.utils import constants
+from crispy_forms.layout import Column, Div, Field, Fieldset, Layout, Row, Submit
+from django import forms
 from django.core.exceptions import ValidationError
+
+from tracker.utils import constants
+from tracker.utils.constants import platformChoices
 
 
 class DatePickerInput(forms.DateInput):
@@ -21,6 +20,8 @@ class DateTimePickerInput(forms.DateTimeInput):
 
 
 class LadderForm(forms.Form):
+    """Ladder creation form"""
+
     # TODO: Default datetimes do not show up for some reason
     def clean(self):
         cleaned_data = super().clean()
@@ -62,13 +63,15 @@ class LadderForm(forms.Form):
         )
 
     name = forms.CharField(label=("Ladder name"), max_length=16, empty_value="Ladder name")
-    start_date = forms.DateTimeField(label=("Start date"), widget=DateTimePickerInput, initial=timezone.now())
+    start_date = forms.DateTimeField(label=("Start date"), widget=DateTimePickerInput)
     end_date = forms.DateTimeField(label=("End date"), widget=DateTimePickerInput)
     is_absolute = forms.BooleanField(label=("Absolute ranking"), required=False)
     ignore_unranked = forms.BooleanField(label=("Hide unranked"), required=False)
 
 
 class PlayerForm(forms.Form):
+    """Form to input the name and platform of a single player. Used as a part of LadderForm that gets added dynamically"""
+
     form_id = ""
 
     def __init__(self, form_id="", *args, **kwargs):

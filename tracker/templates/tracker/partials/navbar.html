@@ -1,10 +1,10 @@
 {% load static %}
 <!DOCTYPE html>
-<nav name="top_bar" class="sticky top-0 left-0 z-50 flex flex-row w-full h-16 grid-cols-4 text-white bg-neutral-900 drop-shadow-md" hx-headers={{ csrf_token }}>
+<nav name="top_bar" class="sticky top-0 left-0 z-50 flex flex-row w-full h-8 grid-cols-4 text-white md:h-16 bg-neutral-900 drop-shadow-md" hx-headers={{ csrf_token }}>
     
     
-    <a class="btn btn-primary" href="{% url 'index' %}">
-        <div class="flex items-center justify-center w-24 h-16 text-center transition-all duration-300 stroke-1 bg-neutral-800 hover:bg-neutral-700 stroke-white">
+    <a class="btn btn-primary w-[33%] md:w-24 h-full" href="{% url 'index' %}">
+        <div class="flex items-center justify-center w-full h-full text-center transition-all duration-300 stroke-1 bg-neutral-800 hover:bg-neutral-700 stroke-white">
             <div class="flex items-center align-center place-items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="white">
                     <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
@@ -15,8 +15,8 @@
     
     
     
-    <a class="btn btn-primary" href="{% url 'create_ladder' %}">
-        <div class="flex items-center justify-center w-24 h-16 text-center transition-all duration-300 stroke-1 bg-neutral-800 hover:bg-neutral-700 stroke-white" >
+    <a class="btn btn-primary w-[33%] md:w-24 h-full" href="{% url 'create_ladder' %}">
+        <div class="flex items-center justify-center w-full h-full text-center transition-all duration-300 stroke-1 bg-neutral-800 hover:bg-neutral-700 stroke-white" >
             <div class="flex items-center align-center place-items-center"> 
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="white">
                     <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
@@ -27,8 +27,8 @@
        
     
     
-    <a class="btn btn-primary" hx-get="{% url 'search' %}" hx-target="#popup_body" hx-trigger="click" hx-swap="innerHTML"->
-        <div class="flex items-center justify-center w-24 h-16 text-center transition-all duration-300 stroke-1 bg-neutral-800 hover:bg-neutral-700 stroke-white">
+    <a class="btn btn-primary w-[33%] md:w-24 h-full" hx-get="{% url 'search' %}" hx-target="#popup_body" hx-trigger="click" hx-swap="innerHTML"->
+        <div class="flex items-center justify-center w-full h-full text-center transition-all duration-300 stroke-1 bg-neutral-800 hover:bg-neutral-700 stroke-white">
             <div class="flex items-center align-center place-items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -38,7 +38,7 @@
     </a> 
         
     
-    <div name="logo" class="fixed flex-col w-16 h-16 right-4">
-        <img alt="Skaarladder logo" src="{% static 'tracker/logo.png' %}" class="duration-300 ease-in-out hover:animate-spin"></img>
+    <div name="logo" class="fixed hidden object-contain w-8 h-full md:w-16 right-4 md:inline">
+        <img alt="Skaarladder logo" src="{% static 'tracker/logo.png' %}" class="object-contain duration-300 ease-in-out hover:animate-spin"></img>
     </div>
 </nav>

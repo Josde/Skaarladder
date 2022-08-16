@@ -1,3 +1,7 @@
+from decouple import config
+
+# League of Legends
+
 tierWeights = {
     "UNRANKED": 0,
     "IRON": 0,
@@ -19,6 +23,7 @@ rankWeights = {
     "NONE": 0,
 }
 
+# Maps riot platform names to OPGG URL
 riotToOPGGRegions = {
     "BR1": "BR",
     "EUN1": "EUNE",
@@ -70,12 +75,19 @@ tierChoices = [
 rankChoices = [("I", "I"), ("II", "II"), ("III", "III"), ("IV", "IV"), ("NONE", "NONE")]
 
 # Settings
+# Delays are in minutes
 
-UPDATE_DELAY = 1800
+UPDATE_DELAY = int(config("UPDATE_DELAY", 10))
+RELEASE_CHECK = bool(config("RELEASE_CHECK", True))
+RELEASE_CHECK_DELAY = int(config("RELEASE_CHECK_DELAY", 3600))
+MAX_STREAK_LENGTH = 10  # Maximum number of matches that will be queried when checking for winstreaks. Making this higher will make hitting a ratelimit easier.
+# Obviously, change these two constants if you are forking the repo to make your own.
 
+RELEASE_USER = "Josde"  # User that uploaded this to github.
+RELEASE_REPO = "Skaarladder"  # Name of the repo
 
 # HTML Attrs
 
 red_text_style = "color:rgb(249,36,114);"
 green_text_style = "color:rgb(180, 210, 115);"
-default_form_style = "bg-neutral-900 text-white m-4 invalid:border-pink-500 invalid:text-pink-600"
+default_form_style = "bg-neutral-900 text-white m-4 invalid:border-pink-500"

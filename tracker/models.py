@@ -1,13 +1,9 @@
-from django.utils import timezone
-from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db import models
+from django.utils import timezone
 from pyot.utils.lol.routing import platform_to_region
-from tracker.utils.constants import (
-    regionChoices,
-    platformChoices,
-    tierChoices,
-    rankChoices,
-)
+
+from tracker.utils.constants import platformChoices, rankChoices, regionChoices, tierChoices
 
 # Choices for ease of use on choice fields.
 # Could be stored in constants.py, but isn't done since usage is constrained to this file for now.
@@ -20,6 +16,8 @@ class User(AbstractUser):
 
 
 class Player(models.Model):
+    """Defines a League of Legends summoner. Contains it's name, ranked stats, etc..."""
+
     name = models.CharField(max_length=24)
     avatar_id = models.CharField(max_length=24, default="")
     puuid = models.CharField(max_length=100, default="")
@@ -55,6 +53,9 @@ class Player(models.Model):
 
 # TODO: Implement django-model-history so I can get stadistics out of this model.
 class Ladder(models.Model):
+    """Defines a Ladder in which players compete.
+    Can be either absolute (highest ranked player wins), or relative (player that climbed the most wins)"""
+
     name = models.CharField(max_length=100)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
@@ -64,6 +65,9 @@ class Ladder(models.Model):
 
 
 class Ladder_Player(models.Model):
+    """Defines the relation between a player and a ladder,
+    since the support of relative ladders makes it so an user can have a different amount of points in multiple ladders"""
+
     # Foreign keys to relate a ladder and a player
     player_id = models.ForeignKey(Player, on_delete=models.CASCADE)
     ladder_id = models.ForeignKey(Ladder, on_delete=models.CASCADE)

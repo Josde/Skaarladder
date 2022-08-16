@@ -10,10 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
-from pathlib import Path
-from decouple import config
 import os
-import logging
+from pathlib import Path
+
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,9 +26,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config("DEBUG", False)
-
-ALLOWED_HOSTS = []
+DEBUG = bool(config("DEBUG", False))
+# FIXME: Make this not a constant
+ALLOWED_HOSTS = [".localhost", "127.0.0.1", "[::1]", ".josde.me"]
+CSRF_TRUSTED_ORIGINS = ["https://skaarl.josde.me"]
 
 
 # Application definition
@@ -59,7 +60,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
-    "django_browser_reload.middleware.BrowserReloadMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
@@ -133,6 +133,7 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
 # WhiteNoise
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
@@ -152,50 +153,74 @@ PYOT_CONFS = ["tracker.pyotconf"]
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
 
 CRISPY_TEMPLATE_PACK = "tailwind"
-if config("REDIS", False):
-    host = config("REDIS_HOST")
-    port = config("REDIS_PORT")
-    db = config("REDIS_DB")
-    password = config("REDIS_PASSWORD")
-    RQ_QUEUES = {
-        "default": {
-            "HOST": host,
-            "PORT": port,
-            "DB": db,
-            "PASSWORD": password,
-            "DEFAULT_TIMEOUT": 360,
-        },
-        "high": {
-            "HOST": host,
-            "PORT": port,
-            "DB": db,
-            "PASSWORD": password,
-            "DEFAULT_TIMEOUT": 500,
-        },
-        "low": {
-            "HOST": host,
-            "PORT": port,
-            "DB": db,
-            "PASSWORD": password,
-        },
-    }
+
+# RQ
+
+if config("REDIS"):  # Since these are necessary, not configuring them will throw an error.
+    host = config("REDIS_HOST", None)
+    port = config("REDIS_PORT", None)
+    db = config("REDIS_DB", "")
+    password = config("REDIS_PASSWORD", "")
+    URL = config("REDIS_URL", None) or config("REDISCLOUD_URL", None)  # Second part is for heroku
+    if URL:
+        RQ_QUEUES = {
+            "default": {"URL": URL},
+            "high": {"URL": URL},
+            "low": {"URL": URL},
+        }
+    elif host and port:
+        RQ_QUEUES = {
+            "default": {
+                "HOST": host,
+                "PORT": port,
+                "DB": db,
+                "PASSWORD": password,
+                "DEFAULT_TIMEOUT": 360,
+            },
+            "high": {
+                "HOST": host,
+                "PORT": port,
+                "DB": db,
+                "PASSWORD": password,
+                "DEFAULT_TIMEOUT": 500,
+            },
+            "low": {
+                "HOST": host,
+                "PORT": port,
+                "DB": db,
+                "PASSWORD": password,
+            },
+        }
+    else:
+        raise RuntimeError(
+            "Looks like you forgot to configure the REDIS environment variables. Either REDIS_HOST and REDIS_PORT must be set, or REDIS_URL must be set."
+        )
     RQ_SHOW_ADMIN_LINK = True
+
 
 if config("HEROKU", False):
     import django_on_heroku
 
     django_on_heroku.settings(locals(), secret_key=False)
 
+    RQ = {
+        "JOB_CLASS": "rq.job.Job",
+        "WORKER_CLASS": "rq.worker.HerokuWorker",
+    }
+
 # sentry
 if config("SENTRY", False):
     import sentry_sdk
     from sentry_sdk.integrations.django import DjangoIntegration
+    from sentry_sdk.integrations.redis import RedisIntegration
+    from sentry_sdk.integrations.rq import RqIntegration
 
+    dsn = config("SENTRY_DSN")
+    env = "development" if DEBUG else "production"
     sentry_sdk.init(
-        dsn=os.getenv("SENTRY_DSN"),
-        integrations=[
-            DjangoIntegration(),
-        ],
+        dsn=dsn,
+        integrations=[RedisIntegration(), RqIntegration(), DjangoIntegration()],
+        environment=env,
         # TODO:  Check if 1.0 is viable for production w/small size
         # Make this configurable
         # And also, probably disable PII since I don't use auth.
@@ -208,5 +233,11 @@ if config("SENTRY", False):
         send_default_pii=True,
     )
 
-if config("DEBUG", False):
-    INSTALLED_APPS.append("django_browser_reload")
+    RQ_SENTRY_DSN = config("RQ_SENTRY_DSN", dsn)
+
+if DEBUG and not config("HEROKU", False):
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+        }
+    }

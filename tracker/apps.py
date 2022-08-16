@@ -1,4 +1,5 @@
 from django.apps import AppConfig
+from .utils import constants
 
 
 class TrackerConfig(AppConfig):
@@ -10,12 +11,16 @@ class TrackerConfig(AppConfig):
 
         if os.environ.get("RUN_MAIN", None) != "true":
             # Prevents this from running twice when using development server. See: https://stackoverflow.com/a/52430581
-            import tracker.updater.updater_jobs as updater_jobs
             from django_rq import get_queue
-            from datetime import datetime
+            import tracker.updater.updater_jobs as updater_jobs
+            import tracker.utils.releases as releases
 
-            # eventually change this to be a singleton connection for efficiency
+            # Enqueue periodic tasks (release check and periodic user update)
             queue = get_queue("default")
-            if updater_jobs.periodic_update not in [x.func for x in queue.jobs] and not (os.getenv("DEBUG", False)):
-                # pass
+            jobs = [
+                x.func for x in queue.jobs
+            ]  # Jobs that are currently enqueued, used to prevent queuing something that was already queued.
+            if constants.RELEASE_CHECK and releases.check_releases not in jobs:
+                queue.enqueue(releases.check_releases)
+            if updater_jobs.periodic_update not in jobs and not (os.getenv("DEBUG", False)):
                 queue.enqueue(updater_jobs.periodic_update)

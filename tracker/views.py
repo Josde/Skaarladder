@@ -1,25 +1,24 @@
-import asyncio
-from datetime import datetime
 import traceback
-from django.http import HttpResponse
-from django.shortcuts import render, redirect
+import uuid
+from datetime import datetime
+
+from asgiref.sync import sync_to_async
 from django.contrib import messages
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
 from django.urls import reverse
-from django.template import loader
+from django.utils import timezone
+from django.views.decorators.cache import cache_page
+from django.views.decorators.http import require_GET, require_http_methods
+from django_htmx.http import HttpResponseClientRedirect
+from django_rq import get_queue
 
 from tracker.updater import api_update_helper
-from .forms import PlayerForm
-from .updater import updater_jobs
-from .models import Player, Ladder, Ladder_Player
-from .forms import LadderForm
-from asgiref.sync import sync_to_async
+
+from .forms import LadderForm, PlayerForm
+from .models import Ladder, Ladder_Player, Player
 from .tables import LadderTable
-import uuid
-from django_htmx.http import HttpResponseClientRedirect
-from django.utils import timezone
-from django.views.decorators.http import require_http_methods, require_GET
-from django.views.decorators.cache import cache_page
-from django_rq import get_queue
+from .updater import updater_jobs
 
 
 @cache_page(60 * 15)
@@ -40,6 +39,7 @@ def error(request):
 
 
 async def create_ladder(request):
+    """View that represents the ladder creation form and it's logic."""
     if request.method == "POST":
         print(request.POST)
         submitted_form = LadderForm(request.POST)
@@ -92,6 +92,7 @@ async def create_ladder(request):
 
 @require_GET
 def create_user_form(request):
+    """View that spawns a PlayerForm with a certain UUID. Used in conjunction with HTMX to dynamically add forms."""
     form_id = uuid.uuid4()
     form = PlayerForm(form_id=form_id)
 
@@ -99,6 +100,7 @@ def create_user_form(request):
 
 
 async def provisional_parse(request):
+    """View that gives out wether a player exists or not. Used with HTMX to dynamically add this below an user form."""
     exists = False
     if request.method == "POST":
         print(request.POST)
@@ -128,9 +130,14 @@ async def provisional_parse(request):
 
 @require_http_methods(["GET", "POST"])
 def ladder(request, ladder_id=0):
+    """View that represents a ladder table."""
     if request.htmx and ladder_id == 0:
+        # If the request is HTMX, it comes from search.
         ladder_id = request.POST.get("search_input", None)
+        if not ladder_id:
+            return HttpResponseClientRedirect(reverse("error"))
         return HttpResponseClientRedirect(reverse("ladder") + "{0}/".format(ladder_id))  # FIXME: Janky as fuck
+    # If request is not HTMX, we have to render a table.
     try:
         ladder_data = Ladder.objects.filter(id=ladder_id).first()
         if ladder_data.is_absolute:
@@ -155,6 +162,7 @@ def ladder(request, ladder_id=0):
         table = LadderTable(player_query)
         if ladder_data.is_absolute:
             table.exclude = "progress"
+        # These variables are for the template and passed through locals()
         right_now = timezone.now()
         start_date = ladder_data.start_date
         end_date = ladder_data.end_date
@@ -177,11 +185,15 @@ def ladder(request, ladder_id=0):
     return render(request, "tracker/ladder.html", context=locals())
 
 
+@require_GET
 def search(request):
+    """Renders the search template. Used with HTMX to dynamically add this on top of pages."""
     return render(request, "tracker/partials/search_modal.html")
 
 
+@require_GET
 def ladder_loading(request, job_id):
+    """Temporal loading page while a Challenge is created. The template is reloaded every three seconds."""
     queue = get_queue("high")
     job = queue.fetch_job(job_id)
     if job.is_finished:
