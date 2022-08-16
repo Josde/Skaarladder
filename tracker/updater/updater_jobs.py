@@ -93,7 +93,7 @@ def create_ladder_job(
             player_ladders.append(player_ladder)
     for item in player_ladders:
         item.save()
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(asyncio.gather(*tasks))
+
+    asyncio.run(asyncio.gather(*tasks))
 
     return ladder.id
