@@ -97,7 +97,8 @@ def create_ladder_job(
     for item in player_ladders:
         item.save()
 
-    for item in tasks:
+    for item in tasks: 
+        #FIXME: This currently creates an event loop per each item, which throws a pyot error.
         asyncio.run(item)
 
     return ladder.id

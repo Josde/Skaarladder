@@ -28,8 +28,8 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(config("DEBUG", False))
 # FIXME: Make this not a constant
-ALLOWED_HOSTS = [".localhost", "127.0.0.1", "[::1]", ".josde.me"]
-CSRF_TRUSTED_ORIGINS = ["https://skaarl.josde.me"]
+ALLOWED_HOSTS = [".localhost", "127.0.0.1", "[::1]", ".josde.me", ".herokuapp.com"]
+CSRF_TRUSTED_ORIGINS = ["https://skaarl.josde.me", "https://lol-soloqchallenge.herokuapp.com/"]
 
 
 # Application definition
