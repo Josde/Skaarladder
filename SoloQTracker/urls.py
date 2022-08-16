@@ -22,8 +22,8 @@ urlpatterns = [
     path("", include("tracker.urls")),
     path("django-rq/", include("django_rq.urls")),
 ]
-
-if config("DEBUG", False):
+# TODO: Save these as variables in settings.py and reuse them throughout the app
+if config("DEBUG", False) and not config("HEROKU", False):
     urlpatterns.append(
         path("__reload__/", include("django_browser_reload.urls")),
     )
