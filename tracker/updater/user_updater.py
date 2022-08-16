@@ -49,6 +49,11 @@ async def update(player_name: str, is_first_run: bool = False, test: bool = Fals
             await sync_to_async(item.save)()
             # Ladder_Player.objects.abulk_update(ladders, ["progress", "progress_delta"]) doesn't work idk why
     else:
+        print(
+            "[{0} PlayerUpdater] Player has the same LP as last time, skipping ladder and streak updates...".format(
+                player_name
+            )
+        )
         await sync_to_async(queried_player.save)()
 
 
@@ -65,6 +70,7 @@ async def update_player_data(queried_player: Player, backend: abstract_update_he
     player_data = None
     try:
         player_data = await backend.get_player_data(queried_player)
+        player_data["last_data_update"] = timezone.now()
         await sync_to_async(update_fields)(
             queried_player,
             player_data,
@@ -74,6 +80,7 @@ async def update_player_data(queried_player: Player, backend: abstract_update_he
                 "id": "summoner_id",
                 "accountId": "account_id",
                 "profileIconId": "avatar_id",
+                "last_data_update": "last_data_update",
             },
         )
 

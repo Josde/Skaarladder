@@ -18,6 +18,7 @@ class ApiUpdateHelper(abstract_update_helper.AbstractUpdateHelper):
         Returns:
             dict: A dict containing the player data
         """
+        print("[{0} UserUpdater] Running player data update.".format(player.name))
         res = await lol.Summoner(name=player.name, platform=player.platform).get()
         return res.dict()
 

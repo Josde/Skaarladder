@@ -1,6 +1,5 @@
 import asyncio
-from datetime import timedelta
-import datetime
+from datetime import timedelta, datetime
 
 from asgiref.sync import sync_to_async
 from django_rq import get_queue
@@ -38,8 +37,8 @@ async def periodic_update():
 
 def create_ladder_job(
     name: str,
-    start_date: datetime.DateTime,
-    end_date: datetime.DateTime,
+    start_date: datetime,
+    end_date: datetime,
     player_platform: str,
     is_absolute: bool,
     ignore_unranked: bool,
