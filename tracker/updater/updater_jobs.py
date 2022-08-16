@@ -18,7 +18,9 @@ def enqueue_periodic():
     This could probably be turned into a generic function that takes the function to enqueue but I'm too lazy for it right now.
     """
     queue = get_queue()
-    queue.enqueue_in(time_delta=timedelta(minutes=constants.UPDATE_DELAY), func=periodic_update)
+    jobs = [x.func for x in queue.jobs]
+    if periodic_update not in jobs and not (os.getenv("DEBUG", False)):
+        queue.enqueue_in(time_delta=timedelta(minutes=constants.UPDATE_DELAY), func=periodic_update)
 
 
 async def periodic_update():
@@ -35,7 +37,8 @@ async def periodic_update():
             await sync_to_async(pipe.execute)()
         dependency = Dependency(jobs=enqueued_jobs)
         await sync_to_async(queue.enqueue)(enqueue_periodic, depends_on=dependency)
-    await sync_to_async(queue.enqueue)(enqueue_periodic)
+    else:
+        await sync_to_async(queue.enqueue)(enqueue_periodic)
 
 
 def create_ladder_job(
