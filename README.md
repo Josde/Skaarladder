@@ -5,6 +5,7 @@
 Skaarladder is an open-source ladder creation web app for League of Legends. It allows you to create ladders and compete with your friends to see who can climb higher on SoloQ.
 
 ## Deploying basics
+Modify ALLOWED_HOSTS in settings.py to your domain of choice.  
 Configure the following config vars or put them in a .env file in the project root:
   - API_KEY: Your Riot Games API Key.
   - SECRET_KEY: Your Django secret key.  

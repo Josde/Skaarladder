@@ -28,7 +28,7 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(config("DEBUG", False))
 # FIXME: Make this not a constant
-ALLOWED_HOSTS = [".josde.me"]
+ALLOWED_HOSTS = [".localhost", "127.0.0.1", "[::1]", ".josde.me"]
 
 
 # Application definition
