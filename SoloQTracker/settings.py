@@ -159,7 +159,7 @@ CRISPY_TEMPLATE_PACK = "tailwind"
 if config("REDIS"):  # Since these are necessary, not configuring them will throw an error.
     host = config("REDIS_HOST")
     port = config("REDIS_PORT")
-    db = config("REDIS_DB", "")
+    db = config("REDIS_DB", 0)
     password = config("REDIS_PASSWORD")
 
     RQ_QUEUES = {
