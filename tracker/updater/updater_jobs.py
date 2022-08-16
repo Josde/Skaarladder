@@ -1,7 +1,7 @@
 import asyncio
 from datetime import timedelta, datetime
 
-from asgiref.sync import sync_to_async
+from asgiref.sync import sync_to_async, async_to_sync
 from django_rq import get_queue
 from rq.job import Dependency
 
@@ -94,6 +94,7 @@ def create_ladder_job(
     for item in player_ladders:
         item.save()
 
-    asyncio.run(asyncio.gather(*tasks))
+    for item in tasks:
+        asyncio.run(item)
 
     return ladder.id

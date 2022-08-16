@@ -236,10 +236,6 @@ if config("SENTRY", False):
     RQ_SENTRY_DSN = config("RQ_SENTRY_DSN", dsn)
 
 if DEBUG and not config("HEROKU", False):
-    INSTALLED_APPS.append("django_browser_reload")
-    MIDDLEWARE.append(
-        "django_browser_reload.middleware.BrowserReloadMiddleware",
-    )
     CACHES = {
         "default": {
             "BACKEND": "django.core.cache.backends.dummy.DummyCache",
