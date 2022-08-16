@@ -13,7 +13,7 @@ def update_fields(obj: object, data_dict: dict, data_to_obj_fields: dict = None)
                                             Defaults to a dict that has the keys of data_dict mapped to itself (as in, both objects have the same fields.)
 
     Raises:
-        KeyError: _description_
+        KeyError: Throws an error if the field wasn't found.
     """
 
     if data_to_obj_fields is None:

@@ -14,6 +14,8 @@ class TrackerConfig(AppConfig):
             from django_rq import get_queue
             import tracker.updater.updater_jobs as updater_jobs
             import tracker.utils.releases as releases
+
+            # Enqueue periodic tasks (release check and periodic user update)
             queue = get_queue("default")
             if constants.RELEASE_CHECK:
                 queue.enqueue(releases.check_releases)

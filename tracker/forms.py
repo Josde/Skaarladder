@@ -20,6 +20,8 @@ class DateTimePickerInput(forms.DateTimeInput):
 
 
 class LadderForm(forms.Form):
+    """Ladder creation form"""
+
     # TODO: Default datetimes do not show up for some reason
     def clean(self):
         cleaned_data = super().clean()
@@ -68,6 +70,8 @@ class LadderForm(forms.Form):
 
 
 class PlayerForm(forms.Form):
+    """Form to input the name and platform of a single player. Used as a part of LadderForm that gets added dynamically"""
+
     form_id = ""
 
     def __init__(self, form_id="", *args, **kwargs):

@@ -8,7 +8,7 @@ from .models import Player
 
 
 class LadderTable(tables.Table):
-    # There is no way to set a default column style in django-tables2, apparently. Fuck DRY
+    # There is no way to set a default column style in django-tables2, apparently, so we have to do copypaste this line several times.
     column_style = {
         "cell": {"class": "md:p-4 text-center border border-neutral-500 border-collapse sm:whitespace-nowrap"}
     }
