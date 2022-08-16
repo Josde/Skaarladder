@@ -1,24 +1,35 @@
 import asyncio
+from typing import List
 
 from pyot.models import lol
 
 from . import abstract_update_helper
+from tracker.models import Player
+from tracker.utils import constants
 
 
 class ApiUpdateHelper(abstract_update_helper.AbstractUpdateHelper):
-    async def get_player_data(self, player):
-        print(
-            "[{0} UserUpdater] Running player data update, either this is the first update or last update was over 7 days ago (lu: {1})".format(
-                player.name, player.last_data_update
-            )
-        )
-        """ Updates the ID, name and such of our Player class.
-        Only ran if it's the first time the player has been queried or if last update was a while ago. """
+    async def get_player_data(self, player: Player) -> dict:
+        """Queries the API for the Summoner Data (name, IDs...)
+
+        Args:
+            player (Player): The player that will be queried
+
+        Returns:
+            dict: A dict containing the player data
+        """
         res = await lol.Summoner(name=player.name, platform=player.platform).get()
         return res.dict()
 
-    async def get_player_ranked_data(self, player):
-        """Queries the player's SoloQ data, getting stats such as LP, winrate and etc."""
+    async def get_player_ranked_data(self, player: Player) -> dict:
+        """Gets the ranked data for SoloQ. This data contains wins, losses, LP...
+
+        Args:
+            player (Player): The player that will be queried
+
+        Returns:
+            dict: A dict containing the ranked data
+        """
         print("[{0} UserUpdater] Running SoloQ data update.".format(player.name))
         queue_data = await lol.SummonerLeague(player.summoner_id, platform=player.platform).get()
         soloq_dict = None
@@ -28,14 +39,21 @@ class ApiUpdateHelper(abstract_update_helper.AbstractUpdateHelper):
                 break
         return soloq_dict
 
-    async def get_streak_data(self, player):
-        """Queries the player's match history and processes his win or loss streak."""
+    async def get_streak_data(self, player: Player) -> int:
+        """Gets the win or lose streak of a player.
+
+        Args:
+            player (Player): The player that will be queried
+
+        Returns:
+            int: The amount of wins (positive) or losses (negative) the player has had in a row.
+        """
         print("[{0} UserUpdater] Running streak data update".format(player.name))
         matches = []
         result = last_result = None
         streak = 0
 
-        matches = await self.get_match_history_details(player, count=10, queue=420)
+        matches = await self.get_match_history_details(player, count=constants.MAX_STREAK_LENGTH, queue=420)
 
         for match_data in matches:
             if (result != last_result) and last_result is not None:
@@ -48,7 +66,17 @@ class ApiUpdateHelper(abstract_update_helper.AbstractUpdateHelper):
 
         return streak
 
-    async def get_match_history_details(self, player, count, queue):
+    async def get_match_history_details(self, player: Player, count: int, queue: int) -> List[lol.Match]:
+        """Gets N amount of matches from a player's match history.
+
+        Args:
+            player (Player): The player whose matches will be queried
+            count (int): How many matches to query
+            queue (int): Which queue to query (420 = SoloQ, 440 = Flex). Check https://static.developer.riotgames.com/docs/lol/queues.json for other gamemodes.
+
+        Returns:
+            List[lol.Match]: A list of matches.
+        """
         tasks = []
         history = await lol.MatchHistory(player.puuid, region=player.region).query(count=count, queue=queue).get()
 
@@ -57,7 +85,16 @@ class ApiUpdateHelper(abstract_update_helper.AbstractUpdateHelper):
 
         return await asyncio.gather(*tasks)
 
-    async def get_match_result(self, player, match_data):
+    async def get_match_result(self, player: Player, match_data: lol.Match) -> bool:
+        """Gets the result (win or loss) of a match
+
+        Args:
+            player (Player): The player whose result we want to know. We need this to identify his team.
+            match_data (lol.Match): The match to parse.
+
+        Returns:
+            bool: True if won, False if lost.
+        """
         teams = match_data.info.teams
         for t in teams:
             participant_ids = [p.puuid for p in t.participants]

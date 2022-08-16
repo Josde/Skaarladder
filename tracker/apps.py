@@ -13,9 +13,9 @@ class TrackerConfig(AppConfig):
             # Prevents this from running twice when using development server. See: https://stackoverflow.com/a/52430581
             from django_rq import get_queue
             import tracker.updater.updater_jobs as updater_jobs
-
+            import tracker.utils.releases as releases
             queue = get_queue("default")
             if constants.RELEASE_CHECK:
-                queue.enqueue(updater_jobs.check_releases)
+                queue.enqueue(releases.check_releases)
             if updater_jobs.periodic_update not in [x.func for x in queue.jobs] and not (os.getenv("DEBUG", False)):
                 queue.enqueue(updater_jobs.periodic_update)

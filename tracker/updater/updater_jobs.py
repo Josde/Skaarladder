@@ -1,14 +1,11 @@
 import asyncio
 from datetime import timedelta
-import traceback
+import datetime
 
-import aiohttp
 from asgiref.sync import sync_to_async
 from django_rq import get_queue
 from rq.job import Dependency
-import sentry_sdk
 
-from SoloQTracker.settings import BASE_DIR
 import tracker.utils.constants as constants
 from tracker.models import Ladder, Ladder_Player, Player
 from tracker.updater.user_updater import update
@@ -26,6 +23,7 @@ def enqueue_periodic():
 
 
 async def periodic_update():
+    """Job that runs periodically and makes sure to run update() on all the players."""
     player_query = Player.objects.all().only("name")
     queue = await sync_to_async(get_queue)()
     jobs = []
@@ -38,7 +36,27 @@ async def periodic_update():
     await sync_to_async(queue.enqueue)(enqueue_periodic, depends_on=dependency)
 
 
-def create_ladder_job(name, start_date, end_date, player_platform, is_absolute, ignore_unranked):
+def create_ladder_job(
+    name: str,
+    start_date: datetime.DateTime,
+    end_date: datetime.DateTime,
+    player_platform: str,
+    is_absolute: bool,
+    ignore_unranked: bool,
+) -> int:
+    """Job that creates a ladder in the background. Assumes all data have been checked beforehand.
+
+    Args:
+        name (str): The name of the ladder.
+        start_date (DateTime): When it will start.
+        end_date (DateTime): When it will end
+        player_platform (str): An array of (player, platform) tuples.
+        is_absolute (bool): If true, the ranking will be absolute (whoever with higher rank wins). If not, it will be relative (whoever climbs the most from its starting rank wins)
+        ignore_unranked (bool): Wether to show or not show unranked players.
+
+    Returns:
+        int: The ID of the recently created ladder. Used to redirect users in the frontend.
+    """
     ladder = Ladder(
         name=name,
         start_date=start_date,
@@ -77,49 +95,3 @@ def create_ladder_job(name, start_date, end_date, player_platform, is_absolute, 
     loop.run_until_complete(asyncio.gather(*tasks))
 
     return ladder.id
-
-
-# TODO: Maybe move these two functions below to a file in utils.
-
-
-async def check_releases():
-    updates = False
-    print("Checking if new releases exist...")
-    URL = "https://api.github.com/repos/{0}/{1}/releases/latest".format(constants.RELEASE_USER, constants.RELEASE_REPO)
-    try:
-        current_release = await get_current_release() # TODO: Make this only get called once, not like RELEASE is gonna be modified while executing.
-        async with aiohttp.ClientSession() as session:
-            async with session.get(URL) as response:
-                content = await response.json()
-                new_release = content["tag_name"]
-        if current_release != new_release:
-            RELEASE_URL = "https://github.com/{0}/{1}/releases/latest".format(
-                constants.RELEASE_USER, constants.RELEASE_REPO
-            )
-            message = """New version found. You are running {0} and {1} is available in GitHub.
-            Go to {2} to download the newest version.""".format(
-                current_release, new_release, RELEASE_URL
-            )
-            print(message)
-            sentry_sdk.capture_message(message)
-            updates = True
-        else:
-            print("No updates found!")
-    except Exception as err:
-        sentry_sdk.capture_exception(err)
-        traceback.print_exc()
-    
-    if not updates: # Stop checking for updates if we know they are availab.e.
-        queue = get_queue("low")
-        queue.enqueue_in(time_delta=timedelta(minutes=constants.RELEASE_CHECK_DELAY), func=check_releases)
-
-
-@sync_to_async
-def get_current_release():
-    file_path = BASE_DIR / "RELEASE"
-
-    with open(file_path) as f:
-        content = f.readline()
-        clean_content = content.strip()
-
-    return clean_content

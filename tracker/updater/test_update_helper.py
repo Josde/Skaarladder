@@ -2,6 +2,11 @@ from . import abstract_update_helper
 
 
 class TestUpdateHelper(abstract_update_helper.AbstractUpdateHelper):
+    """An implementation of abstract_update_helper that rather than querying the API,
+    returns values previously set.
+    Will be used for testing in the future.
+    """
+
     def __init__(
         self,
         player_content=None,
