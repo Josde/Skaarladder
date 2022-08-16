@@ -157,33 +157,44 @@ CRISPY_TEMPLATE_PACK = "tailwind"
 # RQ
 
 if config("REDIS"):  # Since these are necessary, not configuring them will throw an error.
-    host = config("REDIS_HOST")
-    port = config("REDIS_PORT")
-    db = config("REDIS_DB", 0)
-    password = config("REDIS_PASSWORD")
-
-    RQ_QUEUES = {
-        "default": {
-            "HOST": host,
-            "PORT": port,
-            "DB": db,
-            "PASSWORD": password,
-            "DEFAULT_TIMEOUT": 360,
-        },
-        "high": {
-            "HOST": host,
-            "PORT": port,
-            "DB": db,
-            "PASSWORD": password,
-            "DEFAULT_TIMEOUT": 500,
-        },
-        "low": {
-            "HOST": host,
-            "PORT": port,
-            "DB": db,
-            "PASSWORD": password,
-        },
-    }
+    host = config("REDIS_HOST", None)
+    port = config("REDIS_PORT", None)
+    db = config("REDIS_DB", "")
+    password = config("REDIS_PASSWORD", "")
+    URL = config("REDIS_URL", None) or config("REDISCLOUD_URL", None)  # Second part is for heroku
+    if URL:
+        RQ_QUEUES = {
+            "default": {"URL": URL},
+            "high": {"URL": URL},
+            "low": {"URL": URL},
+        }
+    elif host and port:
+        RQ_QUEUES = {
+            "default": {
+                "HOST": host,
+                "PORT": port,
+                "DB": db,
+                "PASSWORD": password,
+                "DEFAULT_TIMEOUT": 360,
+            },
+            "high": {
+                "HOST": host,
+                "PORT": port,
+                "DB": db,
+                "PASSWORD": password,
+                "DEFAULT_TIMEOUT": 500,
+            },
+            "low": {
+                "HOST": host,
+                "PORT": port,
+                "DB": db,
+                "PASSWORD": password,
+            },
+        }
+    else:
+        raise RuntimeError(
+            "Looks like you forgot to configure the REDIS environment variables. Either REDIS_HOST and REDIS_PORT must be set, or REDIS_URL must be set."
+        )
     RQ_SHOW_ADMIN_LINK = True
 
 
