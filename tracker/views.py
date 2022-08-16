@@ -39,6 +39,7 @@ def error(request):
 
 
 async def create_ladder(request):
+    """View that represents the ladder creation form and it's logic."""
     if request.method == "POST":
         print(request.POST)
         submitted_form = LadderForm(request.POST)
@@ -91,6 +92,7 @@ async def create_ladder(request):
 
 @require_GET
 def create_user_form(request):
+    """View that spawns a PlayerForm with a certain UUID. Used in conjunction with HTMX to dynamically add forms."""
     form_id = uuid.uuid4()
     form = PlayerForm(form_id=form_id)
 
@@ -98,6 +100,7 @@ def create_user_form(request):
 
 
 async def provisional_parse(request):
+    """View that gives out wether a player exists or not. Used with HTMX to dynamically add this below an user form."""
     exists = False
     if request.method == "POST":
         print(request.POST)
@@ -127,9 +130,14 @@ async def provisional_parse(request):
 
 @require_http_methods(["GET", "POST"])
 def ladder(request, ladder_id=0):
+    """View that represents a ladder table."""
     if request.htmx and ladder_id == 0:
+        # If the request is HTMX, it comes from search.
         ladder_id = request.POST.get("search_input", None)
+        if not ladder_id:
+            return HttpResponseClientRedirect(reverse("error"))
         return HttpResponseClientRedirect(reverse("ladder") + "{0}/".format(ladder_id))  # FIXME: Janky as fuck
+    # If request is not HTMX, we have to render a table.
     try:
         ladder_data = Ladder.objects.filter(id=ladder_id).first()
         if ladder_data.is_absolute:
@@ -154,6 +162,7 @@ def ladder(request, ladder_id=0):
         table = LadderTable(player_query)
         if ladder_data.is_absolute:
             table.exclude = "progress"
+        # These variables are for the template and passed through locals()
         right_now = timezone.now()
         start_date = ladder_data.start_date
         end_date = ladder_data.end_date
@@ -178,11 +187,13 @@ def ladder(request, ladder_id=0):
 
 @require_GET
 def search(request):
+    """Renders the search template. Used with HTMX to dynamically add this on top of pages."""
     return render(request, "tracker/partials/search_modal.html")
 
 
 @require_GET
 def ladder_loading(request, job_id):
+    """Temporal loading page while a Challenge is created. The template is reloaded every three seconds."""
     queue = get_queue("high")
     job = queue.fetch_job(job_id)
     if job.is_finished:
