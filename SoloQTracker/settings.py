@@ -29,7 +29,7 @@ SECRET_KEY = config("SECRET_KEY")
 DEBUG = bool(config("DEBUG", False))
 # FIXME: Make this not a constant
 ALLOWED_HOSTS = [".localhost", "127.0.0.1", "[::1]", ".josde.me"]
-CSRF_TRUSTED_ORIGINS = ["localhost", "127.0.0.1", "[::1]", "https://skaarl.josde.me"]
+CSRF_TRUSTED_ORIGINS = ["https://skaarl.josde.me"]
 
 
 # Application definition
@@ -60,7 +60,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
-    "django_browser_reload.middleware.BrowserReloadMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
@@ -238,6 +237,9 @@ if config("SENTRY", False):
 
 if DEBUG:
     INSTALLED_APPS.append("django_browser_reload")
+    MIDDLEWARE.append(
+        "django_browser_reload.middleware.BrowserReloadMiddleware",
+    )
     CACHES = {
         "default": {
             "BACKEND": "django.core.cache.backends.dummy.DummyCache",
