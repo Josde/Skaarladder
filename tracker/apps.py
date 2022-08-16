@@ -17,7 +17,10 @@ class TrackerConfig(AppConfig):
 
             # Enqueue periodic tasks (release check and periodic user update)
             queue = get_queue("default")
-            if constants.RELEASE_CHECK:
+            jobs = [
+                x.func for x in queue.jobs
+            ]  # Jobs that are currently enqueued, used to prevent queuing something that was already queued.
+            if constants.RELEASE_CHECK and releases.check_releases not in jobs:
                 queue.enqueue(releases.check_releases)
-            if updater_jobs.periodic_update not in [x.func for x in queue.jobs] and not (os.getenv("DEBUG", False)):
+            if updater_jobs.periodic_update not in jobs and not (os.getenv("DEBUG", False)):
                 queue.enqueue(updater_jobs.periodic_update)

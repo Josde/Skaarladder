@@ -28,11 +28,14 @@ async def periodic_update():
     jobs = []
     async for player in player_query:
         jobs.append(queue.prepare_data(update, [player.name]))
-    with queue.connection.pipeline() as pipe:
-        enqueued_jobs = await sync_to_async(queue.enqueue_many)(jobs, pipeline=pipe)
-        await sync_to_async(pipe.execute)()
-    dependency = Dependency(jobs=enqueued_jobs)
-    await sync_to_async(queue.enqueue)(enqueue_periodic, depends_on=dependency)
+    if jobs:  # only execute if there are jobs to be done, prevents a value errors
+        # TODO: Maybe put a try / except here.
+        with queue.connection.pipeline() as pipe:
+            enqueued_jobs = await sync_to_async(queue.enqueue_many)(jobs, pipeline=pipe)
+            await sync_to_async(pipe.execute)()
+        dependency = Dependency(jobs=enqueued_jobs)
+        await sync_to_async(queue.enqueue)(enqueue_periodic, depends_on=dependency)
+    await sync_to_async(queue.enqueue)(enqueue_periodic)
 
 
 def create_ladder_job(
