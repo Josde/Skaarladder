@@ -12,6 +12,7 @@ class TrackerConfig(AppConfig):
         if os.environ.get("RUN_MAIN", None) != "true":
             # Prevents this from running twice when using development server. See: https://stackoverflow.com/a/52430581
             from django_rq import get_queue
+            from decouple import config
             import tracker.updater.updater_jobs as updater_jobs
             import tracker.utils.releases as releases
 
@@ -22,5 +23,5 @@ class TrackerConfig(AppConfig):
             ]  # Jobs that are currently enqueued, used to prevent queuing something that was already queued.
             if constants.RELEASE_CHECK and releases.check_releases not in jobs:
                 queue.enqueue(releases.check_releases)
-            if updater_jobs.periodic_update not in jobs and not (os.getenv("DEBUG", False)):
+            if updater_jobs.periodic_update not in jobs and not (config("DEBUG", False)):
                 queue.enqueue(updater_jobs.periodic_update)
