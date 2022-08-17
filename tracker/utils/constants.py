@@ -85,7 +85,7 @@ MAX_STREAK_LENGTH = 10  # Maximum number of matches that will be queried when ch
 
 RELEASE_USER = "Josde"  # User that uploaded this to github.
 RELEASE_REPO = "Skaarladder"  # Name of the repo
-
+RELEASE_VERSION = "1.0-beta"
 # HTML Attrs
 
 red_text_style = "color:rgb(249,36,114);"
