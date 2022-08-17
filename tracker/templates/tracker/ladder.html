@@ -28,7 +28,13 @@
                 <h1 id="title" class="m-4 text-4xl font-bold text-center text-white shadow-sm md:m-8 md:pt-16 font-bebas">{{ ladder_name }}</h1>
                 <div class='flex flex-col justify-end'>
                     <span class="text-lg text-center">Use this code to access the ladder: 
-                        <strong _="on click writeText('{{ ladder_id }}') into the navigator's clipboard then put 'Copied!' into #copied">{{  ladder_id }}</strong> <em id="copied"></em></span>
+                        <strong _="on click writeText('{{ ladder_id }}') into the navigator's clipboard 
+                        then set {style: 'display:inline'} on #copied
+                        then show #copied with *opacity 
+                        then wait 1s 
+                        then hide #copied with *opacity
+                        then wait 700ms
+                        then set {style: 'display:none'} on #copied">{{  ladder_id }}</strong> <em class="hidden transition-all duration-700 ease-in-out opacity-0"id="copied">Copied!</em></span>
                     <span class="text-center">The ladder is currently: <strong>{{  ladder_status }}</strong></span>
                     {% if ladder_status == "Ongoing" %}
                     <span class="text-center">Ends on <strong>{{ end_date }}</strong></span>
