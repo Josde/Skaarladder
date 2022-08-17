@@ -6,6 +6,7 @@ from django_rq import get_queue
 from rq.job import Dependency
 
 import tracker.utils.constants as constants
+from tracker.utils.misc import async_wrapper
 from tracker.models import Ladder, Ladder_Player, Player
 from tracker.updater.user_updater import update
 
@@ -97,8 +98,7 @@ def create_ladder_job(
     for item in player_ladders:
         item.save()
 
-    for item in tasks: 
-        #FIXME: This currently creates an event loop per each item, which throws a pyot error.
-        asyncio.run(item)
+
+    asyncio.run(async_wrapper(asyncio.gather, *tasks))
 
     return ladder.id
