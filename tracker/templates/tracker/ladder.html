@@ -27,7 +27,8 @@
             <div class="flex md:w-[64rem] h-full bg-neutral-700 text-white flex-col drop-shadow-xl overflow-auto overflow-x-hidden">
                 <h1 id="title" class="m-4 text-4xl font-bold text-center text-white shadow-sm md:m-8 md:pt-16 font-bebas">{{ ladder_name }}</h1>
                 <div class='flex flex-col justify-end'>
-                    <span class="text-center">The code to access this ladder is: <strong>{{  ladder_id }}</strong></span>
+                    <span class="text-lg text-center">Use this code to access the ladder: 
+                        <strong _="on click writeText('{{ ladder_id }}') into the navigator's clipboard then put 'Copied!' into #copied">{{  ladder_id }}</strong> <em id="copied"></em></span>
                     <span class="text-center">The ladder is currently: <strong>{{  ladder_status }}</strong></span>
                     {% if ladder_status == "Ongoing" %}
                     <span class="text-center">Ends on <strong>{{ end_date }}</strong></span>

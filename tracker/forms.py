@@ -84,12 +84,12 @@ class PlayerForm(forms.Form):
             Row(
                 Field(
                     "player_name",
-                    css_class="bg-neutral-900 text-white",
+                    css_class="bg-neutral-800 text-white",
                     autocomplete="off",
                 ),
                 Field("platform"),
                 Field("valid", css_class="hidden"),
-                css_class="flex flex-row text-white bg-neutral-900",
+                css_class="flex flex-row text-white bg-neutral-800",
             ),
             css_class="flex flex-col",
         )
