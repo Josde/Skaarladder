@@ -42,11 +42,11 @@ class LadderForm(forms.Form):
                 Column(
                     Field(
                         "name",
-                        css_class=constants.default_form_style,
+                        css_class=constants.DEFAULT_FORM_STYLE,
                         autocomplete="off",
                     ),
-                    Field("start_date", css_class=constants.default_form_style),
-                    Field("end_date", css_class=constants.default_form_style),
+                    Field("start_date", css_class=constants.DEFAULT_FORM_STYLE),
+                    Field("end_date", css_class=constants.DEFAULT_FORM_STYLE),
                     Div(
                         HTML(
                             tags.help_button(
@@ -122,6 +122,6 @@ class PlayerForm(forms.Form):
             }
         )
 
-    platform = forms.ChoiceField(label="Platform", choices=constants.platform_choices)
+    platform = forms.ChoiceField(label="Platform", choices=constants.PLATFORM_CHOICES)
     player_name = forms.CharField(label="Name", max_length=16, min_length=3)
     valid = forms.BooleanField(required=False, label="", show_hidden_initial=True)  # Unused for now

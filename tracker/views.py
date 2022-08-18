@@ -61,7 +61,7 @@ async def create_ladder(request):
             player_form.data["valid"] = item[2]
             player_forms.append(player_form)
         if len(player_forms) < 2:
-            submitted_form.add_error(error="Must have at least 2 players in your ladder.")
+                submitted_form.add_error(error="Must have at least 2 players in your ladder.")
         if not submitted_form.is_valid() or not valid_player_forms:
             return render(request, "tracker/ladder_form.html", {"form": submitted_form, "player_forms": player_forms})
 
@@ -131,6 +131,7 @@ async def provisional_parse(request):
 @require_http_methods(["GET", "POST"])
 def ladder(request, ladder_id=0):
     """View that represents a ladder table."""
+    # FIXME:  mccabe: MC0001 / ladder is too complex (11)
     if request.htmx and ladder_id == 0:
         # If the request is HTMX, it comes from search.
         ladder_id = request.POST.get("search_input", None)

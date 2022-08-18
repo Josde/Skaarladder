@@ -3,7 +3,7 @@ from django.db import models
 from django.utils import timezone
 from pyot.utils.lol.routing import platform_to_region
 
-from tracker.utils.constants import platform_choices, rank_choices, region_choices, tier_choices
+from tracker.utils.constants import PLATFORM_CHOICES, RANK_CHOICES, REGION_CHOICES, TIER_CHOICES
 
 # Choices for ease of use on choice fields.
 # Could be stored in constants.py, but isn't done since usage is constrained to this file for now.
@@ -23,12 +23,12 @@ class Player(models.Model):
     puuid = models.CharField(max_length=100, default="")
     summoner_id = models.CharField(max_length=100, default="")
     account_id = models.CharField(max_length=100, default="")
-    region = models.CharField(max_length=10, default="europes", choices=region_choices)
-    platform = models.CharField(max_length=10, default="euw1", choices=platform_choices)
+    region = models.CharField(max_length=10, default="europes", choices=REGION_CHOICES)
+    platform = models.CharField(max_length=10, default="euw1", choices=PLATFORM_CHOICES)
     last_data_update = models.DateTimeField(default=timezone.now)
     # Ranked data
-    tier = models.CharField(max_length=100, default="UNRANKED", choices=tier_choices)
-    rank = models.CharField(max_length=5, default="NONE", choices=rank_choices)
+    tier = models.CharField(max_length=100, default="UNRANKED", choices=TIER_CHOICES)
+    rank = models.CharField(max_length=5, default="NONE", choices=RANK_CHOICES)
     lp = models.IntegerField(default=0, verbose_name="LP")
     wins = models.IntegerField(default=0)
     losses = models.IntegerField(default=0)
@@ -72,9 +72,9 @@ class Ladder_Player(models.Model):
     player_id = models.ForeignKey(Player, on_delete=models.CASCADE)
     ladder_id = models.ForeignKey(Ladder, on_delete=models.CASCADE)
     # Starting state and settings.
-    starting_rank = models.CharField(max_length=20, choices=rank_choices)
+    starting_rank = models.CharField(max_length=20, choices=RANK_CHOICES)
     starting_tier = models.CharField(
-        max_length=30, choices=tier_choices
+        max_length=30, choices=TIER_CHOICES
     )  # Doesn't use ChoiceField for now since this has to be updated programmatically.
     starting_lp = models.IntegerField()
     ignored = models.BooleanField(default=False)

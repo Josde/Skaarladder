@@ -2,7 +2,7 @@ from decouple import config
 
 # League of Legends
 
-tier_weights = {
+TIER_WEIGHTS = {
     "UNRANKED": 0,
     "IRON": 0,
     "BRONZE": 1,
@@ -15,7 +15,7 @@ tier_weights = {
     "CHALLENGER": 6,
 }
 
-rank_weights = {
+RANK_WEIGHTS = {
     "IV": 0,
     "III": 1,
     "II": 2,
@@ -24,7 +24,7 @@ rank_weights = {
 }
 
 # Maps riot platform names to OPGG URL
-riot_to_opgg_regions = {
+RIOT_TO_OPGG_REGIONS = {
     "BR1": "BR",
     "EUN1": "EUNE",
     "EUW1": "EUW",
@@ -40,7 +40,7 @@ riot_to_opgg_regions = {
 
 # Form choices
 
-platform_choices = [
+PLATFORM_CHOICES = [
     ("euw1", "EUW"),
     ("na1", "NA"),
     ("br1", "BR"),
@@ -54,13 +54,13 @@ platform_choices = [
     ("tr1", "TR"),
 ]
 
-region_choices = [
+REGION_CHOICES = [
     ("europe", "europe"),
     ("americas", "americas"),
     ("asia", "asia"),
 ]
 
-tier_choices = [
+TIER_CHOICES = [
     ("UNRANKED", "UNRANKED"),
     ("IRON", "IRON"),
     ("BRONZE", "BRONZE"),
@@ -72,7 +72,7 @@ tier_choices = [
     ("GRANDMASTER", "GRANDMASTER"),
     ("CHALLENGER", "CHALLENGER"),
 ]
-rank_choices = [("I", "I"), ("II", "II"), ("III", "III"), ("IV", "IV"), ("NONE", "NONE")]
+RANK_CHOICES = [("I", "I"), ("II", "II"), ("III", "III"), ("IV", "IV"), ("NONE", "NONE")]
 
 # Settings
 # Delays are in minutes
@@ -88,6 +88,6 @@ RELEASE_REPO = "Skaarladder"  # Name of the repo
 RELEASE_VERSION = "1.0-beta"
 # HTML Attrs
 
-red_text_style = "color:rgb(249,36,114);"
-green_text_style = "color:rgb(180, 210, 115);"
-default_form_style = "bg-neutral-900 text-white m-4 invalid:border-pink-500"
+RED_TEXT_STYLE = "color:rgb(249,36,114);"
+GREEN_TEXT_STYLE = "color:rgb(180, 210, 115);"
+DEFAULT_FORM_STYLE = "bg-neutral-900 text-white m-4 invalid:border-pink-500"

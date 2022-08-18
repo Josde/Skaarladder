@@ -97,7 +97,7 @@ class ApiUpdateHelper(abstract_update_helper.AbstractUpdateHelper):
             bool: True if won, False if lost.
         """
         teams = match_data.info.teams
-        for t in teams:
-            participant_ids = [p.puuid for p in t.participants]
+        for team in teams:
+            participant_ids = [p.puuid for p in team.participants]
             if player.puuid in participant_ids:  # Check the result for the team in which the player is in.
-                return t.win
+                return team.win

@@ -10,6 +10,7 @@ from tracker.updater import api_update_helper, test_update_helper, abstract_upda
 from tracker.utils.league import rank_to_lp
 from tracker.utils.misc import update_fields
 
+
 # We did queries outside of the helper functions to make it more testable.
 async def update(player_name: str, is_first_run: bool = False, test: bool = False):
     """Function that takes a player name and updates all of its information in the DB
