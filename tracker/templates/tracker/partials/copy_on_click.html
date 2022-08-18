@@ -1,0 +1,7 @@
+<a class={{ css_class }} _="on click writeText({{ content }}) into the navigator's clipboard 
+                        then set { style : 'display:inline'} on #copied
+                        then show #copied with *opacity 
+                        then wait 1s 
+                        then hide #copied with *opacity
+                        then wait 700ms
+                        then set { style : 'display:none'} on #copied">{{ content }}</a> <em class="hidden transition-all duration-700 ease-in-out opacity-0" id="copied">copied!</em>

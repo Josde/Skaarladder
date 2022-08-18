@@ -47,11 +47,9 @@ class LadderForm(forms.Form):
                     ),
                     Field("start_date", css_class=constants.DEFAULT_FORM_STYLE),
                     Field("end_date", css_class=constants.DEFAULT_FORM_STYLE),
-                    Div(
-                        HTML(
-                            tags.help_button(
-                                "If this box is ticked, whoever has the highest LPs wins. If not, the player who climbs the most from it's starting ELO will win."
-                            )
+                    Div(  # TODO: Change this to be is_relative. Makes more sense for absolute to be the default.
+                        HTML(  # TODO: Maybe this can be prettified. At least it works.
+                            "{% include 'tracker/partials/help_button.html' with help='If this box is ticked, whoever has the highest LPs wins. If not, the player who climbs the most from its starting ELO will win.' %}"
                         ),
                         Field(
                             "is_absolute",
