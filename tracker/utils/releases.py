@@ -12,7 +12,7 @@ async def check_releases():
     """Periodically check for updates. Will stop checking if an update is found at least once."""
     updates = False
     print("Checking if new releases exist...")
-    URL = "https://api.github.com/repos/{0}/{1}/releases/latest".format(constants.RELEASE_USER, constants.RELEASE_REPO)
+    URL = f"https://api.github.com/repos/{constants.RELEASE_USER}/{constants.RELEASE_REPO}/releases/latest"
     try:
         current_release = constants.RELEASE_VERSION
         async with aiohttp.ClientSession() as session:
@@ -20,13 +20,9 @@ async def check_releases():
                 content = await response.json()
                 new_release = content["tag_name"]
         if current_release != new_release:
-            RELEASE_URL = "https://github.com/{0}/{1}/releases/latest".format(
-                constants.RELEASE_USER, constants.RELEASE_REPO
-            )
-            message = """New version found. You are running {0} and {1} is available in GitHub.
-            Go to {2} to download the newest version.""".format(
-                current_release, new_release, RELEASE_URL
-            )
+            RELEASE_URL = f"https://github.com/{constants.RELEASE_USER}/{constants.RELEASE_REPO}/releases/latest"
+            message = f"""New version found. You are running {current_release} and {new_release} is available in GitHub.
+            Go to {RELEASE_URL} to download the newest version."""
             print(message)
             sentry_sdk.capture_message(message)
             updates = True

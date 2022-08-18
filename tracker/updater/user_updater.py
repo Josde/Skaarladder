@@ -5,7 +5,7 @@ from asgiref.sync import sync_to_async
 from django.utils import timezone
 import sentry_sdk
 
-from tracker.models import Ladder, Ladder_Player, Player
+from tracker.models import Ladder_Player, Player
 from tracker.updater import api_update_helper, test_update_helper, abstract_update_helper
 from tracker.utils.league import rank_to_lp
 from tracker.utils.misc import update_fields
@@ -50,9 +50,7 @@ async def update(player_name: str, is_first_run: bool = False, test: bool = Fals
             # Ladder_Player.objects.abulk_update(ladders, ["progress", "progress_delta"]) doesn't work idk why
     else:
         print(
-            "[{0} PlayerUpdater] Player has the same LP as last time, skipping ladder and streak updates...".format(
-                player_name
-            )
+            f"[{player_name} PlayerUpdater] Player has the same LP as last time, skipping ladder and streak updates..."
         )
         await sync_to_async(queried_player.save)()
 

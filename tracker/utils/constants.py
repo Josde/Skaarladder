@@ -2,7 +2,7 @@ from decouple import config
 
 # League of Legends
 
-tierWeights = {
+tier_weights = {
     "UNRANKED": 0,
     "IRON": 0,
     "BRONZE": 1,
@@ -15,7 +15,7 @@ tierWeights = {
     "CHALLENGER": 6,
 }
 
-rankWeights = {
+rank_weights = {
     "IV": 0,
     "III": 1,
     "II": 2,
@@ -24,7 +24,7 @@ rankWeights = {
 }
 
 # Maps riot platform names to OPGG URL
-riotToOPGGRegions = {
+riot_to_opgg_regions = {
     "BR1": "BR",
     "EUN1": "EUNE",
     "EUW1": "EUW",
@@ -40,7 +40,7 @@ riotToOPGGRegions = {
 
 # Form choices
 
-platformChoices = [
+platform_choices = [
     ("euw1", "EUW"),
     ("na1", "NA"),
     ("br1", "BR"),
@@ -54,13 +54,13 @@ platformChoices = [
     ("tr1", "TR"),
 ]
 
-regionChoices = [
+region_choices = [
     ("europe", "europe"),
     ("americas", "americas"),
     ("asia", "asia"),
 ]
 
-tierChoices = [
+tier_choices = [
     ("UNRANKED", "UNRANKED"),
     ("IRON", "IRON"),
     ("BRONZE", "BRONZE"),
@@ -72,7 +72,7 @@ tierChoices = [
     ("GRANDMASTER", "GRANDMASTER"),
     ("CHALLENGER", "CHALLENGER"),
 ]
-rankChoices = [("I", "I"), ("II", "II"), ("III", "III"), ("IV", "IV"), ("NONE", "NONE")]
+rank_choices = [("I", "I"), ("II", "II"), ("III", "III"), ("IV", "IV"), ("NONE", "NONE")]
 
 # Settings
 # Delays are in minutes

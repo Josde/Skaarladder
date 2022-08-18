@@ -13,6 +13,7 @@ def release_version():
     return constants.RELEASE_VERSION
 
 
+# FIXME: Maybe remake these two functions into views? Seems kind of a waste for subtemplates
 @register.simple_tag
 def copy_on_click(content: str, css_class: str = ""):
     """Tag that creates some HTML text that will be copied on click.

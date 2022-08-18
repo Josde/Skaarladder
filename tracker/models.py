@@ -3,7 +3,7 @@ from django.db import models
 from django.utils import timezone
 from pyot.utils.lol.routing import platform_to_region
 
-from tracker.utils.constants import platformChoices, rankChoices, regionChoices, tierChoices
+from tracker.utils.constants import platform_choices, rank_choices, region_choices, tier_choices
 
 # Choices for ease of use on choice fields.
 # Could be stored in constants.py, but isn't done since usage is constrained to this file for now.
@@ -23,12 +23,12 @@ class Player(models.Model):
     puuid = models.CharField(max_length=100, default="")
     summoner_id = models.CharField(max_length=100, default="")
     account_id = models.CharField(max_length=100, default="")
-    region = models.CharField(max_length=10, default="europes", choices=regionChoices)
-    platform = models.CharField(max_length=10, default="euw1", choices=platformChoices)
+    region = models.CharField(max_length=10, default="europes", choices=region_choices)
+    platform = models.CharField(max_length=10, default="euw1", choices=platform_choices)
     last_data_update = models.DateTimeField(default=timezone.now)
     # Ranked data
-    tier = models.CharField(max_length=100, default="UNRANKED", choices=tierChoices)
-    rank = models.CharField(max_length=5, default="NONE", choices=rankChoices)
+    tier = models.CharField(max_length=100, default="UNRANKED", choices=tier_choices)
+    rank = models.CharField(max_length=5, default="NONE", choices=rank_choices)
     lp = models.IntegerField(default=0, verbose_name="LP")
     wins = models.IntegerField(default=0)
     losses = models.IntegerField(default=0)
@@ -72,9 +72,9 @@ class Ladder_Player(models.Model):
     player_id = models.ForeignKey(Player, on_delete=models.CASCADE)
     ladder_id = models.ForeignKey(Ladder, on_delete=models.CASCADE)
     # Starting state and settings.
-    starting_rank = models.CharField(max_length=20, choices=rankChoices)
+    starting_rank = models.CharField(max_length=20, choices=rank_choices)
     starting_tier = models.CharField(
-        max_length=30, choices=tierChoices
+        max_length=30, choices=tier_choices
     )  # Doesn't use ChoiceField for now since this has to be updated programmatically.
     starting_lp = models.IntegerField()
     ignored = models.BooleanField(default=False)
@@ -84,7 +84,7 @@ class Ladder_Player(models.Model):
     last_update = models.DateTimeField(default=timezone.now)
 
     def __str__(self):  # For admin panel aesthetics
-        return "{0}-{1}".format(self.ladder_id.id, self.player_id.name)
+        return f"{self.ladder_id.id}-{self.player_id.name}"
 
     class Meta:
         indexes = [models.Index(fields=["player_id", "ladder_id"])]

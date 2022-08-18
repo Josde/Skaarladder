@@ -5,7 +5,8 @@ from asgiref.sync import sync_to_async, async_to_sync
 from django_rq import get_queue
 from rq.job import Dependency
 
-import tracker.utils.constants as constants
+from SoloQTracker.settings import DEBUG
+from tracker.utils import constants
 from tracker.utils.misc import async_wrapper
 from tracker.models import Ladder, Ladder_Player, Player
 from tracker.updater.user_updater import update
@@ -20,7 +21,7 @@ def enqueue_periodic():
     """
     queue = get_queue()
     jobs = [x.func for x in queue.jobs]
-    if periodic_update not in jobs and not (os.getenv("DEBUG", False)):
+    if periodic_update not in jobs and not DEBUG:
         queue.enqueue_in(time_delta=timedelta(minutes=constants.UPDATE_DELAY), func=periodic_update)
 
 
@@ -75,7 +76,7 @@ def create_ladder_job(
     players = []
     player_ladders = []
     for item in player_platform:
-        print("Searching player {0} {1}".format(item[0], item[1]))
+        print(f"Searching player {item[0]} {item[1]}")
         try:
             player = Player.objects.get(name=item[0], platform=item[1])
         except Player.DoesNotExist:
@@ -97,7 +98,6 @@ def create_ladder_job(
             player_ladders.append(player_ladder)
     for item in player_ladders:
         item.save()
-
 
     asyncio.run(async_wrapper(asyncio.gather, *tasks))
 

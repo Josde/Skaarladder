@@ -1,10 +1,10 @@
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Column, Div, Field, Fieldset, Layout, Row, Submit
+from crispy_forms.layout import Column, Div, Field, Fieldset, Layout, Row, Submit, HTML
 from django import forms
 from django.core.exceptions import ValidationError
 
 from tracker.utils import constants
-from tracker.utils.constants import platformChoices
+from tracker.templatetags import tags
 
 
 class DatePickerInput(forms.DateInput):
@@ -47,8 +47,16 @@ class LadderForm(forms.Form):
                     ),
                     Field("start_date", css_class=constants.default_form_style),
                     Field("end_date", css_class=constants.default_form_style),
-                    Field(
-                        "is_absolute",
+                    Div(
+                        HTML(
+                            tags.help_button(
+                                "If this box is ticked, whoever has the highest LPs wins. If not, the player who climbs the most from it's starting ELO will win."
+                            )
+                        ),
+                        Field(
+                            "is_absolute",
+                        ),
+                        css_class="inline",
                     ),
                     Field("ignore_unranked"),
                     Submit(
@@ -74,7 +82,7 @@ class PlayerForm(forms.Form):
 
     form_id = ""
 
-    def __init__(self, form_id="", *args, **kwargs):
+    def __init__(self, *args, form_id="", **kwargs):
         super().__init__(*args, **kwargs)
         self.form_id = form_id
         self.helper = FormHelper(self)
@@ -100,7 +108,7 @@ class PlayerForm(forms.Form):
                 "hx-trigger": "keyup delay:500ms changed",
                 "hx-swap": "innerhtml",
                 "form": "ladder_form",
-                "hx-target": "#results-{0}".format(self.form_id),
+                "hx-target": f"#results-{self.form_id}",
             }
         )
 
@@ -110,10 +118,10 @@ class PlayerForm(forms.Form):
                 "hx-trigger": "changed",
                 "hx-swap": "innerhtml",
                 "form": "ladder_form",
-                "hx-target": "#results-{0}".format(self.form_id),
+                "hx-target": f"#results-{self.form_id}",
             }
         )
 
-    platform = forms.ChoiceField(label="Platform", choices=platformChoices)
+    platform = forms.ChoiceField(label="Platform", choices=constants.platform_choices)
     player_name = forms.CharField(label="Name", max_length=16, min_length=3)
     valid = forms.BooleanField(required=False, label="", show_hidden_initial=True)  # Unused for now

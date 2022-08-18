@@ -16,9 +16,14 @@ def rank_to_lp(tier: str, rank: str, points: int) -> int:
         int: The full amount of LPs that it would take to get from IRON IV 0LP to the input.
             Please note that this ignores promos, since they don't affect LP.
     """
-    if (rank not in constants.rankWeights) or (tier not in constants.tierWeights):
+    LP = 0
+    # If error, we return 0LP silently.
+    if (rank not in constants.rank_weights) or (tier not in constants.tier_weights):
         return 0
+
     if tier in ["MASTER", "GRANDMASTER", "CHALLENGER"]:
-        return (constants.tierWeights[tier.upper()]) * 400 + int(points)
+        LP = (constants.tier_weights[tier.upper()]) * 400 + int(points)
     else:
-        return (constants.tierWeights[tier.upper()]) * 400 + (constants.rankWeights[rank.upper()]) * 100 + int(points)
+        LP = (constants.tier_weights[tier.upper()]) * 400 + (constants.rank_weights[rank.upper()]) * 100 + int(points)
+
+    return LP

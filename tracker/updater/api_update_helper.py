@@ -18,7 +18,7 @@ class ApiUpdateHelper(abstract_update_helper.AbstractUpdateHelper):
         Returns:
             dict: A dict containing the player data
         """
-        print("[{0} UserUpdater] Running player data update.".format(player.name))
+        print(f"[{player.name} UserUpdater] Running player data update.")
         res = await lol.Summoner(name=player.name, platform=player.platform).get()
         return res.dict()
 
@@ -31,7 +31,7 @@ class ApiUpdateHelper(abstract_update_helper.AbstractUpdateHelper):
         Returns:
             dict: A dict containing the ranked data
         """
-        print("[{0} UserUpdater] Running SoloQ data update.".format(player.name))
+        print(f"[{player.name} UserUpdater] Running SoloQ data update.")
         queue_data = await lol.SummonerLeague(player.summoner_id, platform=player.platform).get()
         soloq_dict = None
         for item in queue_data.entries:
@@ -49,7 +49,7 @@ class ApiUpdateHelper(abstract_update_helper.AbstractUpdateHelper):
         Returns:
             int: The amount of wins (positive) or losses (negative) the player has had in a row.
         """
-        print("[{0} UserUpdater] Running streak data update".format(player.name))
+        print(f"[{player.name} UserUpdater] Running streak data update")
         matches = []
         result = last_result = None
         streak = 0
@@ -99,8 +99,5 @@ class ApiUpdateHelper(abstract_update_helper.AbstractUpdateHelper):
         teams = match_data.info.teams
         for t in teams:
             participant_ids = [p.puuid for p in t.participants]
-            if player.puuid in participant_ids:
-                if t.win:
-                    return True
-                else:
-                    return False
+            if player.puuid in participant_ids:  # Check the result for the team in which the player is in.
+                return t.win

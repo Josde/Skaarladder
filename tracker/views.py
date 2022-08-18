@@ -136,7 +136,7 @@ def ladder(request, ladder_id=0):
         ladder_id = request.POST.get("search_input", None)
         if not ladder_id:
             return HttpResponseClientRedirect(reverse("error"))
-        return HttpResponseClientRedirect(reverse("ladder") + "{0}/".format(ladder_id))  # FIXME: Janky as fuck
+        return HttpResponseClientRedirect(reverse("ladder") + f"{ladder_id}/")  # FIXME: Janky as fuck
     # If request is not HTMX, we have to render a table.
     try:
         ladder_data = Ladder.objects.filter(id=ladder_id).first()
