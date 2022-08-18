@@ -25,22 +25,22 @@ def enqueue_periodic():
         queue.enqueue_in(time_delta=timedelta(minutes=constants.UPDATE_DELAY), func=periodic_update)
 
 
-async def periodic_update():
+def periodic_update():
     """Job that runs periodically and makes sure to run update() on all the players."""
     player_query = Player.objects.all().only("name")
-    queue = await sync_to_async(get_queue)()
+    queue = get_queue()
     jobs = []
-    async for player in player_query:
+    for player in player_query:
         jobs.append(queue.prepare_data(update, [player.name]))
     if jobs:  # only execute if there are jobs to be done, prevents a value errors
         # TODO: Maybe put a try / except here.
         with queue.connection.pipeline() as pipe:
-            enqueued_jobs = await sync_to_async(queue.enqueue_many)(jobs, pipeline=pipe)
-            await sync_to_async(pipe.execute)()
+            enqueued_jobs = queue.enqueue_many(jobs, pipeline=pipe)
+            pipe.execute()
         dependency = Dependency(jobs=enqueued_jobs)
-        await sync_to_async(queue.enqueue)(enqueue_periodic, depends_on=dependency)
+        queue.enqueue(enqueue_periodic, depends_on=dependency)
     else:
-        await sync_to_async(queue.enqueue)(enqueue_periodic)
+        queue.enqueue(enqueue_periodic)
 
 
 def create_ladder_job(
