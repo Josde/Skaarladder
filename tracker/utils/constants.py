@@ -82,13 +82,13 @@ PLAYER_DATA_UPDATE_DELAY = int(
     config("PLAYER_DATA_UPDATE_DELAY", 360)
 )  # Time between updates of user data (name, avatar...)
 RELEASE_CHECK = bool(config("RELEASE_CHECK", True))
-RELEASE_CHECK_DELAY = int(config("RELEASE_CHECK_DELAY", 3600))
+RELEASE_CHECK_DELAY = int(config("RELEASE_CHECK_DELAY", 1440))
 MAX_STREAK_LENGTH = 10  # Maximum number of matches that will be queried when checking for winstreaks. Making this higher will make hitting a ratelimit easier.
 # Obviously, change these two constants if you are forking the repo to make your own.
 
 RELEASE_USER = "Josde"  # User that uploaded this to github.
 RELEASE_REPO = "Skaarladder"  # Name of the repo
-RELEASE_VERSION = "1.0-beta"
+RELEASE_VERSION = "1.0-rc"
 # HTML Attrs
 
 RED_TEXT_STYLE = "color:rgb(249,36,114);"
