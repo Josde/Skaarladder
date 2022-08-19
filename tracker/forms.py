@@ -40,23 +40,38 @@ class LadderForm(forms.Form):
             Fieldset(
                 "Create a new ladder",
                 Column(
-                    Field(
-                        "name",
-                        css_class=constants.DEFAULT_FORM_STYLE,
-                        autocomplete="off",
-                    ),
-                    Field("start_date", css_class=constants.DEFAULT_FORM_STYLE),
-                    Field("end_date", css_class=constants.DEFAULT_FORM_STYLE),
-                    Div(  # TODO: Change this to be is_relative. Makes more sense for absolute to be the default.
-                        HTML(  # TODO: Maybe this can be prettified. At least it works.
-                            "{% include 'tracker/partials/help_button.html' with help='If this box is ticked, whoever has the highest LPs wins. If not, the player who climbs the most from its starting ELO will win.' %}"
+                    Div(
+                        Field(
+                            "name",
+                            css_class=constants.DEFAULT_FORM_STYLE,
+                            autocomplete="off",
                         ),
+                        css_class=constants.DEFAULT_CONTAINER_STYLE,
+                    ),
+                    Div(
+                        Field("start_date", css_class=constants.DEFAULT_FORM_STYLE),
+                        css_class=constants.DEFAULT_CONTAINER_STYLE,
+                    ),
+                    Div(
+                        Field("end_date", css_class=constants.DEFAULT_FORM_STYLE),
+                        css_class=constants.DEFAULT_CONTAINER_STYLE,
+                    ),
+                    Div(  # TODO: Change this to be is_relative. Makes more sense for absolute to be the default.
                         Field(
                             "is_absolute",
                         ),
-                        css_class="inline",
+                        HTML(  # TODO: Maybe this can be prettified. At least it works.
+                            "{% include 'tracker/partials/help_button.html' with help='If this box is ticked, whoever has the highest LPs wins. If not, the player who climbs the most from its starting ELO will win.' %}",
+                        ),
+                        css_class=constants.DEFAULT_CONTAINER_STYLE,
                     ),
-                    Field("ignore_unranked"),
+                    Div(
+                        Field("ignore_unranked"),
+                        HTML(  # TODO: Maybe this can be prettified. At least it works.
+                            "{% include 'tracker/partials/help_button.html' with help='If this box is ticked, unranked players will not show up.' %}"
+                        ),
+                        css_class=constants.DEFAULT_CONTAINER_STYLE,
+                    ),
                     Submit(
                         "Submit",
                         "Submit",
@@ -64,7 +79,7 @@ class LadderForm(forms.Form):
                     ),
                     css_class="m-4",
                 ),
-                css_class="flex flex-col text-white place-content-end items-end",
+                css_class="flex flex-col text-white",
             ),
         )
 

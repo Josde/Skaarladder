@@ -22,6 +22,7 @@ def enqueue_periodic():
     queue = get_queue()
     jobs = [x.func for x in queue.jobs]
     if periodic_update not in jobs and not DEBUG:
+        print(f"[enqueue_periodic] Enqueuing new update in {constants.UPDATE_DELAY} minutes.")
         queue.enqueue_in(time_delta=timedelta(minutes=constants.UPDATE_DELAY), func=periodic_update)
 
 

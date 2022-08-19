@@ -24,5 +24,5 @@ class TrackerConfig(AppConfig):
             ]  # Jobs that are currently enqueued, used to prevent queuing something that was already queued.
             if constants.RELEASE_CHECK and releases.check_releases not in jobs:
                 queue.enqueue(releases.check_releases)
-            if updater_jobs.periodic_update not in jobs and not DEBUG:
+            if updater_jobs.periodic_update not in jobs and not debug:
                 queue.enqueue(updater_jobs.periodic_update)

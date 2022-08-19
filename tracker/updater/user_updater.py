@@ -175,6 +175,12 @@ async def update_player_ladder_data(
     """
     async for item in ladders:
         ladder_details = item.ladder_id
+        now = timezone.now()
+        if ladder_details.end_date <= now or ladder_details.start_date >= now:
+            print(
+                f"[{queried_player.name} Updater] Found challenge {ladder_details.id} that hasn't started or already ended, skipping."
+            )
+            continue
         previous_progress = item.progress
         if queried_player.tier == "UNRANKED":
             item.starting_tier = "UNRANKED"

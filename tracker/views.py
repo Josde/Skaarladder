@@ -61,7 +61,7 @@ async def create_ladder(request):
             player_form.data["valid"] = item[2]
             player_forms.append(player_form)
         if len(player_forms) < 2:
-                submitted_form.add_error(error="Must have at least 2 players in your ladder.")
+            submitted_form.add_error(error="Must have at least 2 players in your ladder.")
         if not submitted_form.is_valid() or not valid_player_forms:
             return render(request, "tracker/ladder_form.html", {"form": submitted_form, "player_forms": player_forms})
 
@@ -169,12 +169,13 @@ def ladder(request, ladder_id=0):
         end_date = ladder_data.end_date
         ladder_name = ladder_data.name
         ladder_id = ladder_data.id
-        if right_now >= start_date:
+        if start_date <= right_now <= end_date:
             ladder_status = "Ongoing"
-        elif right_now >= end_date:
+        elif right_now <= start_date:
             ladder_status = "Scheduled"
         else:
             ladder_status = "Done"
+        print(f"Starts {start_date} ends {end_date} is {ladder_status}")
     except Ladder.DoesNotExist:
         messages.error(request, "404")
         traceback.print_exc()
