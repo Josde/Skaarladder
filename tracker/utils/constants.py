@@ -78,6 +78,9 @@ RANK_CHOICES = [("I", "I"), ("II", "II"), ("III", "III"), ("IV", "IV"), ("NONE",
 # Delays are in minutes
 
 UPDATE_DELAY = int(config("UPDATE_DELAY", 10))
+PLAYER_DATA_UPDATE_DELAY = int(
+    config("PLAYER_DATA_UPDATE_DELAY", 360)
+)  # Time between updates of user data (name, avatar...)
 RELEASE_CHECK = bool(config("RELEASE_CHECK", True))
 RELEASE_CHECK_DELAY = int(config("RELEASE_CHECK_DELAY", 3600))
 MAX_STREAK_LENGTH = 10  # Maximum number of matches that will be queried when checking for winstreaks. Making this higher will make hitting a ratelimit easier.
@@ -91,3 +94,4 @@ RELEASE_VERSION = "1.0-beta"
 RED_TEXT_STYLE = "color:rgb(249,36,114);"
 GREEN_TEXT_STYLE = "color:rgb(180, 210, 115);"
 DEFAULT_FORM_STYLE = "bg-neutral-900 text-white m-4 invalid:border-pink-500"
+DEFAULT_CONTAINER_STYLE = "flex flex-row md:flex-nowrap shrink"

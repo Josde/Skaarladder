@@ -18,8 +18,13 @@ class ApiUpdateHelper(abstract_update_helper.AbstractUpdateHelper):
         Returns:
             dict: A dict containing the player data
         """
-        print(f"[{player.name} UserUpdater] Running player data update.")
-        res = await lol.Summoner(name=player.name, platform=player.platform).get()
+
+        if not player.puuid:  # If player has no PUUID, search by name.
+            print(f"[{player.name} UserUpdater] Running player data update by name.")
+            res = await lol.Summoner(name=player.name, platform=player.platform).get()
+        else:
+            print(f"[{player.name} UserUpdater] Running player data update by PUUID.")
+            res = await lol.Summoner(puuid=player.puuid).get()
         return res.dict()
 
     async def get_player_ranked_data(self, player: Player) -> dict:
