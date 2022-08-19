@@ -131,12 +131,13 @@ async def provisional_parse(request):
 @require_http_methods(["GET", "POST"])
 def ladder(request, ladder_id=0):
     """View that represents a ladder table."""
+    # FIXME:  mccabe: MC0001 / ladder is too complex (11)
     if request.htmx and ladder_id == 0:
         # If the request is HTMX, it comes from search.
         ladder_id = request.POST.get("search_input", None)
         if not ladder_id:
             return HttpResponseClientRedirect(reverse("error"))
-        return HttpResponseClientRedirect(reverse("ladder") + "{0}/".format(ladder_id))  # FIXME: Janky as fuck
+        return HttpResponseClientRedirect(reverse("ladder") + f"{ladder_id}/")  # FIXME: Janky as fuck
     # If request is not HTMX, we have to render a table.
     try:
         ladder_data = Ladder.objects.filter(id=ladder_id).first()
@@ -168,12 +169,13 @@ def ladder(request, ladder_id=0):
         end_date = ladder_data.end_date
         ladder_name = ladder_data.name
         ladder_id = ladder_data.id
-        if right_now >= start_date:
+        if start_date <= right_now <= end_date:
             ladder_status = "Ongoing"
-        elif right_now >= end_date:
+        elif right_now <= start_date:
             ladder_status = "Scheduled"
         else:
             ladder_status = "Done"
+        print(f"Starts {start_date} ends {end_date} is {ladder_status}")
     except Ladder.DoesNotExist:
         messages.error(request, "404")
         traceback.print_exc()

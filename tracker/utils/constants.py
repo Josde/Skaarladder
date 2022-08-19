@@ -2,7 +2,7 @@ from decouple import config
 
 # League of Legends
 
-tierWeights = {
+TIER_WEIGHTS = {
     "UNRANKED": 0,
     "IRON": 0,
     "BRONZE": 1,
@@ -15,7 +15,7 @@ tierWeights = {
     "CHALLENGER": 6,
 }
 
-rankWeights = {
+RANK_WEIGHTS = {
     "IV": 0,
     "III": 1,
     "II": 2,
@@ -24,7 +24,7 @@ rankWeights = {
 }
 
 # Maps riot platform names to OPGG URL
-riotToOPGGRegions = {
+RIOT_TO_OPGG_REGIONS = {
     "BR1": "BR",
     "EUN1": "EUNE",
     "EUW1": "EUW",
@@ -40,7 +40,7 @@ riotToOPGGRegions = {
 
 # Form choices
 
-platformChoices = [
+PLATFORM_CHOICES = [
     ("euw1", "EUW"),
     ("na1", "NA"),
     ("br1", "BR"),
@@ -54,13 +54,13 @@ platformChoices = [
     ("tr1", "TR"),
 ]
 
-regionChoices = [
+REGION_CHOICES = [
     ("europe", "europe"),
     ("americas", "americas"),
     ("asia", "asia"),
 ]
 
-tierChoices = [
+TIER_CHOICES = [
     ("UNRANKED", "UNRANKED"),
     ("IRON", "IRON"),
     ("BRONZE", "BRONZE"),
@@ -72,22 +72,26 @@ tierChoices = [
     ("GRANDMASTER", "GRANDMASTER"),
     ("CHALLENGER", "CHALLENGER"),
 ]
-rankChoices = [("I", "I"), ("II", "II"), ("III", "III"), ("IV", "IV"), ("NONE", "NONE")]
+RANK_CHOICES = [("I", "I"), ("II", "II"), ("III", "III"), ("IV", "IV"), ("NONE", "NONE")]
 
 # Settings
 # Delays are in minutes
 
 UPDATE_DELAY = int(config("UPDATE_DELAY", 10))
+PLAYER_DATA_UPDATE_DELAY = int(
+    config("PLAYER_DATA_UPDATE_DELAY", 360)
+)  # Time between updates of user data (name, avatar...)
 RELEASE_CHECK = bool(config("RELEASE_CHECK", True))
-RELEASE_CHECK_DELAY = int(config("RELEASE_CHECK_DELAY", 3600))
+RELEASE_CHECK_DELAY = int(config("RELEASE_CHECK_DELAY", 1440))
 MAX_STREAK_LENGTH = 10  # Maximum number of matches that will be queried when checking for winstreaks. Making this higher will make hitting a ratelimit easier.
 # Obviously, change these two constants if you are forking the repo to make your own.
 
 RELEASE_USER = "Josde"  # User that uploaded this to github.
 RELEASE_REPO = "Skaarladder"  # Name of the repo
-
+RELEASE_VERSION = "1.0-rc"
 # HTML Attrs
 
-red_text_style = "color:rgb(249,36,114);"
-green_text_style = "color:rgb(180, 210, 115);"
-default_form_style = "bg-neutral-900 text-white m-4 invalid:border-pink-500"
+RED_TEXT_STYLE = "color:rgb(249,36,114);"
+GREEN_TEXT_STYLE = "color:rgb(180, 210, 115);"
+DEFAULT_FORM_STYLE = "bg-neutral-900 text-white m-4 invalid:border-pink-500 "
+DEFAULT_CONTAINER_STYLE = "block whitespace-nowrap"

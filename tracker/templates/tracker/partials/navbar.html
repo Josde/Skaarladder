@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<nav name="top_bar" class="sticky top-0 left-0 z-50 flex flex-row w-full h-8 grid-cols-4 text-white md:h-16 bg-neutral-900 drop-shadow-md" hx-headers={{ csrf_token }}>
+<nav name="top_bar" class="sticky top-0 left-0 z-50 flex flex-row w-full h-8 grid-cols-4 overflow-hidden text-white no-scrollbar md:h-16 bg-neutral-900 drop-shadow-md" hx-headers={{ csrf_token }}>
     
     
     <a class="btn btn-primary w-[33%] md:w-24 h-full" href="{% url 'index' %}">

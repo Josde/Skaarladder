@@ -5,10 +5,12 @@ from asgiref.sync import sync_to_async
 from django.utils import timezone
 import sentry_sdk
 
-from tracker.models import Ladder, Ladder_Player, Player
+from tracker.models import Ladder_Player, Player
 from tracker.updater import api_update_helper, test_update_helper, abstract_update_helper
 from tracker.utils.league import rank_to_lp
 from tracker.utils.misc import update_fields
+from tracker.utils import constants
+
 
 # We did queries outside of the helper functions to make it more testable.
 async def update(player_name: str, is_first_run: bool = False, test: bool = False):
@@ -29,13 +31,14 @@ async def update(player_name: str, is_first_run: bool = False, test: bool = Fals
     time_since_last_update = timezone.now() - queried_player.last_data_update
 
     previous_absolute_lp = queried_player.absolute_lp
-    if queried_player.puuid == "" or time_since_last_update.days >= 3:
+    if not queried_player.puuid or time_since_last_update.seconds // 3600 >= constants.PLAYER_DATA_UPDATE_DELAY:
+        # timedelta has no minutes attribute for some reason?? lmfao bdfl wtf
         # Parse user data (name, id, profile pic...)
         try:
             await update_player_data(queried_player, backend)
-        except Exception:  # same as below
-            return
-    if queried_player.puuid == "":  # invalid player
+        except Exception:
+            pass
+    if not queried_player.puuid:  # invalid player
         return
     # Create tasks, since we can do everything else asynchronously
     current_absolute_lp = await update_ranked_data(queried_player, backend)
@@ -50,9 +53,7 @@ async def update(player_name: str, is_first_run: bool = False, test: bool = Fals
             # Ladder_Player.objects.abulk_update(ladders, ["progress", "progress_delta"]) doesn't work idk why
     else:
         print(
-            "[{0} PlayerUpdater] Player has the same LP as last time, skipping ladder and streak updates...".format(
-                player_name
-            )
+            f"[{player_name} PlayerUpdater] Player has the same LP as last time, skipping ladder and streak updates..."
         )
         await sync_to_async(queried_player.save)()
 
@@ -176,6 +177,12 @@ async def update_player_ladder_data(
     """
     async for item in ladders:
         ladder_details = item.ladder_id
+        now = timezone.now()
+        if ladder_details.end_date <= now or ladder_details.start_date >= now:
+            print(
+                f"[{queried_player.name} Updater] Found challenge {ladder_details.id} that hasn't started or already ended, skipping."
+            )
+            continue
         previous_progress = item.progress
         if queried_player.tier == "UNRANKED":
             item.starting_tier = "UNRANKED"

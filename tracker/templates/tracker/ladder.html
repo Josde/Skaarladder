@@ -1,6 +1,7 @@
 {% load render_table from django_tables2 %}
 {% load static %}
 {% load cache %}
+{% load tags %}
 <!DOCTYPE html> 
 <html lang="en" data-color-scheme="dark" color-scheme="dark">
     <head>
@@ -23,11 +24,11 @@
             {% include 'tracker/partials/navbar.html' %}
             {% include "tracker/partials/modal_div.html" %}   
         {% endcache %}
-        <div class="flex items-center justify-center w-screen h-screen text-white bg-neutral-900 "> 
-            <div class="flex md:w-[64rem] h-full bg-neutral-800 text-white flex-col drop-shadow-xl overflow-auto overflow-x-hidden">
+        <div class="flex items-center justify-center w-screen h-screen text-white bg-neutral-800 "> 
+            <div class="flex md:w-[64rem] h-full bg-neutral-700 text-white flex-col drop-shadow-xl overflow-auto overflow-x-hidden">
                 <h1 id="title" class="m-4 text-4xl font-bold text-center text-white shadow-sm md:m-8 md:pt-16 font-bebas">{{ ladder_name }}</h1>
                 <div class='flex flex-col justify-end'>
-                    <span class="text-center">The code to access this ladder is: <strong>{{  ladder_id }}</strong></span>
+                    <span class="text-lg text-center">Use this code to access the ladder: {% include 'tracker/partials/copy_on_click.html' with content=ladder_id css_class='font-bold' %}</span>
                     <span class="text-center">The ladder is currently: <strong>{{  ladder_status }}</strong></span>
                     {% if ladder_status == "Ongoing" %}
                     <span class="text-center">Ends on <strong>{{ end_date }}</strong></span>

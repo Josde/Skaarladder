@@ -19,9 +19,10 @@ Configure the following config vars or put them in a .env file in the project ro
   - SENTRY: Set to any value if you want to use Sentry
     - SENTRY_DSN: Your sentry URL
     - RQ_SENTRY_DSN: Optional unless you want to use a different Sentry endpoint. Used only for RQ jobs. (default: same as SENTRY_DSN)
-  - UPDATE_DELAY = The delay between updates, in minutes (default: 10)
+  - UPDATE_DELAY: The delay between updates, in minutes (default: 10)
+  - PLAYER_DATA_UPDATE_DELAY: The delay between checks for player name changes, region changes, etc. (default: 360, meaning 6 hours)
   - RELEASE_CHECK: Set to any value if you want to check for releases. If releases are found, you will be notified through Sentry and the console.
-  - RELEASE_CHECK_DELAY = The delay between update checks, in minutes (default: 3600)
+  - RELEASE_CHECK_DELAY = The delay between update checks, in minutes (default: 1440, meaning 1 day)
 
 # Deploying through Heroku
 After completing the previous step, go into Heroku bash and run:  

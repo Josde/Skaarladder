@@ -3,12 +3,12 @@
 {% load crispy_forms_tags %}
 <!DOCTYPE html>
 <div class="flex flex-col">
-        <div class="flex flex-row m-4 transition-all duration-300 ease-in-out" hx-indicator="#player_loading-{{ form_id }}" >
+        <div class="flex flex-row m-2 transition-all duration-300 ease-in-out" hx-indicator="#player_loading-{{ form_id }}" >
             {% csrf_token %}
             {% crispy form form.helper %}
         </div>
-        <span id="player_loading-{{ form_id }}" class="m-4 loader htmx-indicator place-self-center"></span>
-        <div id='results-{{ form_id }}' class="visible inline text-white transition-all duration-300 ease-in-out">
+        <span name="loader" id="player_loading-{{ form_id }}" class="self-center m-2 loader htmx-indicator"></span>
+        <div id='results-{{ form_id }}' class="inline text-white transition-all duration-300 ease-in-out place-self-center">
             <!-- player data gets added here programmatically through htmx on finishing an input on the form-->
         </div>
 

@@ -1,23 +1,23 @@
-from abc import ABC, abstractclassmethod
+from abc import ABC, abstractmethod
 
 
 class AbstractUpdateHelper(ABC):
-    @abstractclassmethod
+    @abstractmethod
     async def get_player_data(self, player):
         pass
 
-    @abstractclassmethod
+    @abstractmethod
     async def get_player_ranked_data(self, player):
         pass
 
-    @abstractclassmethod
+    @abstractmethod
     async def get_streak_data(self, player):
         pass
 
-    @abstractclassmethod
+    @abstractmethod
     async def get_match_history_details(self, player, count, queue):
         pass
 
-    @abstractclassmethod
+    @abstractmethod
     async def get_match_result(self, player, match_data):
         pass

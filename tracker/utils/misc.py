@@ -1,3 +1,6 @@
+from typing import Coroutine
+
+
 def update_fields(obj: object, data_dict: dict, data_to_obj_fields: dict = None):
     """Function that uses setattr to mass update fields in an object. i.e instead of calling things like
     player.name = ...
@@ -25,3 +28,16 @@ def update_fields(obj: object, data_dict: dict, data_to_obj_fields: dict = None)
         else:
             print("Couldn't find dict field {0} or object field {1}", field, data_to_obj_fields[field])
             raise KeyError
+
+
+async def async_wrapper(func: Coroutine, *args, **kwargs):
+    """Function that wraps and awaits an awaitable function.
+    Mostly used so I can do asyncio.run() of things like asyncio.gather() in sync functions.
+
+    Args:
+        func (Coroutine): The async function to await.
+
+    Returns:
+        _type_: Whatever that function returns.
+    """
+    return await func(*args, **kwargs)
