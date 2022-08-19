@@ -18,12 +18,12 @@ def rank_to_lp(tier: str, rank: str, points: int) -> int:
     """
     lp = 0
     # If error, we return 0LP silently.
-    if (rank not in constants.RANK_WEIGHTS) or (tier not in constants.TIER_CHOICES):
+    if (rank not in constants.RANK_WEIGHTS.keys()) or (tier not in constants.TIER_WEIGHTS.keys()):
         return 0
 
     if tier in ["MASTER", "GRANDMASTER", "CHALLENGER"]:
-        lp = (constants.TIER_CHOICES[tier.upper()]) * 400 + int(points)
+        lp = (constants.TIER_WEIGHTS[tier.upper()]) * 400 + int(points)
     else:
-        lp = (constants.TIER_CHOICES[tier.upper()]) * 400 + (constants.RANK_WEIGHTS[rank.upper()]) * 100 + int(points)
+        lp = (constants.TIER_WEIGHTS[tier.upper()]) * 400 + (constants.RANK_WEIGHTS[rank.upper()]) * 100 + int(points)
 
     return lp
