@@ -12,9 +12,24 @@ select {
   max-width: 60% !important;
 }
 
+/* Forms looking like trash in dark mode */
 input[type=text] {
   background-color: #171717 !important;
+  display: inline !important;
 }
+
+input[type="checkbox"] {
+  background-color: #171717 !important;
+  border-color: #f5f5f5 !important;
+}
+
+/* Crispy forms rendering in a div that can't be styled */
+
+label {
+  display: inline !important;
+  margin-right: 1rem !important;
+}
+
 
 .fill-current.h-4.w-4 {
   /* Fixes the ugly uncentered arrow left in select by crispy-tailwind that can't be styled */

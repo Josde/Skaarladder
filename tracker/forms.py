@@ -57,20 +57,19 @@ class LadderForm(forms.Form):
                         css_class=constants.DEFAULT_CONTAINER_STYLE,
                     ),
                     Div(  # TODO: Change this to be is_relative. Makes more sense for absolute to be the default.
-                        Field(
-                            "is_absolute",
-                        ),
+                        # TODO: Use css_class on checkbox, we style it in bugfix.css rn
+                        Field("is_absolute"),
                         HTML(  # TODO: Maybe this can be prettified. At least it works.
                             "{% include 'tracker/partials/help_button.html' with help='If this box is ticked, whoever has the highest LPs wins. If not, the player who climbs the most from its starting ELO will win.' %}",
                         ),
-                        css_class=constants.DEFAULT_CONTAINER_STYLE,
+                        css_class="flex flex-row",
                     ),
                     Div(
                         Field("ignore_unranked"),
                         HTML(  # TODO: Maybe this can be prettified. At least it works.
                             "{% include 'tracker/partials/help_button.html' with help='If this box is ticked, unranked players will not show up.' %}"
                         ),
-                        css_class=constants.DEFAULT_CONTAINER_STYLE,
+                        css_class="flex flex-row",
                     ),
                     Submit(
                         "Submit",
@@ -79,7 +78,6 @@ class LadderForm(forms.Form):
                     ),
                     css_class="m-4",
                 ),
-                css_class="flex flex-col text-white",
             ),
         )
 

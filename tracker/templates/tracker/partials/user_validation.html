@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 {% if exists %}
-<em class="inline font-mono text-sm text-white">
+<span nowrap class="inline-block font-mono text-sm text-white">
     Player 
-    <img alt="Profile picture" class="inline w-12 h-12" onerror="this.style.display='none'" src="https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/{{ player.avatar_id }}.jpg"> </img>
-    {{ player.name }} <span class="text-green-400"> exists in</span> {{ player.platform }}</em>
+    &nbsp;<img alt="Profile picture" class="inline w-12 h-12" onerror="this.style.display='none'" src="https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/{{ player.avatar_id }}.jpg"> </img>
+    &nbsp;{{ player.name }} <a nowrap class="text-green-400">&nbsp;exists in&nbsp;</a> {{ player.platform }}</span>
 {% else %}
-<span class="inline font-mono text-sm text-white">
-    Player {{ player.name }} <span class="text-red-400"> does not exist in </span> {{ player.platform }}</span>
+<span nowrap class="inline-block font-mono text-sm text-white ">
+    Player {{ player.name }} <a class="text-red-400">&nbsp;does not exist in&nbsp;</a> {{ player.platform }} {% include 'tracker/partials/help_button.html' with help="This is not always correct, so if you know the player exists, go ahead!"%}</span> 
 {% endif %}

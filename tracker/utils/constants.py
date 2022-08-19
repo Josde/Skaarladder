@@ -93,5 +93,5 @@ RELEASE_VERSION = "1.0-beta"
 
 RED_TEXT_STYLE = "color:rgb(249,36,114);"
 GREEN_TEXT_STYLE = "color:rgb(180, 210, 115);"
-DEFAULT_FORM_STYLE = "bg-neutral-900 text-white m-4 invalid:border-pink-500"
-DEFAULT_CONTAINER_STYLE = "flex flex-row md:flex-nowrap shrink"
+DEFAULT_FORM_STYLE = "bg-neutral-900 text-white m-4 invalid:border-pink-500 "
+DEFAULT_CONTAINER_STYLE = "block whitespace-nowrap"
