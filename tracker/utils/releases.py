@@ -8,6 +8,7 @@ from datetime import timedelta
 
 async def check_releases():
     """Periodically check for updates. Will stop checking if an update is found at least once."""
+    # FIXME: This hits ratelimit for some reason
     updates = False
     print("Checking if new releases exist...")
     url = f"https://api.github.com/repos/{constants.RELEASE_USER}/{constants.RELEASE_REPO}/releases/latest"
@@ -30,8 +31,10 @@ async def check_releases():
         sentry_sdk.capture_exception(err)
         traceback.print_exc()
 
-    if not updates:  # Stop checking for updates if we know they are availab.e.
-        queue = get_queue("low")
+    queue = get_queue("low")
+    jobs = [x.func for x in queue.jobs]
+    # Stop checking for updates if we know they are available. Also never enqueue multiple times, which may cause issues when restarting the server such as in Heroku.
+    if not updates and check_releases not in jobs:
         queue.enqueue_in(
             time_delta=timedelta(minutes=constants.RELEASE_CHECK_DELAY),
             func=check_releases,

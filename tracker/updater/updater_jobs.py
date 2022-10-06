@@ -24,6 +24,7 @@ def enqueue_periodic():
     if periodic_update not in jobs and not DEBUG:
         print(f"[enqueue_periodic] Enqueuing new update in {constants.UPDATE_DELAY} minutes.")
         queue.enqueue_in(time_delta=timedelta(minutes=constants.UPDATE_DELAY), func=periodic_update)
+        # FIXME: for some reason this makes the job execute 5-6 minutes later on heroku rather than 10. cause is unknown
 
 
 def periodic_update():

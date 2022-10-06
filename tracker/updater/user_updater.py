@@ -4,6 +4,7 @@ from typing import List, Optional
 from asgiref.sync import sync_to_async
 from django.utils import timezone
 import sentry_sdk
+from pyot.core.exceptions import NotFound
 
 from tracker.models import Ladder_Player, Player
 from tracker.updater import api_update_helper, test_update_helper, abstract_update_helper
@@ -84,7 +85,8 @@ async def update_player_data(queried_player: Player, backend: abstract_update_he
                 "last_data_update": "last_data_update",
             },
         )
-
+    except NotFound:  # TODO: This makes the code more coupled, should look into another way of catching this exact exception.
+        print(f"Player {queried_player.name} could not be found.")
     except Exception as err:
         sentry_sdk.capture_exception(err)
         traceback.print_exc()

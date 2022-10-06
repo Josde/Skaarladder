@@ -142,9 +142,9 @@ def ladder(request, ladder_id=0):
     try:
         ladder_data = Ladder.objects.filter(id=ladder_id).first()
         if ladder_data.is_absolute:
-            order = "-player_id__absolute_lp"
+            order = ("-player_id__absolute_lp")
         else:
-            order = "-progress", "-player_id__absolute_lp"
+            order = ("-progress", "-player_id__absolute_lp")
         if ladder_data.ignore_unranked:
             player_query = (
                 Ladder_Player.objects.filter(ladder_id=ladder_id)
@@ -198,6 +198,11 @@ def ladder_loading(request, job_id):
     """Temporal loading page while a Challenge is created. The template is reloaded every three seconds."""
     queue = get_queue("high")
     job = queue.fetch_job(job_id)
+
+    if not job:
+        messages.error(request, "404")
+        return redirect(reverse("error"))
+
     if job.is_finished:
         ladder_id = job.result
         return redirect("ladder", ladder_id=ladder_id)
