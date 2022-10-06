@@ -142,9 +142,9 @@ def ladder(request, ladder_id=0):
     try:
         ladder_data = Ladder.objects.filter(id=ladder_id).first()
         if ladder_data.is_absolute:
-            order = "-player_id__absolute_lp"
+            order = ["-player_id__absolute_lp"]
         else:
-            order = "-progress"
+            order = ["-progress", "-player_id__absolute_lp"]
         if ladder_data.ignore_unranked:
             player_query = (
                 Ladder_Player.objects.filter(ladder_id=ladder_id)
