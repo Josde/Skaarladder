@@ -32,7 +32,7 @@ async def update(player_name: str, is_first_run: bool = False, test: bool = Fals
     time_since_last_update = timezone.now() - queried_player.last_data_update
 
     previous_absolute_lp = queried_player.absolute_lp
-    if not queried_player.puuid or time_since_last_update.seconds // 3600 >= constants.PLAYER_DATA_UPDATE_DELAY:
+    if not queried_player.puuid or time_since_last_update.total_seconds // 3600 >= constants.PLAYER_DATA_UPDATE_DELAY:
         # timedelta has no minutes attribute for some reason?? lmfao bdfl wtf
         # Parse user data (name, id, profile pic...)
         try:
