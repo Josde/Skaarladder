@@ -32,6 +32,7 @@ class LadderTable(tables.Table):
         platform = "EUW1"  # default
         player_name = "" + value
         player_name = player_name.strip()
+        avatar_id = 1
         try:
             player = Player.objects.get(name=player_name)
             platform = player.platform
