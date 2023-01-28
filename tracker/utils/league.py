@@ -17,7 +17,7 @@ def rank_to_lp(tier: str, rank: str, points: int) -> int:
             Please note that this ignores promos, since they don't affect LP.
     """
     sanitized_rank = rank.upper().strip()
-    sanitized_tier = rank.upper().strip()
+    sanitized_tier = tier.upper().strip()
     # If error, we return 0LP silently.
     if (sanitized_rank not in constants.RANK_WEIGHTS.keys()) or (sanitized_tier not in constants.TIER_WEIGHTS.keys()):
         return 0
