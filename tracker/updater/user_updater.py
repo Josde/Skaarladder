@@ -23,7 +23,7 @@ async def update(player_name: str, is_first_run: bool = False, test: bool = Fals
         test (bool, optional): Currently unused. Makes the backend be a TestUpdateHelper (kind of unimplemented rn). Defaults to False.
     """
     # Prettify this function.
-    current_absolute_lp = previous_absolute_lp = 0
+    previous_absolute_lp = 0
     queried_player = await Player.objects.all().aget(name=player_name)
     if test:
         backend = test_update_helper.TestUpdateHelper()
@@ -32,7 +32,7 @@ async def update(player_name: str, is_first_run: bool = False, test: bool = Fals
     time_since_last_update = timezone.now() - queried_player.last_data_update
 
     previous_absolute_lp = queried_player.absolute_lp
-    if not queried_player.puuid or time_since_last_update.total_seconds // 3600 >= constants.PLAYER_DATA_UPDATE_DELAY:
+    if not queried_player.puuid or int(time_since_last_update.total_seconds()) // 3600 >= constants.PLAYER_DATA_UPDATE_DELAY:
         # timedelta has no minutes attribute for some reason?? lmfao bdfl wtf
         # Parse user data (name, id, profile pic...)
         try:
@@ -124,6 +124,7 @@ async def update_ranked_data(queried_player: Player, backend: abstract_update_he
             }
 
         else:
+            current_absolute_lp = 0
             complete_ranked_data = {
                 "wins": 0,
                 "losses": 0,
@@ -134,7 +135,7 @@ async def update_ranked_data(queried_player: Player, backend: abstract_update_he
                 "last_ranked_update": timezone.now(),
                 "absolute_lp": 0,
             }
-            current_absolute_lp = 0
+            
 
         await sync_to_async(update_fields)(queried_player, complete_ranked_data)
         return current_absolute_lp
