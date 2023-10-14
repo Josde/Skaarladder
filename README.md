@@ -4,6 +4,9 @@
 # Skaarladder
 Skaarladder is an open-source ladder creation web app for League of Legends. It allows you to create ladders and compete with your friends to see who can climb higher on SoloQ.
 
+![image](https://github.com/Josde/Skaarladder/assets/3825181/96dc807e-47ba-4a89-bfd4-fc2e4f35d0a2)
+![image](https://github.com/Josde/Skaarladder/assets/3825181/89812878-62d1-493e-9a16-bb39b302fa89)
+
 ## Deploying basics
 Modify ALLOWED_HOSTS in settings.py to your domain of choice.  
 Configure the following config vars or put them in a .env file in the project root:
